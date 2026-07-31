@@ -487,9 +487,140 @@ def subtract_casualties(fleet: FleetRecord, losses: dict):
 
 ---
 
-## Phase 4: Fleet Management
+## Phase 3.5: Galaxy Generation
 
 **Duration**: Weeks 7-8
+
+**Source files**: NEWGAME.PAS (2042 lines), DFA.PAS (170 lines)
+
+> Numbered 3.5 rather than inserted as a new Phase 4 so the existing phase
+> numbers, and the references to them in CLAUDE.md and the commit history,
+> stay valid.
+
+Originally unscheduled. Without it nothing populates a galaxy, so every phase
+from here on is exercised against worlds placed by hand. It sits after Phase 3
+because it needs the finished world model (designation, industry, trillum
+reserves) and nothing later: it creates fleets nowhere, and seeds NPE records
+without needing AI behaviour.
+
+### 3.5.0 What NEWGAME.PAS actually is
+
+**It is a scenario-file interpreter, not a procedural generator.** It reads a
+`*.SCN` text file and executes directives that build the universe. There is no
+code path that generates a galaxy without one — `LoadScenario` is the only
+entry point, and `StartNewGame` just picks a file.
+
+Two consequences shape this phase:
+
+1. **No `.SCN` files exist in this repo.** `original/` holds only source, the
+   compiled overlay and the changelog. The same is true of `ANACREON.HLP` and
+   `ANACREON.CNF`. Porting the interpreter alone therefore yields a parser
+   with nothing to parse.
+2. **The format is fully recoverable from the parser.** Every directive,
+   argument order and version shim is readable in NEWGAME.PAS, so scenarios
+   can be authored even though the originals are lost.
+
+**Resolution**: port the interpreter faithfully, then author a starter
+scenario against the recovered format. Mark authored scenarios clearly as new
+content — they are *not* ports, and cannot reproduce the original shipped
+galaxies.
+
+### 3.5.1 Scenario tokenizer (utils/dfa.py)
+
+**Source files**: DFA.PAS
+
+`DFA1NextToken` and `DFANextInteger`, the token reader every directive is
+built on. Small and self-contained; do it first.
+
+### 3.5.2 Scenario file format (scena.py)
+
+Header line carries a version — `Copy(Vers,10,2)` — followed by seed,
+min/max players, galaxy size, planet count, difficulty, min/max length and
+first year.
+
+**The version shims are not optional.** The parser branches on `ScenaVersion`
+in several places, e.g.
+
+```pascal
+IF ScenaVersion >= 12 THEN TriRes := NextInteger(SF) ELSE TriRes := 100;
+IF (ScenaVersion < 14) AND (C >= 20) THEN Inc(C);  { class shifted when
+                                                     Terraforming was added }
+```
+
+Authored scenarios should declare the current version so the shims stay dead,
+but the shims still need porting — they document how the format evolved.
+
+### 3.5.3 Directive dispatch (newgame.py)
+
+The commands `LoadScenario` recognises:
+
+| Directive | Effect |
+|---|---|
+| `CLASSTABLE`, `TECHTABLE` | Weighted tables for random world generation |
+| `SETTRILLUMRESERVES` | Regional trillum baseline |
+| `DEFINEZONE`, `DEFINEXY` | Named rectangles and points to place things in |
+| `CREATEWORLD` | One world, fully specified |
+| `CREATERANDOMWORLDS` | N worlds rolled against the class/tech tables |
+| `CREATESTARBASE`, `CREATESTARGATE` | One base or gate |
+| `CREATEPLAYEREMPIRE`, `CREATENPEMPIRE` | Empire records, capital, modifiers |
+| `RANDOMIZEPLAYERS` | Shuffle players across empire slots |
+| `CREATENEBULA`, `CREATERANDOMNEBULA` | Nebula bands and patches |
+| `CREATESRMS` | Pre-placed minefields |
+| `BEGINDESCRIPTION`, `REPORT`, `PAUSE`, `DEBUGSCENARIO` | Text and debugging |
+| `ENDSCENARIO` | Terminator |
+
+Supporting generators: `SetUpWorld`, `CreateRndPlanet`, `RndShips`,
+`RndCargo`, `RndDefns`, `RandomTrillumReserves`, `GetRandomXY`,
+`GetNextXY`, `GetRandomRange`.
+
+**Out of scope — dead in the original.** `BEGINARTIFACTS`,
+`BEGINTRANSACTIONS` and `BEGINVICTORYCONDITIONS` are commented out of the
+dispatch in v2.0, so `CodeCompiler`, `DefineNewArtifact`, `CreateNewArtifact`
+and `DefineNewTransaction` are unreachable. This is also why `cdetypes.py`
+(already ported) has no caller. Leave them unported unless artifacts are
+revived; note it rather than quietly implementing dead code.
+
+### 3.5.4 Reproducibility decision
+
+A scenario carries a `Seed`: non-zero sets `RandSeed`, zero calls
+`Randomize`. A fixed seed is meant to produce the same galaxy every run.
+
+Python's `random` will not match Turbo Pascal's generator, so seeded
+scenarios will diverge from what the original produced. Decide explicitly:
+
+- **(a)** Implement Turbo Pascal's LCG in `utils/pascal.py` and route the
+  ported `Rnd`/`RndVar` through it. Verify the exact recurrence and word size
+  against the original before relying on it. Only this gives galaxies
+  identical to the DOS build.
+- **(b)** Accept divergence. Seeds stay reproducible *within* this port, which
+  is all an authored scenario needs.
+
+**(b) is sufficient** given the original scenarios are lost — there is nothing
+to reproduce. Prefer (a) only if a `.SCN` file surfaces later.
+
+### 3.5.5 Retire the stopgap
+
+`main.place_world` was written to give Phase 3 something to run on and is not
+a port of anything. Once `CREATEWORLD` works, move the tests onto real
+scenario loading and delete it.
+
+### 3.5.6 Deferred to Phase 8
+
+The interactive front end needs the UI: `StartNewGame`, `GetScenarios` (the
+`*.SCN` directory menu), `ScenarioIntroduction` (paged intro text),
+`InputEmpireName` and `SuggestionsWindow`, `Pause`, `CheckSum` (a demo-build
+anti-tamper check on shipped scenarios; likely pointless here). Until then,
+load a scenario by path from the command line.
+
+**Milestone 3.5**: A scenario file loads into a populated galaxy — worlds,
+empires with capitals, nebulae and minefields — and the Phase 3 economy runs
+against it for 50 years without hand-placed worlds.
+
+---
+
+## Phase 4: Fleet Management
+
+**Duration**: Weeks 9-10
 
 ### 4.1 Fleet operations (fleet.py)
 
@@ -603,7 +734,7 @@ def compile_orders(fleet: FleetRecord, orders: list[Order]):
 
 ## Phase 5: Combat System
 
-**Duration**: Weeks 9-10
+**Duration**: Weeks 11-12
 
 ### 5.1 Combat resolution (attack.py)
 
@@ -682,7 +813,7 @@ def calculate_battle_outcome(attacker, defender) -> str:
 
 ## Phase 6: Construction & Advanced Features
 
-**Duration**: Weeks 11-12
+**Duration**: Weeks 13-14
 
 ### 6.1 Construction system (constr.py)
 
@@ -772,7 +903,7 @@ def link_frequencies(game: GameEnvironment, empire: Empire, gate_id: int, freque
 
 ## Phase 7: AI System (NPE)
 
-**Duration**: Weeks 13-16
+**Duration**: Weeks 15-18
 
 ### 7.1 AI core (npe/core.py)
 
@@ -851,7 +982,7 @@ def update_state_department(game: GameEnvironment, empire: Empire, other_empire:
 
 ## Phase 8: Polish & Complete UI
 
-**Duration**: Weeks 17-20
+**Duration**: Weeks 19-22
 
 ### 8.1 Complete map features
 
@@ -902,13 +1033,22 @@ def auto_backup(game: GameEnvironment):
     pass
 ```
 
-### 8.5 Scenario support
+### 8.5 Scenario front end
 
-**Source files**: SCENA.PAS, CODE.PAS, ARTIFACT.PAS
+**Source files**: NEWGAME.PAS (interactive parts), SCENA.PAS
 
-- Scenario file format parser
-- Scenario scripting engine
-- Pre-defined scenarios
+The parser and universe generation are Phase 3.5 — this is only the UI around
+them, listed in §3.5.6:
+
+- Scenario selection menu (`GetScenarios`, scans a directory for `*.SCN`)
+- Paged scenario introduction text (`ScenarioIntroduction`)
+- Empire naming, with the suggestions window (`InputEmpireName`)
+- New-game flow (`StartNewGame`)
+
+**Not planned**: the artifact and transaction scripting engine (CODE.PAS,
+ARTIFACT.PAS, CDETYPES.PAS). Its directives are commented out of the scenario
+dispatch in v2.0, so it is unreachable dead code — see §3.5.3. Reviving it is
+a feature decision, not a porting task.
 
 **Milestone 8**: Full game experience matching original Anacreon.
 
@@ -916,7 +1056,7 @@ def auto_backup(game: GameEnvironment):
 
 ## Phase 9: Testing & Validation
 
-**Duration**: Weeks 21-24
+**Duration**: Weeks 23-26
 
 ### 9.1 Unit tests
 
@@ -972,6 +1112,11 @@ def test_save_load_round_trip():
 - Compare tech advancement rates
 - Play-test scenarios to ensure game balance matches
 
+Note the ceiling on this: the original `.SCN` files are not in the repo (see
+§3.5.0), so validation runs against authored scenarios. Balance can be checked
+for self-consistency and against the Pascal formulas, but not replayed against
+the galaxies the original shipped.
+
 **Milestone 9**: All tests pass, game validated against original.
 
 ---
@@ -986,4 +1131,5 @@ This phased approach ensures:
 4. **Risk mitigation** - Complex systems (combat, AI) tackled after foundation is solid
 5. **Maintainability** - Code structure mirrors original for easy reference
 
-Total estimated time: **24 weeks** for complete implementation.
+Total estimated time: **26 weeks** for complete implementation — 24 as
+originally scoped, plus the two weeks for Phase 3.5, which was missing.

@@ -28,7 +28,7 @@ Detailed module breakdown and file mappings from Pascal source to Python impleme
 Phased implementation roadmap with clear milestones and deliverables.
 
 **Contents:**
-- 9 implementation phases
+- 10 implementation phases (1-9, plus 3.5 for galaxy generation)
 - Week-by-week timeline
 - Code examples for each phase
 - Milestone definitions
@@ -72,11 +72,14 @@ the world economy is ported: `update.py` (UPDATE.PAS), `design.py`,
 `resource.py`, `news.py` and `intrface.py`. Worlds produce resources, grow
 and starve, advance and regress in tech, and rebel.
 
-**Next Steps**: Begin Phase 4 - Fleet management.
-
-**Unscheduled work**: NEWGAME.PAS (galaxy generation) is not covered by any
-phase in this plan. Until it is ported nothing populates a galaxy, and
+**Next Steps**: Begin Phase 3.5 - Galaxy generation (NEWGAME.PAS). This must
+come before Phase 4: until it is ported nothing populates a galaxy, and
 worlds have to be placed by hand.
+
+**Known gap**: the original `*.SCN` scenario files are not in this repo, and
+NEWGAME.PAS is a scenario interpreter rather than a procedural generator. The
+file format is recoverable from the parser, so scenarios can be authored, but
+the galaxies the original shipped cannot be reproduced. See Phase 3.5.0.
 
 ## Contributing
 

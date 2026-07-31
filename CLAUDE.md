@@ -10,7 +10,9 @@ Re:creon is a Python recreation of **Anacreon: Reconstruction 4021** (v2.0, Jan 
 
 Worlds now run a full economy — production, industry growth, population, famine, ambrosia addiction, tech drift, revolution and rebellion. Phase 4 (fleets) is next.
 
-**`NEWGAME.PAS` is not ported and the implementation plan never schedules it.** Nothing generates a galaxy, so worlds must be placed by hand; `main.place_world` is a stopgap for tests and demos and is *not* a port of anything. Real galaxy generation needs scheduling.
+**`NEWGAME.PAS` is not ported.** It is now scheduled as Phase 3.5 in `docs/IMPLEMENTATION_PLAN.md`, which should be done before Phase 4. Until then nothing generates a galaxy and worlds must be placed by hand; `main.place_world` is a stopgap for tests and demos, *not* a port, and Phase 3.5.5 retires it.
+
+Note it is a **scenario-file interpreter, not a procedural generator** — and no `*.SCN` files exist in this repo, so scenarios have to be authored against the format recovered from the parser. `cdetypes.py` has no caller for the same reason: the artifact and transaction directives are commented out of the scenario dispatch in v2.0, making that whole subsystem unreachable dead code in the original.
 
 Modules for later phases are not stubbed out — an absent file means unported. `docs/ARCHITECTURE.md` is the map of what each one will be.
 

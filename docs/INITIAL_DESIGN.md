@@ -66,14 +66,15 @@ The project is successful when:
 
 ## Development Timeline
 
-Estimated 24 weeks for complete implementation:
+Estimated 26 weeks for complete implementation:
 
 - **Weeks 1-4**: Foundation (types, data structures, galaxy, basic UI)
-- **Weeks 5-8**: Core gameplay (economy, fleets, orders)
-- **Weeks 9-12**: Combat and construction
-- **Weeks 13-16**: AI system
-- **Weeks 17-20**: UI polish, save/load, scenarios
-- **Weeks 21-24**: Testing and validation
+- **Weeks 5-8**: Economy, then galaxy generation from scenario files
+- **Weeks 9-12**: Fleets, orders and combat
+- **Weeks 13-14**: Construction and advanced features
+- **Weeks 15-18**: AI system
+- **Weeks 19-22**: UI polish, save/load, scenario front end
+- **Weeks 23-26**: Testing and validation
 
 ## Risk Mitigation
 
