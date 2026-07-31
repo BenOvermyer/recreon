@@ -67,11 +67,16 @@ The original Pascal source code is available in the `original/` directory. Key f
 
 ## Development Status
 
-**Current Phase**: Phase 1 complete - project scaffolded with uv, core types
-and data structures ported (`types.py`, `datastrc.py`, `datacnst.py`,
-`cdetypes.py`, `npe/types.py`, and the type definitions from `galaxy.py`).
+**Current Phase**: Phases 1-2 complete. Core types and data structures are
+ported (`types.py`, `datastrc.py`, `datacnst.py`, `cdetypes.py`,
+`npe/types.py`), along with the galaxy grid (`galaxy.py`), global state
+(`environ.py`), utility calculations (`misc.py`, `utils/`), a subset of the
+interface layer (`primintr.py`), the turn loop (`main.py`) and a Textual UI
+skeleton (`ui/`). A game starts, shows an empty galaxy map, and advances
+turns.
 
-**Next Steps**: Begin Phase 2 - Galaxy and basic game loop
+**Next Steps**: Begin Phase 3 - Planet management and economy. This is also
+where galaxy generation (NEWGAME.PAS) lands, so the map stops being empty.
 
 ## Contributing
 

@@ -6,7 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Re:creon is a Python recreation of **Anacreon: Reconstruction 4021** (v2.0, Jan 2004), a turn-based 4X space strategy game originally written in Turbo Pascal 4.0. The complete original Pascal source (~39k lines, 85 units) lives in `original/` and is the **authoritative specification** — the Python port is intended to be behavior-faithful, not a reimagining.
 
-**Current state: Phase 1 complete** — the type and data layer only. Ported: `types.py` (TYPES.PAS), `datastrc.py` (DATASTRC.PAS), `datacnst.py` (DATACNST.PAS), `cdetypes.py` (CDETYPES.PAS), `npe/types.py` (NPETYPES.PAS), and the type declarations from `galaxy.py` (GALAXY.PAS — its sector runtime is Phase 2). There is no game loop, galaxy generation, AI, or UI yet. Phase 2 in `docs/IMPLEMENTATION_PLAN.md` is next.
+**Current state: Phases 1–2 complete.** Ported: `types.py` (TYPES.PAS), `datastrc.py` (DATASTRC.PAS), `datacnst.py` (DATACNST.PAS), `cdetypes.py` (CDETYPES.PAS), `npe/types.py` (NPETYPES.PAS), `galaxy.py` (GALAXY.PAS), `environ.py` (ENVIRON.PAS + `InitializeUniverse` from LOADSAVE.PAS), `misc.py` (MISC.PAS), `primintr.py` (PRIMINTR.PAS — Phase 2 subset), `utils/` (INT.PAS, REAL1.PAS), plus a turn loop in `main.py` and a Textual skeleton in `ui/`.
+
+A game starts, renders an empty galaxy, and advances turns. Nothing populates it yet — galaxy generation (NEWGAME.PAS) and the economy (UPDATE.PAS) are Phase 3, which is next.
 
 Modules for later phases are not stubbed out — an absent file means unported. `docs/ARCHITECTURE.md` is the map of what each one will be.
 
@@ -17,10 +19,11 @@ uv sync                                     # install deps
 uv run pytest                               # full suite
 uv run pytest tests/test_datacnst.py -q     # one file
 uv run pytest -k combat_table               # one test by name
-uv run recreon                              # entry point (src/recreon/main.py)
+uv run recreon                              # launch the TUI
+uv run recreon --no-ui --size 30            # advance one turn headlessly
 ```
 
-Python 3.12, Textual for the TUI, pytest for tests. No linter or type checker is configured yet.
+Python 3.12, Textual for the TUI, pytest (with `asyncio_mode = "auto"`, for Textual's `run_test()` pilot) for tests. No linter or type checker is configured yet.
 
 ## Documentation map
 
@@ -44,7 +47,15 @@ These are project-wide decisions already made; don't relitigate them per-file:
 7. **`TechnologyTypes` is one enum, not several.** The original declares a single enum and carves overlapping subranges out of it (`ShipTypes = fgt..trn`, `CargoTypes = men..tri`, ...), then indexes tables across those subranges — `CombatTable` spans defenses, ships and troops at once. Splitting it would break the tables. Subranges are exported from `types.py` as tuples (`SHIP_TYPES`, `CARGO_TYPES`, ...), with same-name aliases kept for readability at use sites.
 8. **Pascal arrays indexed by an enum become dicts keyed by that enum**, built via `datacnst._table`, which raises at import time on a row/key-count mismatch. Use it for every new table — it is the only automatic check on a bulk transcription.
 
+9. **Turbo Pascal builtins that differ from Python's go through `utils/pascal.py`.** `Round` is the live trap: Pascal breaks ties away from zero, Python's `round` is banker's rounding, so `Round(2.5)` is 3 and `round(2.5)` is 2. Call `pascal_round` for every `Round` in the original.
+
 > The code sketches in `docs/IMPLEMENTATION_PLAN.md` §1.3–1.4 are approximations written before the port and disagree with the Pascal in several places (empire numbering, `ObjectTypes` order, enum member names). Where they conflict with `original/`, the Pascal wins.
+
+## Coordinates
+
+Sector coordinates are effectively 1-based: the grid is allocated `0..size` inclusive, but `in_galaxy` requires `x > 0 and y > 0`, so row and column 0 exist without being playable. `Limbo` is (0, 0) — where objects sit when they are nowhere. `Galaxy.sector()` raises on out-of-range input rather than following the Pascal, because Python's negative indexing would silently wrap to the opposite edge of the galaxy.
+
+Distance is **Chebyshev**, not Euclidean or Manhattan (`misc.distance`) — diagonal movement costs the same as orthogonal.
 
 ## Working with the Pascal source
 
