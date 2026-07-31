@@ -536,7 +536,12 @@ a test fixture: without it the game has no way to begin.
 `DFA1NextToken` and `DFANextInteger`, the token reader every directive is
 built on. Small and self-contained; do it first.
 
-### 3.5.2 Scenario file format (scena.py)
+### 3.5.2 Scenario file format (newgame.py)
+
+> Originally listed as `scena.py`. SCENA.PAS turns out to be in-game scenario
+> *text display* (background shown on conquest), not format parsing — all the
+> parsing lives in NEWGAME.PAS. SCENA.PAS belongs with the Phase 8 UI.
+
 
 Header line carries a version — `Copy(Vers,10,2)` — followed by seed,
 min/max players, galaxy size, planet count, difficulty, min/max length and
@@ -613,8 +618,13 @@ formulas, which are transcribed exactly and stay that way.
 ### 3.5.5 Retire the stopgap
 
 `main.place_world` was written to give Phase 3 something to run on and is not
-a port of anything. Once `CREATEWORLD` works, move the tests onto real
-scenario loading and delete it.
+a port of anything. Once `CREATEWORLD` works it must leave the shipped
+package.
+
+Moved to `tests/conftest.py` rather than deleted outright: `main.new_game`
+now loads a scenario, so nothing in `src/` fabricates worlds, but unit tests
+still want one world with exactly known attributes instead of a whole
+generated galaxy. Integration-level tests use real scenario loading.
 
 ### 3.5.6 Deferred to Phase 8
 

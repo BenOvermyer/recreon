@@ -10,21 +10,12 @@ from __future__ import annotations
 import argparse
 
 from . import __version__
-from .datacnst import TechDev, TriResByClass
+from pathlib import Path
+
 from .environ import GameEnvironment
-from .galaxy import XYCoord
-from .intrface import create_planet, get_optimum_indus
-from .primintr import empire_active, empire_player, no_more_players, put_indus
-from .types import (
-    PLAYER_EMPIRES,
-    Empire,
-    IDNumber,
-    ObjectTypes,
-    TechLevel,
-    TechnologyTypes,
-    WorldClass,
-    WorldTypes,
-)
+from .newgame import load_scenario
+from .primintr import empire_active, empire_player, no_more_players
+from .types import PLAYER_EMPIRES, Empire
 from .update import update_universe
 
 
@@ -70,88 +61,45 @@ def play(game: GameEnvironment) -> None:
         update_turn(game)
 
 
-def new_game(size: int = 50, planets: int = 0, empires: int = 1) -> GameEnvironment:
-    """A blank game with ``empires`` human empires and an empty galaxy.
+#: Shipped with the package; the only scenario that exists (see
+#: IMPLEMENTATION_PLAN.md §3.5 for why the originals are not available).
+DEFAULT_SCENARIO = Path(__file__).parent / "data" / "scenarios" / "frontier.scn"
 
-    Real setup -- naming empires, placing worlds, seeding fleets -- is
-    NEWGAME.PAS, which the implementation plan never schedules. See
-    :func:`place_world` for the stopgap.
+
+def new_game(
+    scenario: str | Path = DEFAULT_SCENARIO,
+    player_names: dict[Empire, str] | None = None,
+) -> GameEnvironment:
+    """Start a game from a scenario file.
+
+    Empire slots with no name are skipped, so passing one name gives a
+    single-player game against the scenario's NPEs.
     """
-    game = GameEnvironment()
-    game.initialize_universe(size=size, planets=planets)
-
-    for i in range(empires):
-        emp = PLAYER_EMPIRES[i]
-        data = game.Universe.EmpireData[emp]
-        data.InUse = True
-        data.IsAPlayer = True
-        data.EmpireName = f"Empire {i + 1}"
-        data.Founding = game.Year
-        data.TechnologyLevel = TechLevel.WrpTchLvl
-        data.Technology = set(TechDev[TechLevel.WrpTchLvl])
-
-    game.reset_empires_to_move()
-    return game
-
-
-def place_world(
-    game: GameEnvironment,
-    index: int,
-    xy: XYCoord,
-    emp: Empire = Empire.Indep,
-    cls: WorldClass = WorldClass.EthCls,
-    typ: WorldTypes = WorldTypes.IndTyp,
-    tech: TechLevel = TechLevel.WrpTchLvl,
-    pop: int = 500,
-    eff: int = 50,
-) -> IDNumber:
-    """Put one world on the map, developed enough to have an economy.
-
-    A stopgap for NEWGAME.PAS, which generates a whole galaxy -- star
-    placement, empire homeworlds, naming, starting fleets -- and is not
-    scheduled anywhere in the implementation plan. This creates a single
-    world with plausible defaults so the update loop has something to run
-    on; it is not a port of anything.
-    """
-    world = IDNumber(ObjectTypes.Pln, index)
-    planet = game.Universe.Planet[index]
-
-    planet.Emp = emp
-    planet.Cls = cls
-    planet.Typ = typ
-    planet.Tech = tech
-    planet.Pop = pop
-    planet.Eff = eff
-    planet.TriReserve = TriResByClass[cls]
-
-    create_planet(game, world, xy)
-    game.NoOfPlanets = max(game.NoOfPlanets, index)
-
-    # Seed enough raw material to get the first year's production moving.
-    planet.Cargo[TechnologyTypes.met] = 500
-    planet.Cargo[TechnologyTypes.che] = 500
-    planet.Cargo[TechnologyTypes.sup] = 500
-
-    put_indus(game, world, get_optimum_indus(game, world))
-    return world
+    return load_scenario(scenario, player_names or {Empire.Empire1: "Player"})
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(prog="recreon", description="Re:creon")
     parser.add_argument("--version", action="version", version=f"Re:creon {__version__}")
     parser.add_argument(
-        "--size", type=int, default=50, help="galaxy size in sectors (default: 50)"
+        "--scenario",
+        default=DEFAULT_SCENARIO,
+        help=f"scenario file to load (default: {DEFAULT_SCENARIO.name})",
     )
+    parser.add_argument("--name", default="Player", help="your empire's name")
     parser.add_argument(
         "--no-ui", action="store_true", help="advance one turn and exit, without the UI"
     )
     args = parser.parse_args()
 
-    game = new_game(size=args.size)
+    game = new_game(args.scenario, {Empire.Empire1: args.name})
 
     if args.no_ui:
         update_turn(game)
-        print(f"Re:creon {__version__} -- year {game.Year}, galaxy {game.Galaxy.size}^2")
+        print(
+            f"Re:creon {__version__} -- year {game.Year}, "
+            f"galaxy {game.Galaxy.size}^2, {game.NoOfPlanets} worlds"
+        )
         return
 
     from .ui.app import RecreonApp

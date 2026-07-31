@@ -2,7 +2,7 @@
 
 
 from recreon.galaxy import XYCoord
-from recreon.main import new_game
+from conftest import blank_game
 from recreon.primintr import put_object
 from recreon.types import Empire, IDNumber, ObjectTypes, WorldClass
 from recreon.ui.app import RecreonApp
@@ -34,7 +34,7 @@ def test_stargate_glyphs_are_visible():
 
 
 def test_map_glyphs_reflect_sector_contents():
-    game = new_game(size=10)
+    game = blank_game(size=10)
     view = MapView(game)
 
     empty = XYCoord(2, 2)
@@ -49,7 +49,7 @@ def test_map_glyphs_reflect_sector_contents():
 
 
 def test_cursor_clamps_to_the_galaxy_edge():
-    game = new_game(size=5)
+    game = blank_game(size=5)
     view = MapView(game)
 
     view.move_cursor(-10, -10)
@@ -60,7 +60,7 @@ def test_cursor_clamps_to_the_galaxy_edge():
 
 
 async def test_app_starts_and_renders_a_map():
-    game = new_game(size=20, empires=1)
+    game = blank_game(size=20, empires=1)
     app = RecreonApp(game)
 
     async with app.run_test() as pilot:
@@ -70,7 +70,7 @@ async def test_app_starts_and_renders_a_map():
 
 
 async def test_next_turn_binding_advances_the_year():
-    game = new_game(size=20, empires=1)
+    game = blank_game(size=20, empires=1)
     app = RecreonApp(game)
     start = game.Year
 
@@ -82,7 +82,7 @@ async def test_next_turn_binding_advances_the_year():
 
 
 async def test_arrow_keys_move_the_cursor_and_update_the_status():
-    game = new_game(size=20, empires=1)
+    game = blank_game(size=20, empires=1)
     app = RecreonApp(game)
 
     async with app.run_test() as pilot:
@@ -93,7 +93,7 @@ async def test_arrow_keys_move_the_cursor_and_update_the_status():
 
 
 async def test_status_bar_names_what_is_under_the_cursor():
-    game = new_game(size=20, empires=1)
+    game = blank_game(size=20, empires=1)
     game.Universe.EmpireData[Empire.Empire1].EmpireName = "Sarkhon"
     put_object(game, XYCoord(1, 1), IDNumber(ObjectTypes.Pln, 1))
 

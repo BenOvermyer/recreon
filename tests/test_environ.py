@@ -2,7 +2,8 @@
 
 from recreon.environ import DEFAULT_STARTING_YEAR, GameEnvironment
 from recreon.galaxy import MAX_SIZE_OF_GALAXY, NO_SRM_FIELD, Galaxy, XYCoord
-from recreon.main import new_game, update_turn
+from conftest import blank_game
+from recreon.main import update_turn
 from recreon.primintr import (
     empire_active,
     empire_player,
@@ -98,7 +99,7 @@ def test_planet_count_is_clamped():
 
 
 def test_new_game_activates_requested_empires():
-    game = new_game(size=20, empires=3)
+    game = blank_game(size=20, empires=3)
     assert game.Year == DEFAULT_STARTING_YEAR
     for emp in (Empire.Empire1, Empire.Empire2, Empire.Empire3):
         assert empire_active(game, emp)
@@ -109,7 +110,7 @@ def test_new_game_activates_requested_empires():
 
 def test_year_advances_once_per_full_rotation_not_per_turn():
     # Three empires means three player turns to one game year.
-    game = new_game(size=20, empires=3)
+    game = blank_game(size=20, empires=3)
     start = game.Year
 
     assert game.Player == Empire.Empire1
@@ -123,7 +124,7 @@ def test_year_advances_once_per_full_rotation_not_per_turn():
 
 
 def test_single_empire_advances_a_year_every_turn():
-    game = new_game(size=20, empires=1)
+    game = blank_game(size=20, empires=1)
     start = game.Year
     update_turn(game)
     assert game.Player == Empire.Empire1
@@ -131,7 +132,7 @@ def test_single_empire_advances_a_year_every_turn():
 
 
 def test_empires_to_move_refills_on_rotation():
-    game = new_game(size=20, empires=2)
+    game = blank_game(size=20, empires=2)
     update_turn(game)
     assert game.EmpiresToMove == {Empire.Empire2}
     update_turn(game)
@@ -139,7 +140,7 @@ def test_empires_to_move_refills_on_rotation():
 
 
 def test_next_empire_skips_inactive_and_wraps():
-    game = new_game(size=20, empires=1)
+    game = blank_game(size=20, empires=1)
     game.Universe.EmpireData[Empire.Empire5].InUse = True
 
     assert next_empire(game, Empire.Empire1) == Empire.Empire5
@@ -147,7 +148,7 @@ def test_next_empire_skips_inactive_and_wraps():
 
 
 def test_no_more_players_detects_a_finished_game():
-    game = new_game(size=20, empires=1)
+    game = blank_game(size=20, empires=1)
     assert not no_more_players(game)
 
     game.Universe.EmpireData[Empire.Empire1].InUse = False
@@ -155,7 +156,7 @@ def test_no_more_players_detects_a_finished_game():
 
 
 def test_object_placement_and_lookup():
-    game = new_game(size=20)
+    game = blank_game(size=20)
     pos = XYCoord(7, 9)
     planet_id = IDNumber(ObjectTypes.Pln, 1)
 
@@ -171,7 +172,7 @@ def test_object_placement_and_lookup():
 def test_get_fleets_finds_only_active_fleets_at_the_position():
     from recreon.datastrc import FleetRecord
 
-    game = new_game(size=20)
+    game = blank_game(size=20)
     pos = XYCoord(3, 3)
 
     game.Universe.Fleet[1] = FleetRecord(XY=pos)
@@ -185,7 +186,7 @@ def test_get_fleets_finds_only_active_fleets_at_the_position():
 
 
 def test_scouting_marks_both_scouted_and_known():
-    game = new_game(size=20)
+    game = blank_game(size=20)
     planet_id = IDNumber(ObjectTypes.Pln, 1)
 
     assert not scouted(game, Empire.Empire1, planet_id)
@@ -197,8 +198,8 @@ def test_scouting_marks_both_scouted_and_known():
 def test_games_are_independent():
     # The Pascal kept one global universe; the point of GameEnvironment is
     # that tests can hold several.
-    a = new_game(size=10, empires=1)
-    b = new_game(size=20, empires=2)
+    a = blank_game(size=10, empires=1)
+    b = blank_game(size=20, empires=2)
     update_turn(a)
 
     assert a.Year != b.Year

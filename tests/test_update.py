@@ -6,7 +6,7 @@ import pytest
 
 from recreon.datacnst import BasePop, OptMilitary, ThgAdj
 from recreon.galaxy import XYCoord
-from recreon.main import new_game, place_world
+from conftest import blank_game, place_world
 from recreon.news import NewsTypes
 from recreon.primintr import change_rev_index, get_issp, set_issp
 from recreon.types import (
@@ -52,7 +52,7 @@ def make_world(
     eff=60,
     emp=Empire.Empire1,
 ):
-    game = game or new_game(size=20, empires=1)
+    game = game or blank_game(size=20, empires=1)
     world = place_world(
         game, 1, XYCoord(5, 5), emp=emp, cls=cls, typ=typ, pop=pop, eff=eff
     )

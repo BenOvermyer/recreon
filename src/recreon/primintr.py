@@ -387,6 +387,44 @@ def set_empire_technology(
     data.Technology = set(tech_set)
 
 
+def create_empire(
+    game: GameEnvironment,
+    emp: Empire,
+    *,
+    is_player: bool,
+    is_empress: bool,
+    name: str,
+    password: str,
+    tech: TechLevel,
+    tech_set: set[TechnologyTypes],
+    rev_factor: int,
+    modifiers: set,
+    year_founded: int,
+    capital: IDNumber | None = None,
+) -> None:
+    """Bring an empire into play."""
+    from .datacnst import init_defense_record
+
+    data = game.Universe.EmpireData[emp]
+    data.InUse = True
+    data.IsAPlayer = is_player
+    data.IsAnEmpress = is_empress
+    data.EmpireName = name
+    data.Pass = password
+
+    data.TimeLeft = 1500
+    data.Capital = capital or IDNumber()
+    data.DefenseSettings = init_defense_record()
+
+    data.TechnologyLevel = tech
+    data.Technology = set(tech_set)
+
+    #: Added to every world's revolution index each year.
+    data.RevFactor = rev_factor
+    data.Modifiers = set(modifiers)
+    data.Founding = year_founded
+
+
 def total_rev_index(game: GameEnvironment, emp: Empire) -> int:
     return game.Universe.EmpireData[emp].TotalRevIndex
 

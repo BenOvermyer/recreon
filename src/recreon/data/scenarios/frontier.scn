@@ -1,0 +1,175 @@
+ANACREON 16 SCENARIO
+"The Kalgan Frontier"
+
+; ---------------------------------------------------------------------------
+; NEW CONTENT -- NOT A PORT.
+;
+; The scenario files that shipped with Anacreon: Reconstruction 4021 are not
+; available. This one is newly authored against the file format recovered
+; from the NEWGAME.PAS parser, and does not reproduce any galaxy the original
+; shipped. See docs/IMPLEMENTATION_PLAN.md section 3.5.
+;
+; Header fields, in order:
+;   seed  minPlayers  maxPlayers  galaxySize  maxPlanets  difficulty
+;   minLength  maxLength  firstYear
+; ---------------------------------------------------------------------------
+
+  20250731    1    4    40    90    2    50   200   4021
+
+BeginDescription
+A quiet arm of the galaxy, far enough from the old capitals that nobody has
+bothered to draw the borders yet. Three powers have noticed it at once.
+EndDescription
+
+; --- Distribution tables ---------------------------------------------------
+; ClassTable: one weight per world class, in declaration order, summing to
+; 100. Order: Amb Ard Art Bar J K L M Drt Eth Fst GsG HLf Ice Jng Ocn Par
+; Psn Rns Und Ter Vlc
+
+ClassTable
+   2   8   0  10   7   7   7   8   7   9   6   4   2   6   5   5   1   3
+   2   1   0   0
+
+; TechTable: one weight per tech level, summing to 100.
+; Order: pre-tech primitive pre-atomic atomic pre-warp warp jump bio-tech
+;        starship pre-gate gate
+
+TechTable
+   6  14  18  20  16  12   8   4   2   0   0
+
+SetTrillumReserves 100
+
+; --- Regions ---------------------------------------------------------------
+; Zone 1 defaults to the whole galaxy. These carve out the three home
+; territories and the contested middle.
+
+DefineZone 2    2,2     14,14      ; coreward
+DefineZone 3   27,2     39,14      ; rimward
+DefineZone 4    2,27    14,39      ; trailing
+DefineZone 5   15,15    26,26      ; the disputed middle
+DefineZone 6   27,27    39,39      ; the deep frontier
+
+DefineXY Kalgan     20,20
+DefineXY Vantiss     8,8
+DefineXY Sarkhon    33,8
+DefineXY Meleth      8,33
+DefineXY Korrath    33,33
+
+; --- Empires ---------------------------------------------------------------
+; CreatePlayerEmpire: slot  revFactor  techLevel  nExtraTechs [techs...]
+;                     nModifiers [modifiers...]
+; Slots with no name supplied at load time are skipped, so this scenario
+; plays with one to four players.
+
+CreatePlayerEmpire  0   0   6   0   1 Central
+CreatePlayerEmpire  1   0   6   0   1 Central
+CreatePlayerEmpire  2   0   6   0   1 Central
+CreatePlayerEmpire  3   0   6   0   1 Central
+
+; CreateNPEmpire: slot  npeType  name  revFactor  techLevel  nExtraTechs
+;                 nModifiers
+; npeType 2 = Kingdom1 (passive, easily provoked), 1 = Pirate.
+
+CreateNPEmpire      5   2   "Ondar Concordance"   1   6   0   0
+CreateNPEmpire      6   1   RndName               2   5   0   0
+
+; --- Homeworlds ------------------------------------------------------------
+; CreateWorld: n  xy  class  tech  type  empire  pop  eff  triReserve
+;              LAM def GDM ion   fgt hkr jmp jtn pen ssp trn
+;              men nnj amb che met sup tri
+; class 9 = Earthlike, type 4 = capital, tech 6 = jump.
+
+CreateWorld  1  Vantiss:0,0   9  6  4  0  1400  70  100
+             120  60  200  40      400  30  60  20  10   4  180
+             900   0   0  700  900  800  300
+
+CreateWorld  2  Sarkhon:0,0   9  6  4  1  1400  70  100
+             120  60  200  40      400  30  60  20  10   4  180
+             900   0   0  700  900  800  300
+
+CreateWorld  3  Meleth:0,0    9  6  4  2  1400  70  100
+             120  60  200  40      400  30  60  20  10   4  180
+             900   0   0  700  900  800  300
+
+CreateWorld  4  Korrath:0,0   9  6  4  3  1400  70  100
+             120  60  200  40      400  30  60  20  10   4  180
+             900   0   0  700  900  800  300
+
+; Supporting worlds, one agricultural and one mining per home region.
+; type 0 = agricultural, 9 = metal mine.
+
+CreateWorld  5  Vantiss:-3..3,-3..3   9  5   0  0  600  55  100
+               0   20   60  10      80   0   0   0   0   0   40
+             200    0    0  200  200  600  120
+
+CreateWorld  6  Vantiss:-4..4,-4..4   8  5   9  0  400  50  100
+               0   20   60  10      80   0   0   0   0   0   40
+             200    0    0  150  400  200  150
+
+CreateWorld  7  Sarkhon:-3..3,-3..3   9  5   0  1  600  55  100
+               0   20   60  10      80   0   0   0   0   0   40
+             200    0    0  200  200  600  120
+
+CreateWorld  8  Sarkhon:-4..4,-4..4   8  5   9  1  400  50  100
+               0   20   60  10      80   0   0   0   0   0   40
+             200    0    0  150  400  200  150
+
+CreateWorld  9  Meleth:-3..3,-3..3    9  5   0  2  600  55  100
+               0   20   60  10      80   0   0   0   0   0   40
+             200    0    0  200  200  600  120
+
+CreateWorld 10  Meleth:-4..4,-4..4    8  5   9  2  400  50  100
+               0   20   60  10      80   0   0   0   0   0   40
+             200    0    0  150  400  200  150
+
+CreateWorld 12  Korrath:-3..3,-3..3   9  5   0  3  600  55  100
+               0   20   60  10      80   0   0   0   0   0   40
+             200    0    0  200  200  600  120
+
+CreateWorld 13  Korrath:-4..4,-4..4   8  5   9  3  400  50  100
+               0   20   60  10      80   0   0   0   0   0   40
+             200    0    0  150  400  200  150
+
+; The Concordance holds the middle with a fortified capital.
+
+CreateWorld 11  Kalgan:-2..2,-2..2   16  6   4  5  1800  75  100
+             200 120  300  80      600  60 120  30  20   8  200
+            1400   0   0  900 1200 1000  400
+
+; --- Neutral space ---------------------------------------------------------
+
+CreateRandomWorlds  22   5     ; the disputed middle
+CreateRandomWorlds  14   6     ; the deep frontier
+CreateRandomWorlds  12   1     ; scattered anywhere
+
+; --- Installations ---------------------------------------------------------
+; CreateStarbase: n  xy  baseType  tech  type  empire  pop  eff
+;                 LAM def GDM ion   fgt hkr jmp jtn pen ssp trn
+;                 men nnj amb che met sup tri
+; baseType 20 = command base, 23 = outpost.
+
+CreateStarbase  1  Kalgan:-6..6,-6..6  20  6  2  5  120  60
+                 60  40  100  20     200  20  40  10   6   2   60
+                400   0   0  300  400  300  150
+
+CreateStarbase  2  Z:6                 23  5  11 8   20  40
+                  0   0    0   0      20   0   0   0   0   0   10
+                 40   0   0   60   60   80   40
+
+; CreateStargate: xy  gateType  empire.  gateType 24 = gate.
+CreateStargate  Kalgan:-4..4,-4..4   24  5
+
+; --- Phenomena -------------------------------------------------------------
+; CreateNebula: type  upperLeft  lowerRight.  type 1 = nebula, 3 = dense.
+
+CreateNebula  1   16,2    19,13
+CreateNebula  3   17,6    18,9
+
+; CreateRandomNebula: kind  min  max.  kind 2 = patches.
+CreateRandomNebula  2   4   8
+
+; CreateSRMs: empire  upperLeft  lowerRight. The Concordance mines its
+; approaches.
+CreateSRMs  5   18,18   23,23
+
+EndScenario

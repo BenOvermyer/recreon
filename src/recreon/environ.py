@@ -47,6 +47,12 @@ class GameEnvironment:
         #: Revolution-index deltas accumulated during one universe update and
         #: applied to empires at the end of it.
         self.NewTotalRevIndex: dict[Empire, int] = {emp: 0 for emp in Empire}
+
+        #: Per-empire AI state. Scenario loading sets the type; the behaviour
+        #: that reads it is Phase 7.
+        from .npe.types import npe_data_array
+
+        self.NPEData = npe_data_array()
         self.NoOfPlanets: int = 0
         self.TimePerTurn: int = DEFAULT_TIME_PER_TURN
 
@@ -74,9 +80,12 @@ class GameEnvironment:
         starbases, constructions, gates or fleets; the galaxy is empty, with
         no nebulae or minefields. Populating it is NEWGAME.PAS, in Phase 3.
         """
+        from .npe.types import npe_data_array
+
         self.Universe = UniverseRecord()
         self.GlobalSets = GlobalSetsRecord()
         self.News = {emp: [] for emp in Empire}
+        self.NPEData = npe_data_array()
 
         self.Year = starting_year
         self.TimePerTurn = DEFAULT_TIME_PER_TURN

@@ -67,21 +67,20 @@ The original Pascal source code is available in the `original/` directory. Key f
 
 ## Development Status
 
-**Current Phase**: Phases 1-3 complete. On top of the Phase 1-2 foundation,
-the world economy is ported: `update.py` (UPDATE.PAS), `design.py`,
-`resource.py`, `news.py` and `intrface.py`. Worlds produce resources, grow
-and starve, advance and regress in tech, and rebel.
+**Current Phase**: Phases 1-3.5 complete. On top of the Phase 1-2 foundation,
+the world economy is ported (`update.py`, `design.py`, `resource.py`,
+`news.py`, `intrface.py`) along with scenario loading (`newgame.py`,
+`utils/dfa.py`). A scenario file yields a populated galaxy whose worlds
+produce resources, grow and starve, advance and regress in tech, and rebel.
 
-**Next Steps**: Begin Phase 3.5 - Galaxy generation (NEWGAME.PAS). This must
-come before Phase 4: until it is ported nothing populates a galaxy, and
-worlds have to be placed by hand.
+**Next Steps**: Begin Phase 4 - Fleet management.
 
-**Settled**: the original `*.SCN` scenario files are permanently unavailable,
-and NEWGAME.PAS is a scenario interpreter rather than a procedural generator.
-Scenarios will be authored against the format recovered from the parser and
-shipped in `data/scenarios/`. Generation uses Python's RNG — seeds are
-reproducible within this port, but galaxies will not match the DOS build.
-See Phase 3.5.0 and 3.5.4.
+Galaxy generation is done: `newgame.py` interprets `.scn` scenario files, and
+`src/recreon/data/scenarios/frontier.scn` is an authored starter scenario.
+The original `*.SCN` files are permanently unavailable, so authored scenarios
+are new content and reproduce no galaxy the original shipped. Generation uses
+Python's RNG: seeds are reproducible within this port but do not match the
+DOS build. See Phase 3.5.
 
 ## Contributing
 

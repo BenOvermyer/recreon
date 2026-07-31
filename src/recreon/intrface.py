@@ -24,7 +24,7 @@ from .datacnst import (
     ThgAdj,
     TypeData,
 )
-from .galaxy import XYCoord
+from .galaxy import Location, XYCoord
 from .misc import total_prod
 from .primintr import (
     get_class,
@@ -36,6 +36,7 @@ from .primintr import (
     get_type,
 )
 from .types import (
+    Empire,
     IndusTypes,
     IDNumber,
     ObjectTypes,
@@ -225,6 +226,71 @@ def get_optimum_indus(game: GameEnvironment, obj: IDNumber) -> dict[IT, int]:
     return indus
 
 
+def scout(game: GameEnvironment, emp: Empire, xy: XYCoord) -> None:
+    """Reveal the eight sectors around ``xy`` to ``emp``.
+
+    A dark nebula blocks the sweep -- the original bails out of the whole
+    loop on hitting one, so which sectors get revealed depends on scan order.
+    Preserved as-is.
+    """
+    from .datacnst import DirX, DirY
+    from .news import NewsTypes, add_news
+    from .primintr import (
+        get_nebula,
+        get_object,
+        get_status,
+        known,
+        scout_object,
+        scouted,
+    )
+    from .types import Directions, NebulaTypes
+
+    if xy == XYCoord(0, 0):
+        return
+
+    for direction in Directions:
+        x = xy.x + DirX[direction]
+        y = xy.y + DirY[direction]
+        if not game.Galaxy.in_galaxy(x, y):
+            continue
+
+        temp = XYCoord(x, y)
+        obj = get_object(game, temp)
+        other_emp = get_status(game, obj)
+
+        if obj.ObjTyp != ObjectTypes.Void and not scouted(game, emp, obj):
+            if not known(game, emp, obj) and other_emp != emp:
+                add_news(game, emp, NewsTypes.POk, Location(XY=XYCoord(0, 0), ID=obj))
+            scout_object(game, emp, obj)
+
+        if get_nebula(game, temp) == NebulaTypes.DarkNebula:
+            return
+
+
+def next_stargate_slot(game: GameEnvironment) -> int:
+    """Highest free stargate index, or 0 when all are taken."""
+    slot = len(game.Universe.Stargate) - 1
+    while slot > 0 and slot in game.GlobalSets.SetOfActiveGates:
+        slot -= 1
+    return slot
+
+
+def create_stargate(
+    game: GameEnvironment,
+    obj: IDNumber,
+    new_emp: Empire,
+    gate_type: TechnologyTypes,
+    pos: XYCoord,
+) -> None:
+    game.Galaxy.sector(pos).Obj = obj
+
+    gate = game.Universe.Stargate[obj.Index]
+    gate.XY = pos
+    gate.GTyp = gate_type
+    gate.Emp = new_emp
+    game.GlobalSets.SetOfActiveGates.add(obj.Index)
+
+
 def create_planet(game: GameEnvironment, obj: IDNumber, new_xy: XYCoord) -> None:
     """Place a planet into the world and register it in its sector."""
     game.Galaxy.sector(new_xy).Obj = obj
@@ -268,6 +334,9 @@ def create_starbase(
 __all__ = [
     "Gamma",
     "create_planet",
+    "create_stargate",
+    "next_stargate_slot",
+    "scout",
     "create_starbase",
     "get_industrial_distribution",
     "get_optimum_indus",

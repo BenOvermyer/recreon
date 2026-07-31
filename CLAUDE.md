@@ -6,15 +6,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Re:creon is a Python recreation of **Anacreon: Reconstruction 4021** (v2.0, Jan 2004), a turn-based 4X space strategy game originally written in Turbo Pascal 4.0. The complete original Pascal source (~39k lines, 85 units) lives in `original/` and is the **authoritative specification** — the Python port is intended to be behavior-faithful, not a reimagining.
 
-**Current state: Phases 1–3 complete.** Ported: `types.py` (TYPES.PAS), `datastrc.py` (DATASTRC.PAS), `datacnst.py` (DATACNST.PAS), `cdetypes.py` (CDETYPES.PAS), `npe/types.py` (NPETYPES.PAS), `galaxy.py` (GALAXY.PAS), `environ.py` (ENVIRON.PAS + `InitializeUniverse` from LOADSAVE.PAS), `misc.py` (MISC.PAS), `primintr.py` and `intrface.py` (PRIMINTR/INTRFACE.PAS — the subsets used so far), `news.py` (NEWS.PAS), `update.py` (UPDATE.PAS world update), `design.py` (DESIGN.PAS designation + INTRFACE's `DesignateWorld`/`TerraformWorld`), `resource.py` (RESOURCE.PAS), `utils/` (INT.PAS, REAL1.PAS), the turn loop in `main.py`, and `ui/`.
+**Current state: Phases 1–3.5 complete.** Ported: `types.py` (TYPES.PAS), `datastrc.py` (DATASTRC.PAS), `datacnst.py` (DATACNST.PAS), `cdetypes.py` (CDETYPES.PAS), `npe/types.py` (NPETYPES.PAS), `galaxy.py` (GALAXY.PAS), `environ.py` (ENVIRON.PAS + `InitializeUniverse` from LOADSAVE.PAS), `misc.py` (MISC.PAS), `primintr.py` and `intrface.py` (PRIMINTR/INTRFACE.PAS — the subsets used so far), `news.py` (NEWS.PAS), `update.py` (UPDATE.PAS world update), `design.py` (DESIGN.PAS designation + INTRFACE's `DesignateWorld`/`TerraformWorld`), `resource.py` (RESOURCE.PAS), `newgame.py` (NEWGAME.PAS), `utils/` (INT.PAS, REAL1.PAS, DFA.PAS), the turn loop in `main.py`, and `ui/`.
 
-Worlds now run a full economy — production, industry growth, population, famine, ambrosia addiction, tech drift, revolution and rebellion. Phase 4 (fleets) is next.
+A scenario file loads into a populated galaxy — worlds, empires with capitals, nebulae, minefields — and worlds run a full economy: production, industry growth, population, famine, ambrosia addiction, tech drift, revolution and rebellion. Phase 4 (fleets) is next.
 
-**`NEWGAME.PAS` is not ported.** It is now scheduled as Phase 3.5 in `docs/IMPLEMENTATION_PLAN.md`, which should be done before Phase 4. Until then nothing generates a galaxy and worlds must be placed by hand; `main.place_world` is a stopgap for tests and demos, *not* a port, and Phase 3.5.5 retires it.
+**Galaxies come from scenario files.** `newgame.py` (NEWGAME.PAS) is a **scenario-file interpreter, not a procedural generator** — there is no code path that builds a galaxy without a `.scn`. The original `*.SCN` files are permanently unavailable, so `data/scenarios/frontier.scn` is authored against the format recovered from the parser. It is new content, not a port, and reproduces no galaxy the original shipped.
 
-Note it is a **scenario-file interpreter, not a procedural generator** — and the original `*.SCN` files are permanently unavailable, so scenarios are authored against the format recovered from the parser and shipped in `data/scenarios/`. Authored scenarios are new content, not ports; nothing here reproduces a galaxy the original shipped.
+Two settled decisions: galaxy **generation uses Python's `random`** (seeded from the scenario's `Seed`), so a seed is reproducible within this port but will not match the DOS build — that divergence is accepted, not a bug, and it is scoped to generation only; the balance formulas stay transcribed exactly. And `cdetypes.py` has no caller because the artifact and transaction directives are commented out of the scenario dispatch in v2.0, making that whole subsystem unreachable dead code in the original.
 
-Two settled decisions that follow from that: galaxy **generation uses Python's `random`** (seeded at the boundary from the scenario's `Seed`), so a seed is reproducible within this port but will not match the DOS build — that divergence is accepted, not a bug. This is scoped to generation only; the balance formulas stay transcribed exactly. And `cdetypes.py` has no caller because the artifact and transaction directives are commented out of the scenario dispatch in v2.0, making that whole subsystem unreachable dead code in the original.
+The scenario header keeps its version at **fixed columns 10–11** of line 1, and the parser rejects anything else rather than parsing loosely: Python's `int()` strips whitespace where Pascal's `Val` errors, so a header off by one column would otherwise read as some low version, silently enable the old-format shims, and desync every directive after it.
+
+`place_world` lives in `tests/conftest.py`, not in the package — unit tests want one world with known attributes; nothing in `src/` fabricates worlds.
 
 Modules for later phases are not stubbed out — an absent file means unported. `docs/ARCHITECTURE.md` is the map of what each one will be.
 
@@ -26,7 +28,8 @@ uv run pytest                               # full suite
 uv run pytest tests/test_datacnst.py -q     # one file
 uv run pytest -k combat_table               # one test by name
 uv run recreon                              # launch the TUI
-uv run recreon --no-ui --size 30            # advance one turn headlessly
+uv run recreon --scenario path.scn --name X  # pick a scenario / empire name
+uv run recreon --no-ui                      # advance one turn headlessly
 ```
 
 Python 3.12, Textual for the TUI, pytest (with `asyncio_mode = "auto"`, for Textual's `run_test()` pilot) for tests. No linter or type checker is configured yet.
@@ -36,7 +39,7 @@ Python 3.12, Textual for the TUI, pytest (with `asyncio_mode = "auto"`, for Text
 Read these before writing code; they carry the full design and are more specific than this file:
 
 - `docs/ARCHITECTURE.md` — target module layout under `src/recreon/`, with the Pascal unit each Python module ports, plus dependency graph and per-module function lists.
-- `docs/IMPLEMENTATION_PLAN.md` — 9 phases with milestones and code sketches. Phases are ordered by dependency: data structures → galaxy/game loop → economy → fleets → combat → construction → AI → UI → validation.
+- `docs/IMPLEMENTATION_PLAN.md` — 10 phases (1–9, plus 3.5) with milestones and code sketches. Phases are ordered by dependency: data structures → galaxy/game loop → economy → scenario generation → fleets → combat → construction → AI → UI → validation.
 - `docs/TRANSLATION_NOTES.md` — Pascal→Python idiom table and gotchas (`DIV` → `//`, 1-based `FOR..TO` inclusive ranges, records → dataclasses, pointers → references, overlays → plain imports).
 - `docs/INITIAL_DESIGN.md` — game mechanics summary and success criteria.
 
