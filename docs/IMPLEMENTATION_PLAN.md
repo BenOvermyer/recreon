@@ -512,18 +512,22 @@ entry point, and `StartNewGame` just picks a file.
 
 Two consequences shape this phase:
 
-1. **No `.SCN` files exist in this repo.** `original/` holds only source, the
-   compiled overlay and the changelog. The same is true of `ANACREON.HLP` and
-   `ANACREON.CNF`. Porting the interpreter alone therefore yields a parser
-   with nothing to parse.
+1. **No `.SCN` files exist, and none will.** `original/` holds only source,
+   the compiled overlay and the changelog; the same is true of `ANACREON.HLP`
+   and `ANACREON.CNF`. **Decided: the original scenario files are permanently
+   unavailable.** Porting the interpreter alone therefore yields a parser with
+   nothing to parse.
 2. **The format is fully recoverable from the parser.** Every directive,
    argument order and version shim is readable in NEWGAME.PAS, so scenarios
    can be authored even though the originals are lost.
 
-**Resolution**: port the interpreter faithfully, then author a starter
-scenario against the recovered format. Mark authored scenarios clearly as new
-content — they are *not* ports, and cannot reproduce the original shipped
-galaxies.
+**Decided**: port the interpreter faithfully, then author scenarios against
+the recovered format and ship them in `data/scenarios/`. Mark them clearly as
+new content — they are *not* ports, and no scenario in this project will
+reproduce a galaxy the original shipped.
+
+This makes the authored starter scenario a **deliverable of this phase**, not
+a test fixture: without it the game has no way to begin.
 
 ### 3.5.1 Scenario tokenizer (utils/dfa.py)
 
@@ -580,23 +584,31 @@ and `DefineNewTransaction` are unreachable. This is also why `cdetypes.py`
 (already ported) has no caller. Leave them unported unless artifacts are
 revived; note it rather than quietly implementing dead code.
 
-### 3.5.4 Reproducibility decision
+### 3.5.4 Randomness
 
 A scenario carries a `Seed`: non-zero sets `RandSeed`, zero calls
 `Randomize`. A fixed seed is meant to produce the same galaxy every run.
 
-Python's `random` will not match Turbo Pascal's generator, so seeded
-scenarios will diverge from what the original produced. Decide explicitly:
+**Decided: use Python's `random`.** Turbo Pascal's LCG will not be
+reimplemented. Since the original scenarios are permanently unavailable
+(§3.5.0), there is no galaxy to reproduce bit-for-bit, and matching the DOS
+generator would buy nothing.
 
-- **(a)** Implement Turbo Pascal's LCG in `utils/pascal.py` and route the
-  ported `Rnd`/`RndVar` through it. Verify the exact recurrence and word size
-  against the original before relying on it. Only this gives galaxies
-  identical to the DOS build.
-- **(b)** Accept divergence. Seeds stay reproducible *within* this port, which
-  is all an authored scenario needs.
+What this does and does not give you:
 
-**(b) is sufficient** given the original scenarios are lost — there is nothing
-to reproduce. Prefer (a) only if a `.SCN` file surfaces later.
+- A seeded scenario is reproducible **within this port** — same seed, same
+  galaxy, run to run and machine to machine. That is what authored scenarios
+  and regression tests need.
+- Galaxies will **not** match what the DOS build produced from the same seed.
+  Accepted, and not a defect to file.
+
+Implementation: keep seeding at the boundary — `random.seed(scenario_seed)`
+when the seed is non-zero, leave `random` unseeded otherwise. The ported
+`Rnd` / `RndVar` in `utils/int_utils.py` already delegate to `random` and
+need no change.
+
+This decision is scoped to *generation*. It says nothing about the balance
+formulas, which are transcribed exactly and stay that way.
 
 ### 3.5.5 Retire the stopgap
 
@@ -1112,10 +1124,12 @@ def test_save_load_round_trip():
 - Compare tech advancement rates
 - Play-test scenarios to ensure game balance matches
 
-Note the ceiling on this: the original `.SCN` files are not in the repo (see
-§3.5.0), so validation runs against authored scenarios. Balance can be checked
-for self-consistency and against the Pascal formulas, but not replayed against
-the galaxies the original shipped.
+Note the ceiling on this: the original `.SCN` files are permanently
+unavailable (§3.5.0), so validation runs against authored scenarios. Balance
+is checked against the Pascal *formulas* — which are transcribed exactly and
+can be verified term by term — not by replaying the galaxies the original
+shipped. Generation itself is deliberately not bit-comparable (§3.5.4), so
+"same seed, same galaxy as DOS" is not a test that can exist.
 
 **Milestone 9**: All tests pass, game validated against original.
 

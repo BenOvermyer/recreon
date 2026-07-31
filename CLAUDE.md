@@ -12,7 +12,9 @@ Worlds now run a full economy — production, industry growth, population, famin
 
 **`NEWGAME.PAS` is not ported.** It is now scheduled as Phase 3.5 in `docs/IMPLEMENTATION_PLAN.md`, which should be done before Phase 4. Until then nothing generates a galaxy and worlds must be placed by hand; `main.place_world` is a stopgap for tests and demos, *not* a port, and Phase 3.5.5 retires it.
 
-Note it is a **scenario-file interpreter, not a procedural generator** — and no `*.SCN` files exist in this repo, so scenarios have to be authored against the format recovered from the parser. `cdetypes.py` has no caller for the same reason: the artifact and transaction directives are commented out of the scenario dispatch in v2.0, making that whole subsystem unreachable dead code in the original.
+Note it is a **scenario-file interpreter, not a procedural generator** — and the original `*.SCN` files are permanently unavailable, so scenarios are authored against the format recovered from the parser and shipped in `data/scenarios/`. Authored scenarios are new content, not ports; nothing here reproduces a galaxy the original shipped.
+
+Two settled decisions that follow from that: galaxy **generation uses Python's `random`** (seeded at the boundary from the scenario's `Seed`), so a seed is reproducible within this port but will not match the DOS build — that divergence is accepted, not a bug. This is scoped to generation only; the balance formulas stay transcribed exactly. And `cdetypes.py` has no caller because the artifact and transaction directives are commented out of the scenario dispatch in v2.0, making that whole subsystem unreachable dead code in the original.
 
 Modules for later phases are not stubbed out — an absent file means unported. `docs/ARCHITECTURE.md` is the map of what each one will be.
 

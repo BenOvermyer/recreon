@@ -76,10 +76,12 @@ and starve, advance and regress in tech, and rebel.
 come before Phase 4: until it is ported nothing populates a galaxy, and
 worlds have to be placed by hand.
 
-**Known gap**: the original `*.SCN` scenario files are not in this repo, and
-NEWGAME.PAS is a scenario interpreter rather than a procedural generator. The
-file format is recoverable from the parser, so scenarios can be authored, but
-the galaxies the original shipped cannot be reproduced. See Phase 3.5.0.
+**Settled**: the original `*.SCN` scenario files are permanently unavailable,
+and NEWGAME.PAS is a scenario interpreter rather than a procedural generator.
+Scenarios will be authored against the format recovered from the parser and
+shipped in `data/scenarios/`. Generation uses Python's RNG — seeds are
+reproducible within this port, but galaxies will not match the DOS build.
+See Phase 3.5.0 and 3.5.4.
 
 ## Contributing
 
