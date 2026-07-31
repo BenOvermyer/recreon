@@ -67,9 +67,11 @@ The original Pascal source code is available in the `original/` directory. Key f
 
 ## Development Status
 
-**Current Phase**: Not started
+**Current Phase**: Phase 1 complete - project scaffolded with uv, core types
+and data structures ported (`types.py`, `datastrc.py`, `datacnst.py`,
+`cdetypes.py`, `npe/types.py`, and the type definitions from `galaxy.py`).
 
-**Next Steps**: Begin Phase 1 - Project setup and core data structures
+**Next Steps**: Begin Phase 2 - Galaxy and basic game loop
 
 ## Contributing
 

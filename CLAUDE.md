@@ -6,16 +6,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Re:creon is a Python recreation of **Anacreon: Reconstruction 4021** (v2.0, Jan 2004), a turn-based 4X space strategy game originally written in Turbo Pascal 4.0. The complete original Pascal source (~39k lines, 85 units) lives in `original/` and is the **authoritative specification** — the Python port is intended to be behavior-faithful, not a reimagining.
 
-**Current state: no Python code exists yet.** The repo contains only `original/` (Pascal reference) and `docs/` (design + plan). The first task in `docs/IMPLEMENTATION_PLAN.md` Phase 1 is project scaffolding.
+**Current state: Phase 1 complete** — the type and data layer only. Ported: `types.py` (TYPES.PAS), `datastrc.py` (DATASTRC.PAS), `datacnst.py` (DATACNST.PAS), `cdetypes.py` (CDETYPES.PAS), `npe/types.py` (NPETYPES.PAS), and the type declarations from `galaxy.py` (GALAXY.PAS — its sector runtime is Phase 2). There is no game loop, galaxy generation, AI, or UI yet. Phase 2 in `docs/IMPLEMENTATION_PLAN.md` is next.
 
-## Planned toolchain
+Modules for later phases are not stubbed out — an absent file means unported. `docs/ARCHITECTURE.md` is the map of what each one will be.
 
-- Python 3.10+ (pattern matching is used in the translation patterns)
-- `uv` for packaging: `uv init`, `uv add textual rich pytest`
-- Textual for the TUI
-- pytest for tests (`uv run pytest`, single test: `uv run pytest tests/test_combat.py::test_combat_resolution`)
+## Commands
 
-These come from the design docs, not from existing config — when scaffolding, follow `docs/IMPLEMENTATION_PLAN.md` §1.1 rather than inventing a different stack.
+```bash
+uv sync                                     # install deps
+uv run pytest                               # full suite
+uv run pytest tests/test_datacnst.py -q     # one file
+uv run pytest -k combat_table               # one test by name
+uv run recreon                              # entry point (src/recreon/main.py)
+```
+
+Python 3.12, Textual for the TUI, pytest for tests. No linter or type checker is configured yet.
 
 ## Documentation map
 
@@ -35,6 +40,11 @@ These are project-wide decisions already made; don't relitigate them per-file:
 3. **Pascal field names are kept** on ported records (`Emp`, `Cls`, `Typ`, `Eff`, `RevIndex`, `TriReserve`), while new Python-level functions use snake_case. Ported enum members also keep Pascal spelling (`fgt`, `hkr`, `ssp`, `amb`, `tri`).
 4. **Global `VAR` state collapses into a `GameEnvironment` class** (`environ.py`) that is threaded through functions as a parameter, replacing the Pascal globals `Year`, `Player`, `Universe`, `Galaxy`.
 5. **Pascal's overlay directives (`{$O ...}` in ANACREON.PAS) are ignored** — they were a DOS memory-management artifact. Use regular imports.
+6. **Enums are `IntEnum` with explicit 0-based values** matching Pascal `Ord()`. Other code depends on the ordinals (`NoSRMField = Ord(Indep) * 16`), so members must never be renumbered or reordered.
+7. **`TechnologyTypes` is one enum, not several.** The original declares a single enum and carves overlapping subranges out of it (`ShipTypes = fgt..trn`, `CargoTypes = men..tri`, ...), then indexes tables across those subranges — `CombatTable` spans defenses, ships and troops at once. Splitting it would break the tables. Subranges are exported from `types.py` as tuples (`SHIP_TYPES`, `CARGO_TYPES`, ...), with same-name aliases kept for readability at use sites.
+8. **Pascal arrays indexed by an enum become dicts keyed by that enum**, built via `datacnst._table`, which raises at import time on a row/key-count mismatch. Use it for every new table — it is the only automatic check on a bulk transcription.
+
+> The code sketches in `docs/IMPLEMENTATION_PLAN.md` §1.3–1.4 are approximations written before the port and disagree with the Pascal in several places (empire numbering, `ObjectTypes` order, enum member names). Where they conflict with `original/`, the Pascal wins.
 
 ## Working with the Pascal source
 
