@@ -9,13 +9,14 @@ from __future__ import annotations
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.containers import Horizontal
+from textual.containers import Horizontal, Vertical
 from textual.widgets import Footer, Header, Static
 
 from ..environ import GameEnvironment
 from ..primintr import empire_name, get_object
 from ..types import ObjectTypes
 from .map_view import MapView
+from .status import EmpirePanel, WorldPanel
 
 
 class StatusBar(Static):
@@ -47,6 +48,9 @@ class RecreonApp(App):
     CSS = """
     Screen { layout: vertical; }
     #map { width: 1fr; height: 1fr; padding: 0 1; }
+    #side { width: 34; height: 1fr; border-left: solid $panel; padding: 0 1; }
+    WorldPanel { height: 1fr; }
+    EmpirePanel { height: auto; border-top: solid $panel; }
     StatusBar { dock: bottom; height: 1; background: $panel; color: $text; padding: 0 1; }
     """
 
@@ -67,22 +71,32 @@ class RecreonApp(App):
         yield Header()
         self.map_view = MapView(self.game)
         self.map_view.id = "map"
+        self.world_panel = WorldPanel(self.game)
+        self.empire_panel = EmpirePanel(self.game)
         self.status_bar = StatusBar(self.game, self.map_view)
-        yield Horizontal(self.map_view)
+
+        yield Horizontal(
+            self.map_view,
+            Vertical(self.world_panel, self.empire_panel, id="side"),
+        )
         yield self.status_bar
         yield Footer()
 
     def on_mount(self) -> None:
+        self._refresh_all()
+
+    def _refresh_all(self) -> None:
+        self.map_view.refresh()
+        self.world_panel.look_at(self.map_view.cursor_x, self.map_view.cursor_y)
+        self.empire_panel.refresh()
         self.status_bar.refresh_status()
 
     def action_move(self, dx: int, dy: int) -> None:
         self.map_view.move_cursor(dx, dy)
-        self.map_view.refresh()
-        self.status_bar.refresh_status()
+        self._refresh_all()
 
     def action_next_turn(self) -> None:
         from ..main import update_turn
 
         update_turn(self.game)
-        self.map_view.refresh()
-        self.status_bar.refresh_status()
+        self._refresh_all()

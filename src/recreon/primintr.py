@@ -12,9 +12,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from .datacnst import DEFAULT_ISSP
 from .galaxy import XYCoord, limbo, nebula_of
 from .types import (
+    MAX_INDEX,
     MAX_NO_OF_FLEETS,
+    MAX_RESOURCES,
     PLAYER_EMPIRES,
     Empire,
     IDNumber,
@@ -180,6 +183,220 @@ def get_efficiency(game: GameEnvironment, obj: IDNumber) -> int:
     if obj.ObjTyp in (ObjectTypes.Pln, ObjectTypes.Base):
         return entity.Eff
     return 0
+
+
+def get_special(game: GameEnvironment, obj: IDNumber) -> set:
+    entity = _entity(game, obj)
+    if obj.ObjTyp in (ObjectTypes.Pln, ObjectTypes.Base):
+        return entity.Special
+    return set()
+
+
+def get_rev_index(game: GameEnvironment, obj: IDNumber) -> int:
+    entity = _entity(game, obj)
+    if obj.ObjTyp in (ObjectTypes.Pln, ObjectTypes.Base):
+        return entity.RevIndex
+    return 0
+
+
+def troop_strength(game: GameEnvironment, obj: IDNumber) -> int:
+    """Troop strength: men + 2 * ninja."""
+    cargo = get_cargo(game, obj)
+    return cargo[T.men] + 2 * cargo[T.nnj]
+
+
+def trillum_reserves(game: GameEnvironment, obj: IDNumber) -> int:
+    """Trillum left in the ground. Starbases draw on an unlimited supply."""
+    if obj.ObjTyp == ObjectTypes.Pln:
+        return game.Universe.Planet[obj.Index].TriReserve
+    if obj.ObjTyp == ObjectTypes.Base:
+        return MAX_RESOURCES
+    return 0
+
+
+def get_base_type(game: GameEnvironment, obj: IDNumber) -> TechnologyTypes:
+    return game.Universe.Starbase[obj.Index].STyp
+
+
+# --- Setters -----------------------------------------------------------------
+
+
+def put_ships(game: GameEnvironment, obj: IDNumber, ships: dict[T, int]) -> None:
+    entity = _entity(game, obj)
+    if obj.ObjTyp in (ObjectTypes.Pln, ObjectTypes.Base, ObjectTypes.Flt):
+        entity.Ships = dict(ships)
+
+
+def put_cargo(game: GameEnvironment, obj: IDNumber, cargo: dict[T, int]) -> None:
+    entity = _entity(game, obj)
+    if obj.ObjTyp in (ObjectTypes.Pln, ObjectTypes.Base, ObjectTypes.Flt):
+        entity.Cargo = dict(cargo)
+
+
+def put_defns(game: GameEnvironment, obj: IDNumber, defns: dict[T, int]) -> None:
+    entity = _entity(game, obj)
+    if obj.ObjTyp in (ObjectTypes.Pln, ObjectTypes.Base):
+        entity.Defns = dict(defns)
+
+
+def put_indus(game: GameEnvironment, obj: IDNumber, indus: dict) -> None:
+    entity = _entity(game, obj)
+    if obj.ObjTyp in (ObjectTypes.Pln, ObjectTypes.Base):
+        entity.Indus = dict(indus)
+
+
+def put_trillum_reserves(game: GameEnvironment, obj: IDNumber, new_res: int) -> None:
+    if obj.ObjTyp == ObjectTypes.Pln:
+        game.Universe.Planet[obj.Index].TriReserve = new_res
+
+
+def set_class(game: GameEnvironment, obj: IDNumber, cls: WorldClass) -> None:
+    if obj.ObjTyp == ObjectTypes.Pln:
+        game.Universe.Planet[obj.Index].Cls = cls
+
+
+def set_tech(game: GameEnvironment, obj: IDNumber, tech: TechLevel) -> None:
+    entity = _entity(game, obj)
+    if obj.ObjTyp in (ObjectTypes.Pln, ObjectTypes.Base):
+        entity.Tech = tech
+
+
+def set_population(game: GameEnvironment, obj: IDNumber, pop: int) -> None:
+    entity = _entity(game, obj)
+    if obj.ObjTyp in (ObjectTypes.Pln, ObjectTypes.Base):
+        entity.Pop = pop
+
+
+def set_efficiency(game: GameEnvironment, obj: IDNumber, eff: int) -> None:
+    entity = _entity(game, obj)
+    if obj.ObjTyp in (ObjectTypes.Pln, ObjectTypes.Base):
+        entity.Eff = eff
+
+
+def set_status(game: GameEnvironment, obj: IDNumber, emp: Empire) -> None:
+    entity = _entity(game, obj)
+    if entity is not None:
+        entity.Emp = emp
+
+
+def set_type(game: GameEnvironment, obj: IDNumber, typ: WorldTypes) -> None:
+    entity = _entity(game, obj)
+    if obj.ObjTyp in (ObjectTypes.Pln, ObjectTypes.Base):
+        entity.Typ = typ
+
+
+def set_special(game: GameEnvironment, obj: IDNumber, setting: set) -> None:
+    entity = _entity(game, obj)
+    if obj.ObjTyp in (ObjectTypes.Pln, ObjectTypes.Base):
+        entity.Special = set(setting)
+
+
+def set_terraform_target(
+    game: GameEnvironment, obj: IDNumber, target: WorldClass
+) -> None:
+    if obj.ObjTyp == ObjectTypes.Pln:
+        game.Universe.Planet[obj.Index].TerraformTarget = target
+
+
+def get_terraform_target(game: GameEnvironment, obj: IDNumber) -> WorldClass:
+    if obj.ObjTyp == ObjectTypes.Pln:
+        return game.Universe.Planet[obj.Index].TerraformTarget
+    return WorldClass.BarCls
+
+
+def change_rev_index(game: GameEnvironment, obj: IDNumber, chg: int) -> None:
+    """Adjust the revolution index, clamped to 0..100."""
+    entity = _entity(game, obj)
+    if obj.ObjTyp not in (ObjectTypes.Pln, ObjectTypes.Base):
+        return
+    entity.RevIndex = max(0, min(MAX_INDEX, entity.RevIndex + chg))
+
+
+# --- ISSP --------------------------------------------------------------------
+#
+# The four adjustable ISSP settings are packed into the 16-bit ImpExp word,
+# one nibble each. Production industries are not adjustable and answer with a
+# fixed index.
+
+#: Nibble shift within ImpExp for each adjustable industry.
+_ISSP_SHIFT = {
+    IndusTypes.CheInd: 0,
+    IndusTypes.MinInd: 4,
+    IndusTypes.SupInd: 8,
+    IndusTypes.TriInd: 12,
+}
+
+#: Industries whose ISSP is fixed rather than stored.
+_FIXED_ISSP_INDUSTRIES = frozenset(
+    {
+        IndusTypes.BioInd,
+        IndusTypes.SYGInd,
+        IndusTypes.SYJInd,
+        IndusTypes.SYSInd,
+        IndusTypes.SYTInd,
+    }
+)
+
+
+def get_issp(game: GameEnvironment, obj: IDNumber, ind: IndusTypes) -> int:
+    """Index into the ISSP table for one industry.
+
+    Production industries always answer 6 (150%); starbases always answer 0.
+    """
+    if ind in _FIXED_ISSP_INDUSTRIES:
+        return 6
+    if obj.ObjTyp == ObjectTypes.Base:
+        return 0
+    if obj.ObjTyp != ObjectTypes.Pln:
+        return 0
+    imp_exp = game.Universe.Planet[obj.Index].ImpExp
+    return (imp_exp >> _ISSP_SHIFT[ind]) & 0x0F
+
+
+def set_issp(game: GameEnvironment, obj: IDNumber, ind: IndusTypes, issp_ind: int) -> None:
+    if ind in _FIXED_ISSP_INDUSTRIES or obj.ObjTyp != ObjectTypes.Pln:
+        return
+    planet = game.Universe.Planet[obj.Index]
+    shift = _ISSP_SHIFT[ind]
+    planet.ImpExp = (planet.ImpExp & ~(0x0F << shift)) | ((issp_ind & 0x0F) << shift)
+
+
+def initialize_issp(game: GameEnvironment, obj: IDNumber) -> None:
+    if obj.ObjTyp == ObjectTypes.Pln:
+        game.Universe.Planet[obj.Index].ImpExp = DEFAULT_ISSP
+
+
+# --- Empire technology -------------------------------------------------------
+
+
+def get_empire_technology(
+    game: GameEnvironment, emp: Empire
+) -> tuple[TechLevel, set[TechnologyTypes]]:
+    data = game.Universe.EmpireData[emp]
+    return data.TechnologyLevel, data.Technology
+
+
+def set_empire_technology(
+    game: GameEnvironment,
+    emp: Empire,
+    tech: TechLevel,
+    tech_set: set[TechnologyTypes],
+) -> None:
+    data = game.Universe.EmpireData[emp]
+    data.TechnologyLevel = tech
+    data.Technology = set(tech_set)
+
+
+def total_rev_index(game: GameEnvironment, emp: Empire) -> int:
+    return game.Universe.EmpireData[emp].TotalRevIndex
+
+
+def set_total_rev_index(game: GameEnvironment, emp: Empire, new_index: int) -> None:
+    game.Universe.EmpireData[emp].TotalRevIndex = new_index
+
+
+def change_total_rev_index(game: GameEnvironment, emp: Empire, inc: int) -> None:
+    game.Universe.EmpireData[emp].TotalRevIndex += inc
 
 
 # --- Scouting ----------------------------------------------------------------

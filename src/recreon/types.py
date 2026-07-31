@@ -346,6 +346,16 @@ def resource_array() -> dict[TechnologyTypes, int]:
     return dict.fromkeys(tech_range(T.LAM, T.tri), 0)
 
 
+def indus_range(first: IndusTypes, last: IndusTypes) -> tuple[IndusTypes, ...]:
+    """Expand a Pascal subrange ``first..last`` over IndusTypes.
+
+    Worth using rather than writing the members out: ``CheInd TO TriInd``
+    reads like the three raw-material industries but is the ordinal range
+    1..8, which also sweeps up the shipyards and SupInd.
+    """
+    return tuple(IndusTypes(i) for i in range(int(first), int(last) + 1))
+
+
 def indus_array() -> dict[IndusTypes, int]:
     return dict.fromkeys(IndusTypes, 0)
 

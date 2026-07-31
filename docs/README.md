@@ -67,16 +67,16 @@ The original Pascal source code is available in the `original/` directory. Key f
 
 ## Development Status
 
-**Current Phase**: Phases 1-2 complete. Core types and data structures are
-ported (`types.py`, `datastrc.py`, `datacnst.py`, `cdetypes.py`,
-`npe/types.py`), along with the galaxy grid (`galaxy.py`), global state
-(`environ.py`), utility calculations (`misc.py`, `utils/`), a subset of the
-interface layer (`primintr.py`), the turn loop (`main.py`) and a Textual UI
-skeleton (`ui/`). A game starts, shows an empty galaxy map, and advances
-turns.
+**Current Phase**: Phases 1-3 complete. On top of the Phase 1-2 foundation,
+the world economy is ported: `update.py` (UPDATE.PAS), `design.py`,
+`resource.py`, `news.py` and `intrface.py`. Worlds produce resources, grow
+and starve, advance and regress in tech, and rebel.
 
-**Next Steps**: Begin Phase 3 - Planet management and economy. This is also
-where galaxy generation (NEWGAME.PAS) lands, so the map stops being empty.
+**Next Steps**: Begin Phase 4 - Fleet management.
+
+**Unscheduled work**: NEWGAME.PAS (galaxy generation) is not covered by any
+phase in this plan. Until it is ported nothing populates a galaxy, and
+worlds have to be placed by hand.
 
 ## Contributing
 

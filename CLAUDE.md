@@ -6,9 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Re:creon is a Python recreation of **Anacreon: Reconstruction 4021** (v2.0, Jan 2004), a turn-based 4X space strategy game originally written in Turbo Pascal 4.0. The complete original Pascal source (~39k lines, 85 units) lives in `original/` and is the **authoritative specification** — the Python port is intended to be behavior-faithful, not a reimagining.
 
-**Current state: Phases 1–2 complete.** Ported: `types.py` (TYPES.PAS), `datastrc.py` (DATASTRC.PAS), `datacnst.py` (DATACNST.PAS), `cdetypes.py` (CDETYPES.PAS), `npe/types.py` (NPETYPES.PAS), `galaxy.py` (GALAXY.PAS), `environ.py` (ENVIRON.PAS + `InitializeUniverse` from LOADSAVE.PAS), `misc.py` (MISC.PAS), `primintr.py` (PRIMINTR.PAS — Phase 2 subset), `utils/` (INT.PAS, REAL1.PAS), plus a turn loop in `main.py` and a Textual skeleton in `ui/`.
+**Current state: Phases 1–3 complete.** Ported: `types.py` (TYPES.PAS), `datastrc.py` (DATASTRC.PAS), `datacnst.py` (DATACNST.PAS), `cdetypes.py` (CDETYPES.PAS), `npe/types.py` (NPETYPES.PAS), `galaxy.py` (GALAXY.PAS), `environ.py` (ENVIRON.PAS + `InitializeUniverse` from LOADSAVE.PAS), `misc.py` (MISC.PAS), `primintr.py` and `intrface.py` (PRIMINTR/INTRFACE.PAS — the subsets used so far), `news.py` (NEWS.PAS), `update.py` (UPDATE.PAS world update), `design.py` (DESIGN.PAS designation + INTRFACE's `DesignateWorld`/`TerraformWorld`), `resource.py` (RESOURCE.PAS), `utils/` (INT.PAS, REAL1.PAS), the turn loop in `main.py`, and `ui/`.
 
-A game starts, renders an empty galaxy, and advances turns. Nothing populates it yet — galaxy generation (NEWGAME.PAS) and the economy (UPDATE.PAS) are Phase 3, which is next.
+Worlds now run a full economy — production, industry growth, population, famine, ambrosia addiction, tech drift, revolution and rebellion. Phase 4 (fleets) is next.
+
+**`NEWGAME.PAS` is not ported and the implementation plan never schedules it.** Nothing generates a galaxy, so worlds must be placed by hand; `main.place_world` is a stopgap for tests and demos and is *not* a port of anything. Real galaxy generation needs scheduling.
 
 Modules for later phases are not stubbed out — an absent file means unported. `docs/ARCHITECTURE.md` is the map of what each one will be.
 
@@ -56,6 +58,12 @@ These are project-wide decisions already made; don't relitigate them per-file:
 Sector coordinates are effectively 1-based: the grid is allocated `0..size` inclusive, but `in_galaxy` requires `x > 0 and y > 0`, so row and column 0 exist without being playable. `Limbo` is (0, 0) — where objects sit when they are nowhere. `Galaxy.sector()` raises on out-of-range input rather than following the Pascal, because Python's negative indexing would silently wrap to the opposite edge of the galaxy.
 
 Distance is **Chebyshev**, not Euclidean or Manhattan (`misc.distance`) — diagonal movement costs the same as orthogonal.
+
+## Pascal subranges in loops
+
+`FOR X := A TO B` iterates **ordinals**, so a loop that reads like a semantic grouping may sweep in members between the endpoints. `FOR IndI := CheInd TO TriInd` looks like the three raw-material industries but is ordinals 1..8 — it also covers the four shipyards and `SupInd`. That one matters: `SupInd` producing supplies inside `produce_raw_material` is the only thing that feeds a world, and narrowing the loop starves the entire galaxy while every unit test still passes.
+
+Use `types.indus_range` / `types.tech_range` rather than writing members out by hand, and check the endpoints' ordinals before assuming what a range contains.
 
 ## Working with the Pascal source
 

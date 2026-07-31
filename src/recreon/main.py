@@ -10,19 +10,22 @@ from __future__ import annotations
 import argparse
 
 from . import __version__
+from .datacnst import TechDev, TriResByClass
 from .environ import GameEnvironment
-from .primintr import empire_active, empire_player, no_more_players
-from .types import PLAYER_EMPIRES, Empire
-
-
-def update_universe(game: GameEnvironment) -> None:
-    """Advance the world by one year.
-
-    Port of UPDATE.PAS ``UpdateUniverse``, of which only the year increment
-    is implemented. Planet production, starbase updates, construction
-    progress and empire research are Phase 3 onward.
-    """
-    game.Year += 1
+from .galaxy import XYCoord
+from .intrface import create_planet, get_optimum_indus
+from .primintr import empire_active, empire_player, no_more_players, put_indus
+from .types import (
+    PLAYER_EMPIRES,
+    Empire,
+    IDNumber,
+    ObjectTypes,
+    TechLevel,
+    TechnologyTypes,
+    WorldClass,
+    WorldTypes,
+)
+from .update import update_universe
 
 
 def update_turn(game: GameEnvironment) -> None:
@@ -71,8 +74,8 @@ def new_game(size: int = 50, planets: int = 0, empires: int = 1) -> GameEnvironm
     """A blank game with ``empires`` human empires and an empty galaxy.
 
     Real setup -- naming empires, placing worlds, seeding fleets -- is
-    NEWGAME.PAS, in Phase 3. This is just enough to have something to look
-    at and advance.
+    NEWGAME.PAS, which the implementation plan never schedules. See
+    :func:`place_world` for the stopgap.
     """
     game = GameEnvironment()
     game.initialize_universe(size=size, planets=planets)
@@ -84,9 +87,53 @@ def new_game(size: int = 50, planets: int = 0, empires: int = 1) -> GameEnvironm
         data.IsAPlayer = True
         data.EmpireName = f"Empire {i + 1}"
         data.Founding = game.Year
+        data.TechnologyLevel = TechLevel.WrpTchLvl
+        data.Technology = set(TechDev[TechLevel.WrpTchLvl])
 
     game.reset_empires_to_move()
     return game
+
+
+def place_world(
+    game: GameEnvironment,
+    index: int,
+    xy: XYCoord,
+    emp: Empire = Empire.Indep,
+    cls: WorldClass = WorldClass.EthCls,
+    typ: WorldTypes = WorldTypes.IndTyp,
+    tech: TechLevel = TechLevel.WrpTchLvl,
+    pop: int = 500,
+    eff: int = 50,
+) -> IDNumber:
+    """Put one world on the map, developed enough to have an economy.
+
+    A stopgap for NEWGAME.PAS, which generates a whole galaxy -- star
+    placement, empire homeworlds, naming, starting fleets -- and is not
+    scheduled anywhere in the implementation plan. This creates a single
+    world with plausible defaults so the update loop has something to run
+    on; it is not a port of anything.
+    """
+    world = IDNumber(ObjectTypes.Pln, index)
+    planet = game.Universe.Planet[index]
+
+    planet.Emp = emp
+    planet.Cls = cls
+    planet.Typ = typ
+    planet.Tech = tech
+    planet.Pop = pop
+    planet.Eff = eff
+    planet.TriReserve = TriResByClass[cls]
+
+    create_planet(game, world, xy)
+    game.NoOfPlanets = max(game.NoOfPlanets, index)
+
+    # Seed enough raw material to get the first year's production moving.
+    planet.Cargo[TechnologyTypes.met] = 500
+    planet.Cargo[TechnologyTypes.che] = 500
+    planet.Cargo[TechnologyTypes.sup] = 500
+
+    put_indus(game, world, get_optimum_indus(game, world))
+    return world
 
 
 def main() -> None:
