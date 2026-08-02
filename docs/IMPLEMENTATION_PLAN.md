@@ -512,22 +512,26 @@ entry point, and `StartNewGame` just picks a file.
 
 Two consequences shape this phase:
 
-1. **No `.SCN` files exist, and none will.** `original/` holds only source,
-   the compiled overlay and the changelog; the same is true of `ANACREON.HLP`
-   and `ANACREON.CNF`. **Decided: the original scenario files are permanently
-   unavailable.** Porting the interpreter alone therefore yields a parser with
-   nothing to parse.
-2. **The format is fully recoverable from the parser.** Every directive,
+1. **The format is fully recoverable from the parser.** Every directive,
    argument order and version shim is readable in NEWGAME.PAS, so scenarios
-   can be authored even though the originals are lost.
+   can be authored from the source alone.
+2. **The original `.SCN` files were later recovered** and now live in
+   `original/scenarios/` — 13 files, all format version 10. This supersedes
+   the earlier finding that they were permanently unavailable, on which the
+   rest of this section was written.
 
-**Decided**: port the interpreter faithfully, then author scenarios against
-the recovered format and ship them in `data/scenarios/`. Mark them clearly as
-new content — they are *not* ports, and no scenario in this project will
-reproduce a galaxy the original shipped.
+**Done**: the interpreter is ported, and `data/scenarios/frontier.scn` is
+authored against the recovered format. It is new content, not a port, and
+reproduces no galaxy the original shipped; it remains the default.
 
-This makes the authored starter scenario a **deliverable of this phase**, not
-a test fixture: without it the game has no way to begin.
+The authored starter scenario was a **deliverable of this phase**, not a test
+fixture: at the time it was the only way the game could begin.
+
+**Still open now that the originals exist**: the parser reads `INTRO`,
+`IMPERIUM` and `TRINITY` but not all 13. `Nebula.SCN` has a `1234567890…`
+ruler line at line 11 that the dispatch rejects as an unknown command, and
+`AWAKEN.SCN` asks for more worlds than `MAX_NO_OF_PLANETS`. Both need fixing
+against the real files rather than against what the parser appeared to want.
 
 ### 3.5.1 Scenario tokenizer (utils/dfa.py)
 
@@ -594,10 +598,17 @@ revived; note it rather than quietly implementing dead code.
 A scenario carries a `Seed`: non-zero sets `RandSeed`, zero calls
 `Randomize`. A fixed seed is meant to produce the same galaxy every run.
 
-**Decided: use Python's `random`.** Turbo Pascal's LCG will not be
-reimplemented. Since the original scenarios are permanently unavailable
-(§3.5.0), there is no galaxy to reproduce bit-for-bit, and matching the DOS
-generator would buy nothing.
+**Was decided: use Python's `random`.** Turbo Pascal's LCG was not
+reimplemented, because with no original scenarios there was no galaxy to
+reproduce bit-for-bit and matching the DOS generator would have bought
+nothing.
+
+> **Reopened.** §3.5.0 no longer holds — the original scenarios exist. Each
+> carries a fixed `Seed`, so reimplementing Turbo Pascal's LCG would now make
+> the shipped scenarios generate the galaxies players actually saw in 2004.
+> That is a real prize and the argument above no longer applies. The current
+> code still uses Python's `random`; changing it is a decision to be taken,
+> not an oversight.
 
 What this does and does not give you:
 
