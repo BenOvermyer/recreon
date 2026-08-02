@@ -6,9 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Re:creon is a Python recreation of **Anacreon: Reconstruction 4021** (v2.0, Jan 2004), a turn-based 4X space strategy game originally written in Turbo Pascal 4.0. The complete original Pascal source (~39k lines, 85 units) lives in `original/` and is the **authoritative specification** — the Python port is intended to be behavior-faithful, not a reimagining.
 
-**Current state: Phases 1–3.5 complete.** Ported: `types.py` (TYPES.PAS), `datastrc.py` (DATASTRC.PAS), `datacnst.py` (DATACNST.PAS), `cdetypes.py` (CDETYPES.PAS), `npe/types.py` (NPETYPES.PAS), `galaxy.py` (GALAXY.PAS), `environ.py` (ENVIRON.PAS + `InitializeUniverse` from LOADSAVE.PAS), `misc.py` (MISC.PAS), `primintr.py` and `intrface.py` (PRIMINTR/INTRFACE.PAS — the subsets used so far), `news.py` (NEWS.PAS), `update.py` (UPDATE.PAS world update), `design.py` (DESIGN.PAS designation + INTRFACE's `DesignateWorld`/`TerraformWorld`), `resource.py` (RESOURCE.PAS), `newgame.py` (NEWGAME.PAS), `utils/` (INT.PAS, REAL1.PAS, DFA.PAS), the turn loop in `main.py`, and `ui/`.
+**Current state: Phases 1–4 complete, except the Phase 4 UI (§4.3).** Ported: `types.py` (TYPES.PAS), `datastrc.py` (DATASTRC.PAS), `datacnst.py` (DATACNST.PAS), `cdetypes.py` (CDETYPES.PAS), `npe/types.py` (NPETYPES.PAS), `galaxy.py` (GALAXY.PAS), `environ.py` (ENVIRON.PAS + `InitializeUniverse` from LOADSAVE.PAS), `misc.py` (MISC.PAS), `primintr.py` and `intrface.py` (PRIMINTR/INTRFACE.PAS — the subsets used so far, now including the whole name subsystem), `news.py` (NEWS.PAS), `update.py` (UPDATE.PAS world update), `design.py` (DESIGN.PAS designation + INTRFACE's `DesignateWorld`/`TerraformWorld`), `resource.py` (RESOURCE.PAS), `newgame.py` (NEWGAME.PAS), `orders.py` (ORDERS.PAS), `fleet.py` (FLEET.PAS), `utils/` (INT.PAS, REAL1.PAS, DFA.PAS), the turn loop in `main.py`, and `ui/`.
 
-A scenario file loads into a populated galaxy — worlds, empires with capitals, nebulae, minefields — and worlds run a full economy: production, industry growth, population, famine, ambrosia addiction, tech drift, revolution and rebellion. Phase 4 (fleets) is next.
+A scenario file loads into a populated galaxy — worlds, empires with capitals, nebulae, minefields — and worlds run a full economy: production, industry growth, population, famine, ambrosia addiction, tech drift, revolution and rebellion. Fleets deploy, carry cargo, burn fuel, move through gates, fortresses, minefields, disrupters and nebulae, and run compiled standing orders. Phase 5 (combat) is next; the fleet TUI (§4.3) and `MovePlayerStarbases` (which belongs with Phase 6 construction) are the two pieces of Phase 4 still outstanding.
+
+**Fleets do not all move at the same moment in the turn rotation.** `update_all_fleets(player, next_player)` moves warp fleets and anything sitting on a gate for the *incoming* empire, and jump/HK fleets for the *outgoing* one, so a jump ordered this turn lands this turn. It is called from `main.update_turn`, not from `update_universe` — fleet movement is per-turn, world updates are per-year.
 
 **Galaxies come from scenario files.** `newgame.py` (NEWGAME.PAS) is a **scenario-file interpreter, not a procedural generator** — there is no code path that builds a galaxy without a `.scn`. The original `*.SCN` files are permanently unavailable, so `data/scenarios/frontier.scn` is authored against the format recovered from the parser. It is new content, not a port, and reproduces no galaxy the original shipped.
 
@@ -56,7 +58,9 @@ These are project-wide decisions already made; don't relitigate them per-file:
 7. **`TechnologyTypes` is one enum, not several.** The original declares a single enum and carves overlapping subranges out of it (`ShipTypes = fgt..trn`, `CargoTypes = men..tri`, ...), then indexes tables across those subranges — `CombatTable` spans defenses, ships and troops at once. Splitting it would break the tables. Subranges are exported from `types.py` as tuples (`SHIP_TYPES`, `CARGO_TYPES`, ...), with same-name aliases kept for readability at use sites.
 8. **Pascal arrays indexed by an enum become dicts keyed by that enum**, built via `datacnst._table`, which raises at import time on a row/key-count mismatch. Use it for every new table — it is the only automatic check on a bulk transcription.
 
-9. **Turbo Pascal builtins that differ from Python's go through `utils/pascal.py`.** `Round` is the live trap: Pascal breaks ties away from zero, Python's `round` is banker's rounding, so `Round(2.5)` is 3 and `round(2.5)` is 2. Call `pascal_round` for every `Round` in the original.
+9. **Turbo Pascal builtins that differ from Python's go through `utils/pascal.py`.** `Round` is the live trap: Pascal breaks ties away from zero, Python's `round` is banker's rounding, so `Round(2.5)` is 3 and `round(2.5)` is 2. Call `pascal_round` for every `Round` in the original, `trunc` for every `Trunc`, and `pascal_val` for every `Val` whose failure is meant to be caught (Python's `int` accepts surrounding whitespace, `_` separators and a unicode minus; Pascal's `Val` errors on all three).
+
+10. **Two DATACNST tables have no source in `original/`.** `CargoSpace` and `ObjName` are referenced by the Pascal but declared in no file in the tree. Their values in `datacnst.py` therefore cannot be checked against anything — treat them as the one place where "transcribed exactly" is a claim the repo cannot back up, and do not silently "correct" them either.
 
 > The code sketches in `docs/IMPLEMENTATION_PLAN.md` §1.3–1.4 are approximations written before the port and disagree with the Pascal in several places (empire numbering, `ObjectTypes` order, enum member names). Where they conflict with `original/`, the Pascal wins.
 
@@ -64,7 +68,9 @@ These are project-wide decisions already made; don't relitigate them per-file:
 
 Sector coordinates are effectively 1-based: the grid is allocated `0..size` inclusive, but `in_galaxy` requires `x > 0 and y > 0`, so row and column 0 exist without being playable. `Limbo` is (0, 0) — where objects sit when they are nowhere. `Galaxy.sector()` raises on out-of-range input rather than following the Pascal, because Python's negative indexing would silently wrap to the opposite edge of the galaxy.
 
-Distance is **Chebyshev**, not Euclidean or Manhattan (`misc.distance`) — diagonal movement costs the same as orthogonal.
+Distance is **Chebyshev**, not Euclidean or Manhattan (`misc.distance`) — diagonal movement costs the same as orthogonal. Fleet movement follows from that: `fleet.get_new_pos` steps both axes at once.
+
+Player-facing coordinates are **relative to the active player's capital**, which reads as `0,0`. The two axes do not convert the same way: `absolute_x` adds the capital's X, but `absolute_y` *subtracts* from the capital's Y, because +Y is north for the player while grid row 1 is at the top. `relative_x`/`relative_y` invert the same pair. Getting this symmetric silently mirrors every typed destination about the capital.
 
 ## Pascal subranges in loops
 

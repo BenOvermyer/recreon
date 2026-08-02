@@ -19,12 +19,13 @@ from .datacnst import (
     TechAdj,
     TrnAdj,
 )
-from .galaxy import XYCoord
+from .galaxy import Location, XYCoord
 from .types import (
     CARGO_TYPES,
     MAX_INDUS_INDEX,
     MAX_RESOURCES,
     SHIP_TYPES,
+    IDNumber,
     IndusTypes,
     TechLevel,
     TechnologyTypes,
@@ -56,6 +57,26 @@ def distance(first: XYCoord, second: XYCoord) -> int:
 
 
 def same_xy(first: XYCoord, second: XYCoord) -> bool:
+    return first == second
+
+
+def same_id(first: IDNumber, second: IDNumber) -> bool:
+    """Whether two IDs point at the same object.
+
+    The original compares the two-byte record as a single Integer; here the
+    dataclass compares field by field, which is the same test.
+    """
+    return first == second
+
+
+def same_location(first: Location, second: Location) -> bool:
+    """Whether two locations match in *both* object and coordinate.
+
+    The original compares all four bytes at once, so a location naming an
+    object at Limbo does not match the same object at a real coordinate.
+    Name lookup depends on that: callers normalise a Location before
+    comparing, rather than the comparison being forgiving.
+    """
     return first == second
 
 

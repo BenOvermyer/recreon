@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from .galaxy import XYCoord
+from .galaxy import Location, XYCoord
 from .types import (
     MAX_NO_OF_CONSTR_SITES,
     MAX_NO_OF_FLEETS,
@@ -124,8 +124,12 @@ class FleetRecord:
 
     KnownBy: set[Empire] = field(default_factory=set)
 
+    #: Index of the next order to execute, 1-based; 0 means "no orders".
     NextOrder: int = 0
-    OrderData: list[int] = field(default_factory=lambda: [0] * 7)  # 1..6, 0 unused
+    #: The compiled order list. Declared ``ARRAY [1..6] OF Byte`` in the
+    #: original and type-punned to an ``OrderStructure`` (a length and a heap
+    #: pointer) by ORDERS.PAS; here it just holds the commands.
+    OrderData: list = field(default_factory=list)
 
     NPEDataIndex: int = 0
 
@@ -179,10 +183,15 @@ class ConstrRecord:
 
 @dataclass(slots=True)
 class NameRecord:
-    """Player-assigned name for a location. A linked list in the original."""
+    """Player-assigned name for a location. A linked list in the original.
+
+    ``Coord`` is a full :class:`~recreon.galaxy.Location`, not a bare
+    coordinate: a name can be pinned to an object that moves (a fleet) as
+    readily as to a fixed point in space.
+    """
 
     Name: str = ""
-    Coord: XYCoord = field(default_factory=XYCoord)
+    Coord: Location = field(default_factory=Location)
 
 
 def defense_distribution_array() -> dict[ShellPos, dict[TechnologyTypes, int]]:

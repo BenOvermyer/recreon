@@ -18,6 +18,7 @@ from .datacnst import (
     SAFETY_ADJ,
     SUPPLIES_PER_BILLION,
     AMBROSIA_ADJ,
+    CargoSpace,
     ClassIndAdj,
     PrincipalIndustry,
     TechAdj2,
@@ -25,15 +26,20 @@ from .datacnst import (
     TypeData,
 )
 from .galaxy import Location, XYCoord
-from .misc import total_prod
+from .misc import fleet_cargo_space, total_prod
 from .primintr import (
+    get_base_type,
     get_class,
     get_efficiency,
+    get_gate_type,
     get_issp,
+    get_object,
     get_population,
     get_special,
+    get_status,
     get_tech,
     get_type,
+    get_warp_link_freq,
 )
 from .types import (
     Empire,
@@ -331,11 +337,99 @@ def create_starbase(
     game.GlobalSets.SetOfStarbasesOf[new_emp].add(obj.Index)
 
 
+# --- Fleet helpers -----------------------------------------------------------
+
+#: Order in which BalanceFleet jettisons cargo: cheapest first, ambrosia last.
+#: 1-based in the original; index 0 is unused here for the same reason.
+CARGO_PRIORITY: tuple[TechnologyTypes | None, ...] = (
+    None,
+    TechnologyTypes.che,
+    TechnologyTypes.sup,
+    TechnologyTypes.met,
+    TechnologyTypes.men,
+    TechnologyTypes.nnj,
+    TechnologyTypes.tri,
+    TechnologyTypes.amb,
+)
+
+
+def balance_fleet(ships: dict[TechnologyTypes, int], cargo: dict[TechnologyTypes, int]) -> None:
+    """Jettison cargo in place until the fleet fits in its own transports.
+
+    Works down CARGO_PRIORITY dumping whole cargo types, then partly refills
+    the last one to exactly fill the space that freed up. A fleet whose
+    transports were destroyed loses cargo this way rather than becoming
+    illegal.
+    """
+    to_remove = 1
+    thing = CARGO_PRIORITY[to_remove]
+    space_left = fleet_cargo_space(ships, cargo)
+
+    while space_left < 0:
+        cargo[thing] = 0
+        new_space_left = fleet_cargo_space(ships, cargo)
+        if new_space_left < 0:
+            space_left = new_space_left
+            to_remove += 1
+            thing = CARGO_PRIORITY[to_remove]
+        else:
+            cargo[thing] = new_space_left * CargoSpace[thing]
+            space_left = 0
+
+
+def passing_through_fortress(game: GameEnvironment, flt_xy: XYCoord) -> bool:
+    """Whether a fortress starbase sits on the fleet's current sector."""
+    base_obj = get_object(game, flt_xy)
+    return (
+        base_obj.ObjTyp == ObjectTypes.Base
+        and get_base_type(game, base_obj) == TechnologyTypes.frt
+    )
+
+
+def passing_through_gate(
+    game: GameEnvironment, flt_id: IDNumber, flt_xy: XYCoord, dest_xy: XYCoord
+) -> bool:
+    """Whether the fleet can jump from ``flt_xy`` to ``dest_xy`` via a gate.
+
+    A plain gate (``gte``) sends a fleet anywhere. A link (``lnk``) only
+    connects to another gate or link at the far end -- and, per the original,
+    only when the destination gate's frequency does *not* match, which is what
+    distinguishes a link's own network from a gate the fleet could simply use.
+
+    Fortresses are handled separately by the caller.
+    """
+    gate_obj = get_object(game, flt_xy)
+    if gate_obj.ObjTyp != ObjectTypes.Gate:
+        return False
+    if get_warp_link_freq(game, get_status(game, flt_id), gate_obj) != get_warp_link_freq(
+        game, get_status(game, gate_obj), gate_obj
+    ):
+        return False
+
+    gate_type = get_gate_type(game, gate_obj)
+    if gate_type == TechnologyTypes.gte:
+        return True
+    if gate_type == TechnologyTypes.lnk:
+        dest_obj = get_object(game, dest_xy)
+        return (
+            dest_obj.ObjTyp == ObjectTypes.Gate
+            and get_gate_type(game, dest_obj)
+            in (TechnologyTypes.lnk, TechnologyTypes.gte)
+            and get_warp_link_freq(game, get_status(game, flt_id), dest_obj)
+            != get_warp_link_freq(game, get_status(game, dest_obj), dest_obj)
+        )
+    return False
+
+
 __all__ = [
+    "CARGO_PRIORITY",
     "Gamma",
+    "balance_fleet",
     "create_planet",
     "create_stargate",
     "next_stargate_slot",
+    "passing_through_fortress",
+    "passing_through_gate",
     "scout",
     "create_starbase",
     "get_industrial_distribution",

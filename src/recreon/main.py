@@ -13,8 +13,10 @@ from . import __version__
 from pathlib import Path
 
 from .environ import GameEnvironment
+from .fleet import update_all_fleets
 from .newgame import load_scenario
-from .primintr import empire_active, empire_player, no_more_players
+from .news import erase_news
+from .primintr import empire_active, empire_player, next_empire, no_more_players
 from .types import PLAYER_EMPIRES, Empire
 from .update import update_universe
 
@@ -26,9 +28,19 @@ def update_turn(game: GameEnvironment) -> None:
     advances when the rotation wraps past Empire8 -- not once per player
     turn -- so a full round of empires is one game year.
 
+    Fleets move here rather than in ``update_universe``, and they move twice
+    per handoff: once for the outgoing empire's jump fleets and once for the
+    incoming empire's warp fleets. ``update_all_fleets`` decides which is
+    which.
+
     The asynchronous (play-by-mail) branch is not ported; ``AsyncTurns`` is
     always False for now.
     """
+    if empire_active(game, game.Player):
+        erase_news(game, game.Player)
+        update_all_fleets(game, game.Player, next_empire(game, game.Player))
+        # MovePlayerStarbases is Phase 6, with construction.
+
     game.EmpiresToMove.discard(game.Player)
 
     while True:
@@ -43,7 +55,9 @@ def update_turn(game: GameEnvironment) -> None:
             if empire_player(game, game.Player):
                 return
             # An NPE's turn resolves without stopping the loop. ImplementNPE
-            # and the fleet updates land in Phase 7.
+            # is Phase 7, but its fleets still move on schedule.
+            erase_news(game, game.Player)
+            update_all_fleets(game, game.Player, next_empire(game, game.Player))
 
         if not any(empire_active(game, emp) for emp in PLAYER_EMPIRES):
             # Nothing left to rotate to; bail rather than spin forever.

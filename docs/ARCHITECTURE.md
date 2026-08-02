@@ -171,24 +171,30 @@ Fleet management from FLEET.PAS.
 
 **Key functions:**
 - `deploy_fleet()` - Create new fleet from world
-- `abort_fleet()` - Transfer fleet to ground
-- `change_fleet_composition()` - Load/unload ships and cargo
+- `abort_fleet()` - Transfer fleet to ground (must be followed by `destroy_fleet()`)
+- `change_composition_of_fleet()` - Load/unload ships and cargo, moving fuel to match
 - `refuel_fleet()` - Convert trillum to fuel
-- `update_fleet()` - Movement, fuel consumption, pathfinding
+- `update_fleet()` - One year of movement, then orders on arrival
+- `update_all_fleets()` - Which fleets move at this point in the turn rotation
 - `execute_fleet_orders()` - Run order scripts
-- Stargate teleportation
-- SRM mine damage
-- Disrupter interaction
+- `in_range_of_disrupter()` / `in_range_of_my_disrupter()` - Disrupter interaction
+- `mine_field_damage()` - SRM mine losses
 
-**Fleet movement sequence:**
-1. Calculate path toward destination
-2. Check for stargates (instant teleport)
-3. Check for fortress teleportation
-4. Consume fuel
-5. Handle jump/HK fleet SRM mine damage
-6. Handle disrupter effects
-7. Check for dense nebulae
-8. Execute orders on arrival
+**Fleet movement sequence** (`update_fleet`, skipped entirely when the fleet is
+already at its destination):
+1. Decide the mode: usable stargate under the fleet, or fortress (teleport if
+   the destination is within 5 sectors, else a catapult boost)
+2. Consume one year's fuel, refuelling from carried trillum; go inactive if
+   there is none
+3. Teleport to the destination, unless a dense nebula sits on it
+4. Otherwise step up to `FltMovementRate` sectors, checking each step for
+   SRM mines and hostile disrupters (jump and HK fleets only), friendly
+   disrupters (warp fleets, which then run at jump speed), and dense nebulae
+5. Execute orders if the fleet arrived
+
+**Turn scheduling.** Fleets do not all move at the same moment. Warp fleets and
+anything sitting on a gate move for the *incoming* empire; jump and HK fleets
+move for the *outgoing* one, so a jump ordered this turn lands this turn.
 
 ### attack.py
 Combat resolution from ATTACK.PAS.
@@ -264,10 +270,19 @@ Fleet order scripting from ORDERS.PAS.
 - `REPE` - Repeat from start of orders
 - `WAIT` - Pause execution
 
+Only the first four characters of a verb are significant, so `DEST` and
+`DESTination` are the same order.
+
 **Functions:**
-- `parse_orders()` - Convert text to order list
-- `compile_orders()` - Store in fleet
-- `execute_orders()` - Run order script
+- `parse_line()` - Convert one line of text to a `CommandRecord`
+- `compile_orders()` - Compile order text into an `OrderStructure`
+- `decompile_orders()` - Render compiled orders back to editable text
+- `get_fleet_code()` / `set_fleet_code()` - The fleet's stored order list
+- `fleet_next_statement()` / `set_fleet_next_statement()` - Where it resumes
+
+`AbortCOM` exists as an enum member with no parser or executor: the `ABOR`
+branch is commented out of `ParseLine` in v2.0, so no compiled order carries
+it. Execution lives in `fleet.execute_fleet_orders()`.
 
 ## AI Layer (npe/)
 

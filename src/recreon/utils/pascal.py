@@ -20,6 +20,20 @@ def pascal_round(x: float) -> int:
     return math.floor(x + 0.5) if x >= 0 else math.ceil(x - 0.5)
 
 
+def pascal_val(s: str) -> int:
+    """Turbo Pascal ``Val`` on an Integer: parse, or raise ``ValueError``.
+
+    Python's ``int`` accepts surrounding whitespace, underscores as digit
+    separators and a unicode minus; Pascal's ``Val`` reports an error at the
+    offending character for all three. The difference matters wherever a
+    parse failure is meant to be caught rather than silently succeed.
+    """
+    body = s[1:] if s[:1] in "+-" else s
+    if not body.isascii() or not body.isdigit():
+        raise ValueError(f"invalid integer: {s!r}")
+    return int(s)
+
+
 def trunc(x: float) -> int:
     """Turbo Pascal ``Trunc``: truncate toward zero.
 
