@@ -7,7 +7,6 @@ keeps them. The command-loop and window code around them is Phase 8.
 
 from __future__ import annotations
 
-import random
 from typing import TYPE_CHECKING
 
 from .datacnst import MAX_ISSP, MinTechForType, TechDev
@@ -29,7 +28,7 @@ from .primintr import (
 )
 from .types import IndusTypes, IDNumber, TechLevel, WorldClass, WorldTypes
 from .utils.int_utils import rnd
-from .utils.pascal import pascal_round
+from .utils.pascal import pascal_random_real, pascal_round
 
 if TYPE_CHECKING:
     from .environ import GameEnvironment
@@ -66,12 +65,12 @@ def designate_world(
         set_type(game, cap_id, WorldTypes.BseTyp)
 
         eff = get_efficiency(game, cap_id)
-        set_efficiency(game, cap_id, eff - pascal_round(eff / (1.5 + random.random())))
+        set_efficiency(game, cap_id, eff - pascal_round(eff / (1.5 + pascal_random_real())))
 
         change_total_rev_index(game, emp, rnd(35, 45))
 
     eff = get_efficiency(game, world)
-    set_efficiency(game, world, eff - pascal_round(eff / (1.5 + random.random())))
+    set_efficiency(game, world, eff - pascal_round(eff / (1.5 + pascal_random_real())))
 
     set_type(game, world, new_type)
 

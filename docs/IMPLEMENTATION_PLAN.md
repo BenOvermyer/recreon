@@ -527,11 +527,31 @@ reproduces no galaxy the original shipped; it remains the default.
 The authored starter scenario was a **deliverable of this phase**, not a test
 fixture: at the time it was the only way the game could begin.
 
-**Still open now that the originals exist**: the parser reads `INTRO`,
-`IMPERIUM` and `TRINITY` but not all 13. `Nebula.SCN` has a `1234567890…`
-ruler line at line 11 that the dispatch rejects as an unknown command, and
-`AWAKEN.SCN` asks for more worlds than `MAX_NO_OF_PLANETS`. Both need fixing
-against the real files rather than against what the parser appeared to want.
+**Validated against the originals**: 11 of the 13 load. Two things the real
+files taught that the parser alone had not:
+
+1. **`ScenarioIntroduction` is part of the load**, not front-end chrome. It
+   runs between the header and the directive loop in the same forward pass:
+   discard tokens until `BEGINTEXT`, then read lines until `ENDTEXT`, with
+   `NEWPAGE` splitting pages and both matched as substrings of a line. The
+   discard is load-bearing — `Nebula.SCN` parks a column ruler between its
+   header and its intro, and only the discard keeps it out of the dispatch.
+   `frontier.scn` gained an intro block so it conforms.
+2. **`GetRandomXY` giving up is a real outcome.** It tries 101 times and then
+   reports `No room for random world in zone`. `GAUNTLET.SCN` packs 172 worlds
+   into small zones and trips it on a few per cent of unseeded runs — in the
+   DOS build as much as here.
+
+The remaining two are defective as shipped and would have failed originally:
+
+- `AWAKEN.SCN` asks for 212 worlds against `MaxNoOfPlanets = 200`. The
+  original has no bounds check and would have written past the planet array;
+  the port reports the overrun instead.
+- `PRINCES.SCN` carries a stray `0 ; (reserved)` token in its one
+  `CreateStarbase` block, one field more than the directive takes, so the
+  block runs long and its last cargo amount is read as a directive.
+
+Neither is a parser defect. The parser should not be loosened to accept them.
 
 ### 3.5.1 Scenario tokenizer (utils/dfa.py)
 
@@ -598,17 +618,35 @@ revived; note it rather than quietly implementing dead code.
 A scenario carries a `Seed`: non-zero sets `RandSeed`, zero calls
 `Randomize`. A fixed seed is meant to produce the same galaxy every run.
 
-**Was decided: use Python's `random`.** Turbo Pascal's LCG was not
-reimplemented, because with no original scenarios there was no galaxy to
-reproduce bit-for-bit and matching the DOS generator would have bought
-nothing.
+**Settled: Turbo Pascal's LCG is ported**, in `utils/pascal.py`. Python's
+`random` is not used anywhere in the package.
 
-> **Reopened.** §3.5.0 no longer holds — the original scenarios exist. Each
-> carries a fixed `Seed`, so reimplementing Turbo Pascal's LCG would now make
-> the shipped scenarios generate the galaxies players actually saw in 2004.
-> That is a real prize and the argument above no longer applies. The current
-> code still uses Python's `random`; changing it is a decision to be taken,
-> not an oversight.
+```
+RandSeed := RandSeed * 134775813 + 1        { mod 2**32 }
+Random(N) := (unsigned(RandSeed) * N) shr 32
+```
+
+The multiplier is `$08088405`. `Random(N)` is the **top 32 bits of the
+product**, not `RandSeed mod N` — the latter is a widely repeated description
+of this generator and produces a different sequence. `tests/test_pascal.py`
+checks the implementation against the published Borland Pascal 7 seed
+sequence `-19094774, 649090867, 0, 1, 134775814, -596792289`, forwards and
+backwards.
+
+`Rnd(Min,Max)` is `Random(Max-Min+1)+Min`, so every draw in the game — combat,
+economy, generation — runs on this.
+
+> **What this turned out not to buy.** The reopening argument was that the
+> shipped scenarios carry fixed seeds, so porting the LCG would regenerate the
+> galaxies players saw. That premise was wrong: **all 13 shipped scenarios
+> carry `Seed 0`**, which means `Randomize`. Those galaxies were rolled fresh
+> on every new game and never existed twice; there is nothing to recover.
+>
+> The port is still worth having, for two smaller reasons. Our own seeded
+> scenarios now draw the sequence the original would have drawn. And call
+> sites depend on the generator's quirks — `Random(1)` is always 0, which
+> `ATTACK.PAS:1498` relies on for its surrender check — which Python's
+> `randint` would get wrong.
 
 What this does and does not give you:
 

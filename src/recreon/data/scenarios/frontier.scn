@@ -16,6 +16,29 @@ ANACREON 16 SCENARIO
 
   20250731    1    4    40    90    2    50   200   4021
 
+; --- Introduction ----------------------------------------------------------
+; Every scenario needs a BeginText/EndText block: the loader discards every
+; token between the header and BeginText, then shows these pages before the
+; galaxy is built. NewPage splits pages.
+
+BeginText
+
+                         THE KALGAN FRONTIER
+
+     Beyond the Kalgan Rift the old star charts simply stop. Not because
+  anyone surveyed the edge and found nothing -- because the surveyors
+  never came back, and the Imperium had larger worries by then.
+
+     A thousand years later the Rift is quiet, the Imperium is a rumour,
+  and three young powers have all arrived at the same conclusion within a
+  decade of each other: whoever holds the Frontier holds the road back to
+  the Core.
+
+     None of them has the strength to take it alone. All of them are
+  about to try.
+
+EndText
+
 BeginDescription
 A quiet arm of the galaxy, far enough from the old capitals that nobody has
 bothered to draw the borders yet. Three powers have noticed it at once.

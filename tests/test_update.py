@@ -1,7 +1,5 @@
 """Milestone 3: worlds produce, populations grow, tech advances."""
 
-import random
-
 import pytest
 
 from recreon.datacnst import BasePop, OptMilitary, ThgAdj
@@ -34,13 +32,14 @@ from recreon.update import (
     use_up_ambrosia,
     use_up_food,
 )
+from recreon.utils.pascal import set_rand_seed
 
 T = TechnologyTypes
 
 
 @pytest.fixture(autouse=True)
 def _seeded():
-    random.seed(1234)
+    set_rand_seed(1234)
 
 
 def make_world(

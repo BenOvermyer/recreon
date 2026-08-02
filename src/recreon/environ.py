@@ -56,6 +56,11 @@ class GameEnvironment:
         self.NoOfPlanets: int = 0
         self.TimePerTurn: int = DEFAULT_TIME_PER_TURN
 
+        #: Pages of the scenario's introduction text, as loaded. The original
+        #: displays these before the galaxy is built and keeps nothing; they
+        #: are kept here for the Phase 8 UI to show.
+        self.ScenarioIntroduction: list[str] = []
+
         # Session flags, from the ENVIRON.PAS typed constants.
         self.AutoSave: bool = True
         self.PauseActive: bool = True

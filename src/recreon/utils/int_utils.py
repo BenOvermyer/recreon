@@ -5,9 +5,7 @@ Port of INT.PAS. ``SwapInt`` is dropped -- Python has tuple assignment.
 
 from __future__ import annotations
 
-import random
-
-from .pascal import trunc
+from .pascal import pascal_random, trunc
 
 #: Turbo Pascal's 16-bit ``MaxInt``, the clamp bound used by IntLmt.
 MAXINT = 32767
@@ -65,10 +63,14 @@ def rnd(minimum: int, maximum: int) -> int:
     """Random integer in ``minimum..maximum`` inclusive.
 
     Returns ``minimum`` when ``maximum <= minimum``, as the original does.
+
+    Goes through Turbo Pascal's generator rather than Python's, so a scenario
+    seed reproduces the galaxy the DOS build produced. Every random draw in
+    the game funnels through here.
     """
     if maximum <= minimum:
         return minimum
-    return random.randint(minimum, maximum)
+    return pascal_random((maximum - minimum) + 1) + minimum
 
 
 def rnd_var(value: int, variation: int) -> int:

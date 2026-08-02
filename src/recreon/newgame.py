@@ -4,26 +4,31 @@ Port of NEWGAME.PAS. This is a scenario-*file interpreter*: it reads a `.scn`
 text file and executes directives that build the universe. There is no code
 path that generates a galaxy without one.
 
-The original scenario files that shipped with Anacreon are not available, so
-the format here is recovered from the parser and the scenarios in
-``data/scenarios/`` are newly authored -- they are not ports and do not
-reproduce any galaxy the original shipped. See IMPLEMENTATION_PLAN.md §3.5.
+The 13 scenario files that shipped with Anacreon are in ``original/scenarios``
+and are the authority on the format; 11 of them load. ``data/scenarios`` holds
+newly authored content, which is not a port and reproduces no galaxy the
+original shipped. See IMPLEMENTATION_PLAN.md §3.5.
+
+Loading is a single forward pass over the file: header, then the introduction
+(see :meth:`ScenarioLoader.read_introduction`), then directives until
+``ENDSCENARIO``. Nothing seeks backwards, so a directive that reads the wrong
+number of tokens desynchronises everything after it -- which is how both of
+the two unloadable shipped scenarios fail.
 
 Deliberately not ported:
 
-* The interactive front end -- scenario menu, paged introduction text, empire
-  naming prompts. :func:`load_scenario` takes names as an argument instead.
-  Phase 8.
+* The interactive front end -- scenario menu, empire naming prompts, and the
+  paging of the introduction text. :func:`load_scenario` takes names as an
+  argument and hands the intro pages to the caller. Phase 8.
 * ``BEGINARTIFACTS`` / ``BEGINTRANSACTIONS`` / ``BEGINVICTORYCONDITIONS``.
   These are commented out of the dispatch in v2.0, so the artifact scripting
   engine is unreachable dead code. This is why ``cdetypes.py`` has no caller.
 * ``CheckSum``, an anti-tamper check the demo build ran over shipped
-  scenarios. Pointless with no shipped scenarios.
+  scenarios.
 """
 
 from __future__ import annotations
 
-import random
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -64,6 +69,7 @@ from .primintr import (
 from .types import (
     CARGO_TYPES,
     DEFNS_TYPES,
+    MAX_NO_OF_PLANETS,
     MAX_NO_OF_STARBASES,
     PLAYER_EMPIRES,
     SHIP_TYPES,
@@ -79,7 +85,7 @@ from .types import (
 )
 from .utils.dfa import TokenReader, TokenError
 from .utils.int_utils import greater_int, rnd, rnd_var
-from .utils.pascal import pascal_round, trunc
+from .utils.pascal import pascal_round, randomize, set_rand_seed, trunc
 
 T = TechnologyTypes
 
@@ -166,6 +172,10 @@ class ScenarioLoader:
     no_of_players: Empire = Empire.Empire1
     player_names: dict[Empire, str] = field(default_factory=dict)
     empire_names: dict[Empire, str] = field(default_factory=dict)
+    #: Pascal's ``NextEmpToCreate``: how many empires have been created so
+    #: far. RANDOMIZEPLAYERS uses it as the first slot it is allowed to
+    #: shuffle, so empires already placed are left where they are.
+    next_empire_to_create: int = 0
 
     @property
     def failed(self) -> bool:
@@ -185,20 +195,29 @@ class ScenarioLoader:
         empty, unmined and not dense nebula -- giving up after 100 tries, as
         the original does, rather than looping forever on a full zone.
         """
-        xy = limbo()
-        for _ in range(101):
+        count = 0
+        while True:
             xy = XYCoord(rnd(x1, x2), rnd(y1, y2))
-            if not check_world:
-                return xy
+            count += 1
             if (
-                get_object(self.game, xy).ObjTyp == ObjectTypes.Void
-                and enemy_mine(self.game, xy) == Empire.Indep
-                and get_nebula(self.game, xy) != NebulaTypes.DenseNebula
+                not check_world
+                or count > 100
+                or (
+                    get_object(self.game, xy).ObjTyp == ObjectTypes.Void
+                    and enemy_mine(self.game, xy) == Empire.Indep
+                    and get_nebula(self.game, xy) != NebulaTypes.DenseNebula
+                )
             ):
-                return xy
+                break
 
-        self.error("ERROR: No room for random world in zone.")
-        return limbo()
+        if count > 100:
+            # Note this fires on the 101st attempt even when that attempt
+            # found a free sector -- the original tests the counter after the
+            # loop, not the outcome. Kept: it is a generation path, and the
+            # draw count has to match.
+            self.error("ERROR: No room for random world in zone.")
+            return limbo()
+        return xy
 
     @staticmethod
     def _range(text: str) -> tuple[int, int]:
@@ -453,6 +472,11 @@ class ScenarioLoader:
         ships = self._read_amounts(SHIP_TYPES)
         cargo = self._read_amounts(CARGO_TYPES)
 
+        if self.first_world > MAX_NO_OF_PLANETS:
+            self.error(
+                f"ERROR: Too many worlds created (limit {MAX_NO_OF_PLANETS})."
+            )
+            return
         obj = IDNumber(ObjectTypes.Pln, self.first_world)
         self.first_world += 1
 
@@ -543,6 +567,17 @@ class ScenarioLoader:
             self.error("ERROR: CreateRandomWorlds before ClassTable/TechTable.")
             return
 
+        if self.first_world + count - 1 > MAX_NO_OF_PLANETS:
+            # The original has no such check and writes past the planet array;
+            # AWAKEN.SCN asks for 212 worlds against a limit of 200 and would
+            # have corrupted memory in the DOS build. Reported rather than
+            # silently truncated, following how the original handles the same
+            # situation for starbases and stargates.
+            self.error(
+                f"ERROR: Too many worlds created (limit {MAX_NO_OF_PLANETS})."
+            )
+            return
+
         for index in range(self.first_world, self.first_world + count):
             coord = self.get_random_xy(zone.x1, zone.y1, zone.x2, zone.y2, True)
 
@@ -602,6 +637,7 @@ class ScenarioLoader:
             rev_factor=rev_factor, modifiers=modifiers, year_founded=self.game.Year,
         )
         self.empire_names[emp] = name
+        self.next_empire_to_create += 1
 
     def do_create_np_empire(self) -> None:
         emp = Empire(self.reader.next_integer())
@@ -624,6 +660,7 @@ class ScenarioLoader:
             rev_factor=rev_factor, modifiers=modifiers, year_founded=self.game.Year,
         )
         self.empire_names[emp] = name
+        self.next_empire_to_create += 1
 
         from .npe.types import NPEmpireTypes
 
@@ -703,14 +740,31 @@ class ScenarioLoader:
                     put_mine(self.game, xy, emp)
 
     def do_randomize_players(self) -> None:
-        """Shuffle which empire slot each player occupies."""
-        named = [e for e in PLAYER_EMPIRES if self.player_names.get(e)]
-        if len(named) < 2:
+        """Shuffle which empire slot each player occupies.
+
+        Built by rejection sampling -- draw a slot, redraw while it collides
+        with one already taken -- rather than by a shuffle. That is not an
+        arbitrary choice: it consumes a specific, input-dependent number of
+        RNG draws, and every later draw in the scenario shifts with it. A
+        Fisher-Yates shuffle would give a valid permutation and the wrong
+        galaxy.
+        """
+        first = self.next_empire_to_create
+        last = self.header.max_players - 1
+        if first >= last:
             return
-        names = [self.player_names[e] for e in named]
-        random.shuffle(names)
-        for emp, name in zip(named, names, strict=True):
-            self.player_names[emp] = name
+
+        order: dict[int, int] = {first: rnd(first, last)}
+        for i in range(first + 1, last + 1):
+            while True:
+                order[i] = rnd(first, last)
+                if all(order[j] != order[i] for j in range(first, i)):
+                    break
+
+        names = dict(self.player_names)
+        for i in range(first, last + 1):
+            src = PLAYER_EMPIRES[order[i]]
+            self.player_names[PLAYER_EMPIRES[i]] = names.get(src, "")
 
     def _skip_until(self, marker: str) -> None:
         while True:
@@ -752,17 +806,70 @@ class ScenarioLoader:
         h.max_length = self.reader.next_integer()
         h.first_year = self.reader.next_integer()
 
+    def read_introduction(self) -> list[str]:
+        """Consume the scenario's introduction, returning its pages of text.
+
+        Port of ``ScenarioIntroduction``, minus the interactive paging. It
+        runs between the header and the directive loop, in the same single
+        forward pass over the file, and does two things:
+
+        * **Discards every token until ``BEGINTEXT``.** This is why scenarios
+          can carry scratch between the header and the intro -- Nebula.SCN has
+          a ``1234567890...`` column ruler there -- without the directive
+          dispatch ever seeing it.
+        * **Reads lines until ``ENDTEXT``**, with ``NEWPAGE`` splitting pages.
+          Both are matched as substrings of the line, not as tokens, so a line
+          merely containing the word ends the page.
+
+        Every scenario the game shipped has exactly one ``BEGINTEXT``; a file
+        without one runs this scan to EOF and fails, exactly as the original
+        would.
+        """
+        while True:
+            token = self.reader.next_token().upper()
+            if token == "BEGINTEXT":
+                break
+            if self.reader.at_eof:
+                self.error("ERROR: BEGINTEXT not found.")
+                return []
+
+        # The original follows the scan with an unconditional ReadLn to drop
+        # anything trailing BEGINTEXT on its line. Here the tokenizer has
+        # usually consumed the newline already, so this has to be conditional
+        # or it swallows the intro's first line.
+        if not self.reader.at_line_start:
+            self.reader.read_line()
+
+        pages: list[str] = []
+        page: list[str] = []
+        while True:
+            line = self.reader.read_line()
+            upper = line.upper()
+            if "ENDTEXT" in upper:
+                pages.append("\n".join(page))
+                return pages
+            if "NEWPAGE" in upper:
+                pages.append("\n".join(page))
+                page = []
+                continue
+            if self.reader.at_eof:
+                self.error("ERROR: ENDTEXT not found.")
+                return pages
+            page.append(line)
+
     def run(self) -> None:
         """Execute directives until ENDSCENARIO, EOF or the first error."""
         # Zone 1 defaults to the whole galaxy.
         size = self.header.size_of_galaxy
         self.zones[1] = Zone(1, 1, size, size)
 
-        # A non-zero seed makes the galaxy reproducible; zero leaves the RNG
-        # as it is. This port does not reproduce the DOS build's galaxies --
-        # see IMPLEMENTATION_PLAN.md §3.5.4.
+        # A non-zero seed makes the galaxy reproducible, and reproducible the
+        # same way the DOS build was: `rnd` runs on Turbo Pascal's own
+        # generator, so a seeded scenario regenerates the galaxy players saw.
         if self.header.seed != 0:
-            random.seed(self.header.seed)
+            set_rand_seed(self.header.seed)
+        else:
+            randomize()
 
         handlers = {
             "CLASSTABLE": self.do_class_table,
@@ -852,6 +959,13 @@ def load_scenario(
     # initialize_universe resets NoOfPlanets; the directives grow it as they
     # place worlds, and the header value is only an upper bound.
     game.NoOfPlanets = 0
+
+    # The introduction sits between the header and the first directive in the
+    # same forward pass, so it has to be consumed even though nothing displays
+    # it yet. Its pages are kept for the Phase 8 UI.
+    game.ScenarioIntroduction = loader.read_introduction()
+    if loader.failed:
+        raise ScenarioError("\n".join(loader.errors))
 
     loader.run()
     if loader.failed:

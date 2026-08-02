@@ -1,7 +1,5 @@
 """Milestone 4: fleets deploy, carry cargo, burn fuel, move and obey orders."""
 
-import random
-
 import pytest
 
 from conftest import blank_game, place_world
@@ -64,6 +62,7 @@ from recreon.types import (
     cargo_array,
     ship_array,
 )
+from recreon.utils.pascal import set_rand_seed
 
 T = TechnologyTypes
 
@@ -503,7 +502,7 @@ def test_sweeping_empty_space_reports_no_mines(game, world):
 
 
 def test_mines_destroy_part_of_a_jump_fleet(game, world):
-    random.seed(7)
+    set_rand_seed(7)
     stock(game, world, {T.jmp: 1000})
     fleet = launch(game, world, {T.jmp: 1000})
 
@@ -517,7 +516,7 @@ def test_mines_destroy_part_of_a_jump_fleet(game, world):
 
 def test_mines_can_wipe_out_a_small_fleet(game, world):
     """The flat 1..100 term dominates for small fleets, so they go under."""
-    random.seed(7)
+    set_rand_seed(7)
     stock(game, world, {T.jmp: 5})
     fleet = launch(game, world, {T.jmp: 5})
 
@@ -623,7 +622,7 @@ def test_a_dense_nebula_stops_a_fleet_short_of_it(game, world):
 
 
 def test_a_minefield_stops_a_jump_fleet_in_the_mined_sector(game, world):
-    random.seed(11)
+    set_rand_seed(11)
     stock(game, world, {T.jmp: 2000}, {T.tri: 500})
     fleet = launch(game, world, {T.jmp: 2000}, dest=XYCoord(20, 10))
     put_mine(game, XYCoord(13, 10), Empire.Empire2)

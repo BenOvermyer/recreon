@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-Re:creon is a Python recreation of **Anacreon: Reconstruction 4021** (v2.0, Jan 2004), a turn-based 4X space strategy game originally written in Turbo Pascal 4.0. The complete original Pascal source (~39k lines, 85 units) lives in `original/` and is the **authoritative specification** — the Python port is intended to be behavior-faithful, not a reimagining.
+Re:creon is a Python recreation of **Anacreon: Reconstruction 4021** (v2.0, Jan 2004), a turn-based 4X space strategy game originally written in Turbo Pascal. The complete original Pascal source (~39k lines, 85 units) lives in `original/` and is the **authoritative specification** — the Python port is intended to be behavior-faithful, not a reimagining.
+
+**Turbo Pascal 5.0 or later, not 4.0** as this file long claimed. `ANACREON.PAS` uses `{$O}` overlay directives and `ANACREON.OVR` carries a `TPOV` signature; the overlay manager did not exist before TP 5.0. This is not pedantry — it dates the build into the range where Borland's `Random` uses the `$08088405` LCG that `utils/pascal.py` reproduces.
 
 **Current state: Phases 1–4 complete, except the Phase 4 UI (§4.3).** Ported: `types.py` (TYPES.PAS), `datastrc.py` (DATASTRC.PAS), `datacnst.py` (DATACNST.PAS), `cdetypes.py` (CDETYPES.PAS), `npe/types.py` (NPETYPES.PAS), `galaxy.py` (GALAXY.PAS), `environ.py` (ENVIRON.PAS + `InitializeUniverse` from LOADSAVE.PAS), `misc.py` (MISC.PAS), `primintr.py` and `intrface.py` (PRIMINTR/INTRFACE.PAS — the subsets used so far, now including the whole name subsystem), `news.py` (NEWS.PAS), `update.py` (UPDATE.PAS world update), `design.py` (DESIGN.PAS designation + INTRFACE's `DesignateWorld`/`TerraformWorld`), `resource.py` (RESOURCE.PAS), `newgame.py` (NEWGAME.PAS), `orders.py` (ORDERS.PAS), `fleet.py` (FLEET.PAS), `utils/` (INT.PAS, REAL1.PAS, DFA.PAS), the turn loop in `main.py`, and `ui/`.
 
@@ -16,9 +18,20 @@ A scenario file loads into a populated galaxy — worlds, empires with capitals,
 
 **The original `*.SCN` files are in `original/scenarios/`** — 13 of them, all declaring format version 10. This reverses the earlier premise that they were permanently unavailable, and they are now the authority on the format: where a real scenario disagrees with what the parser seemed to want, the file wins. `data/scenarios/frontier.scn` is still authored content rather than a port (it declares version 16 and reproduces no galaxy the original shipped), and is still the default the game boots.
 
-The parser does not yet read all of them. `INTRO`, `IMPERIUM` and `TRINITY` load; `Nebula.SCN` trips over a `1234567890…` ruler line the dispatch treats as an unknown command, and `AWAKEN.SCN` overruns `MAX_NO_OF_PLANETS`. Both are Phase 3.5 gaps, not Phase 4 ones.
+**11 of the 13 load. The other two are defective as shipped**, and would have failed in the DOS build too:
 
-Two decisions: galaxy **generation uses Python's `random`** (seeded from the scenario's `Seed`), so a seed is reproducible within this port but will not match the DOS build — scoped to generation only; the balance formulas stay transcribed exactly. **This one was settled on the premise that no original scenario existed to reproduce, and that premise no longer holds** — reimplementing Turbo Pascal's LCG is now possible and would make the shipped scenarios generate their real galaxies. Open, not settled. And `cdetypes.py` has no caller because the artifact and transaction directives are commented out of the scenario dispatch in v2.0, making that whole subsystem unreachable dead code in the original.
+- `AWAKEN.SCN` asks for 212 worlds (36 explicit plus 176 random) against `MaxNoOfPlanets = 200`. The original has no bounds check here and would have written past the planet array; the port reports `Too many worlds created` instead.
+- `PRINCES.SCN` has a stray `0 ; (reserved)` token in its one `CreateStarbase` block. Every other scenario's starbase block has six fields after the coordinate; this one has seven, so the block runs long and its trailing cargo amount is read as the next directive.
+
+Neither is a parser bug — don't "fix" the parser to accept them, and don't edit the shipped files.
+
+**Galaxy generation runs on Turbo Pascal's own RNG** (`utils/pascal.py`), not Python's: seed update `s = s*134775813 + 1 mod 2^32`, and `Random(N)` is the top 32 bits of `s * N`, *not* `s mod N`. Every draw in the game funnels through `int_utils.rnd`, so this governs combat and the economy as well as generation. Verified against the published Borland Pascal 7 sequence in `tests/test_pascal.py`.
+
+Note what this does *not* buy: **all 13 shipped scenarios carry `Seed 0`**, meaning `Randomize`. The galaxies players saw in 2004 were rolled fresh on every new game and never existed twice, so there is nothing there to reproduce. What the LCG gives is that our own seeded scenarios draw the sequence the original would have drawn, and that quirks call sites depend on — `Random(1)` is always 0, which `ATTACK.PAS` relies on — behave correctly.
+
+`cdetypes.py` has no caller because the artifact and transaction directives are commented out of the scenario dispatch in v2.0, making that whole subsystem unreachable dead code in the original.
+
+**Loading is one forward pass, and the introduction is part of it.** Between the header and the first directive, `read_introduction` discards every token until `BEGINTEXT` and then reads lines until `ENDTEXT` (`NEWPAGE` splits pages, both matched as substrings of a line rather than as tokens). Scenarios rely on the discard: `Nebula.SCN` keeps a column ruler there. A scenario without a `BEGINTEXT` block fails to load.
 
 The scenario header keeps its version at **fixed columns 10–11** of line 1, and the parser rejects anything else rather than parsing loosely: Python's `int()` strips whitespace where Pascal's `Val` errors, so a header off by one column would otherwise read as some low version, silently enable the old-format shims, and desync every directive after it.
 
@@ -62,7 +75,7 @@ These are project-wide decisions already made; don't relitigate them per-file:
 7. **`TechnologyTypes` is one enum, not several.** The original declares a single enum and carves overlapping subranges out of it (`ShipTypes = fgt..trn`, `CargoTypes = men..tri`, ...), then indexes tables across those subranges — `CombatTable` spans defenses, ships and troops at once. Splitting it would break the tables. Subranges are exported from `types.py` as tuples (`SHIP_TYPES`, `CARGO_TYPES`, ...), with same-name aliases kept for readability at use sites.
 8. **Pascal arrays indexed by an enum become dicts keyed by that enum**, built via `datacnst._table`, which raises at import time on a row/key-count mismatch. Use it for every new table — it is the only automatic check on a bulk transcription.
 
-9. **Turbo Pascal builtins that differ from Python's go through `utils/pascal.py`.** `Round` is the live trap: Pascal breaks ties away from zero, Python's `round` is banker's rounding, so `Round(2.5)` is 3 and `round(2.5)` is 2. Call `pascal_round` for every `Round` in the original, `trunc` for every `Trunc`, and `pascal_val` for every `Val` whose failure is meant to be caught (Python's `int` accepts surrounding whitespace, `_` separators and a unicode minus; Pascal's `Val` errors on all three).
+9. **Turbo Pascal builtins that differ from Python's go through `utils/pascal.py`.** `Round` is the live trap: Pascal breaks ties away from zero, Python's `round` is banker's rounding, so `Round(2.5)` is 3 and `round(2.5)` is 2. Call `pascal_round` for every `Round` in the original, `trunc` for every `Trunc`, `pascal_val` for every `Val` whose failure is meant to be caught (Python's `int` accepts surrounding whitespace, `_` separators and a unicode minus; Pascal's `Val` errors on all three), and `pascal_random` / `pascal_random_real` / `set_rand_seed` for `Random` and `RandSeed`. **Never call Python's `random` module** — a draw that bypasses the ported LCG desynchronises every draw after it. Tests that need determinism call `set_rand_seed`, not `random.seed`.
 
 10. **Two DATACNST tables have no source in `original/`.** `CargoSpace` and `ObjName` are referenced by the Pascal but declared in no file in the tree. Their values in `datacnst.py` therefore cannot be checked against anything — treat them as the one place where "transcribed exactly" is a claim the repo cannot back up, and do not silently "correct" them either.
 

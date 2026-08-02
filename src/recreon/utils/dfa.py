@@ -68,6 +68,17 @@ class TokenReader:
     def at_eof(self) -> bool:
         return self.pos >= len(self.text)
 
+    @property
+    def at_line_start(self) -> bool:
+        """Whether the cursor sits at the beginning of a line.
+
+        A token ends when its delimiter is consumed, so after reading one the
+        cursor may already be on the next line. Callers that want to discard
+        the *rest* of a token's line have to ask, or they eat a whole line of
+        content instead.
+        """
+        return self.pos == 0 or self.text[self.pos - 1 : self.pos] == "\n"
+
     def _read_char(self) -> str:
         if self.pos >= len(self.text):
             self.pos += 1

@@ -1,6 +1,6 @@
 """Milestone 3.5: a scenario file loads into a populated galaxy."""
 
-import random
+from pathlib import Path
 
 import pytest
 
@@ -12,11 +12,12 @@ from recreon.types import (
     Empire,
     NebulaTypes,
     ObjectTypes,
-    TechLevel,
     WorldTypes,
 )
 from recreon.update import update_universe
 from recreon.utils.dfa import TokenError, TokenReader
+from recreon.utils.int_utils import rnd
+from recreon.utils.pascal import set_rand_seed
 
 # --- Tokenizer ---------------------------------------------------------------
 
@@ -162,7 +163,7 @@ def test_check_world_avoids_occupied_sectors():
 
 @pytest.fixture
 def game():
-    random.seed(99)
+    set_rand_seed(99)
     return load_scenario(
         DEFAULT_SCENARIO, {Empire.Empire1: "Vantiss", Empire.Empire2: "Sarkhon"}
     )
@@ -293,7 +294,7 @@ def test_a_seed_makes_the_galaxy_reproducible():
     # Reproducible within this port. Deliberately not matching the DOS build
     # -- see IMPLEMENTATION_PLAN.md §3.5.4.
     def load():
-        random.seed(1)
+        set_rand_seed(1)
         g = load_scenario(DEFAULT_SCENARIO, {Empire.Empire1: "A"})
         return [
             (p.XY.x, p.XY.y, int(p.Cls), int(p.Tech))
@@ -318,10 +319,19 @@ def test_the_economy_runs_on_a_generated_galaxy(game):
 
 # --- Error handling ----------------------------------------------------------
 
+#: A minimal valid scenario prefix: header line, header fields, and the
+#: BeginText/EndText introduction the loader consumes before any directive.
+HEADER = (
+    'ANACREON 16 SCENARIO\n"T" 0 1 1 20 10 1 1 1 4021\n'
+    "BeginText\nan introduction\nEndText\n"
+)
+
+
+
 
 def test_unknown_directive_is_an_error(tmp_path):
     path = tmp_path / "bad.scn"
-    path.write_text('ANACREON 16 SCENARIO\n"T" 0 1 1 20 10 1 1 1 4021\nFLOOP\n')
+    path.write_text(HEADER + "FLOOP\n")
     with pytest.raises(ScenarioError, match="Unknown command"):
         load_scenario(path, {Empire.Empire1: "A"})
 
@@ -329,25 +339,21 @@ def test_unknown_directive_is_an_error(tmp_path):
 def test_class_table_must_sum_to_one_hundred(tmp_path):
     path = tmp_path / "bad.scn"
     weights = " ".join(["1"] * 22)  # 22, not 100
-    path.write_text(
-        f'ANACREON 16 SCENARIO\n"T" 0 1 1 20 10 1 1 1 4021\nClassTable {weights}\n'
-    )
+    path.write_text(HEADER + f"ClassTable {weights}\n")
     with pytest.raises(ScenarioError, match="do not add up to 100"):
         load_scenario(path, {Empire.Empire1: "A"})
 
 
 def test_tech_table_must_sum_to_one_hundred(tmp_path):
     path = tmp_path / "bad.scn"
-    path.write_text(
-        f'ANACREON 16 SCENARIO\n"T" 0 1 1 20 10 1 1 1 4021\nTechTable {" ".join(["1"] * 11)}\n'
-    )
+    path.write_text(HEADER + f'TechTable {" ".join(["1"] * 11)}\n')
     with pytest.raises(ScenarioError, match="do not add up to 100"):
         load_scenario(path, {Empire.Empire1: "A"})
 
 
 def test_truncated_file_is_an_error(tmp_path):
     path = tmp_path / "short.scn"
-    path.write_text('ANACREON 16 SCENARIO\n"T" 0 1 1 20 10 1 1 1 4021\nCreateWorld 1\n')
+    path.write_text(HEADER + "CreateWorld 1\n")
     with pytest.raises(ScenarioError):
         load_scenario(path, {Empire.Empire1: "A"})
 
@@ -391,3 +397,195 @@ def test_pre_14_files_shift_class_indices_past_terraforming():
     loader.run()
     assert not loader.failed, loader.errors
     assert loader.game.Universe.Planet[1].Cls == WorldClass.VlcCls
+
+
+# --- The scenarios that shipped with the original ----------------------------
+
+SCENARIO_DIR = Path(__file__).resolve().parent.parent / "original" / "scenarios"
+
+#: The two shipped scenarios that are malformed. Both would have failed in the
+#: DOS build too -- see the tests below for what is wrong with each.
+BROKEN_SCENARIOS = {"AWAKEN", "PRINCES"}
+
+ORIGINAL_SCENARIOS = sorted(p.stem for p in SCENARIO_DIR.glob("*.SCN"))
+
+FOUR_PLAYERS = {
+    Empire.Empire1: "A",
+    Empire.Empire2: "B",
+    Empire.Empire3: "C",
+    Empire.Empire4: "D",
+}
+
+
+def test_the_scenario_directory_is_populated():
+    """Guards the parametrised tests below against silently becoming no-ops."""
+    assert len(ORIGINAL_SCENARIOS) == 13
+
+
+@pytest.mark.parametrize(
+    "name", [n for n in ORIGINAL_SCENARIOS if n not in BROKEN_SCENARIOS]
+)
+def test_shipped_scenarios_load(name):
+    # Every shipped scenario carries Seed 0, so the loader would call
+    # Randomize and roll a different galaxy each run. Pinning the seed here
+    # keeps the test deterministic; see the test below for what varies when
+    # it is not pinned.
+    set_rand_seed(20260802)
+    game = load_scenario(SCENARIO_DIR / f"{name}.SCN", FOUR_PLAYERS)
+
+    assert game.Galaxy.size > 0
+    assert game.NoOfPlanets > 0
+    assert game.ScenarioIntroduction, "every shipped scenario has intro text"
+
+
+def test_a_crowded_zone_can_genuinely_fail_to_place_a_world():
+    """GetRandomXY gives up after 101 tries and reports an error rather than
+    looping. GAUNTLET packs 172 worlds into small zones and trips this on a
+    few per cent of unseeded runs -- in the DOS build as much as here, since
+    the give-up threshold is the original's."""
+    outcomes = set()
+    for seed in range(1, 40):
+        set_rand_seed(seed)
+        try:
+            load_scenario(SCENARIO_DIR / "GAUNTLET.SCN", FOUR_PLAYERS)
+            outcomes.add("loaded")
+        except ScenarioError as exc:
+            assert "No room for random world" in str(exc)
+            outcomes.add("no room")
+
+    assert "loaded" in outcomes, "most seeds should place every world"
+
+
+def test_awaken_asks_for_more_worlds_than_the_game_can_hold():
+    """36 explicit worlds plus 176 random ones against a limit of 200. The
+    original has no check here and would have written past the planet array.
+
+    It never loads, on any seed. Which error surfaces first depends on the
+    roll -- packing that many worlds also exhausts zones -- so the test pins
+    seeds and requires the limit to be the reported cause at least once."""
+    reasons = set()
+    for seed in range(1, 20):
+        set_rand_seed(seed)
+        with pytest.raises(ScenarioError) as caught:
+            load_scenario(SCENARIO_DIR / "AWAKEN.SCN", FOUR_PLAYERS)
+        reasons.add(str(caught.value))
+
+    assert any("Too many worlds" in r for r in reasons), reasons
+
+
+def test_princes_has_a_stray_token_in_its_starbase_block():
+    """Its one CreateStarbase carries an extra `0 ; (reserved)` field that the
+    directive takes no argument for. Every other scenario's starbase block has
+    six fields; this one has seven, so the block runs one token long and the
+    trailing cargo amount is read as the next command."""
+    with pytest.raises(ScenarioError, match='Unknown command "3500"'):
+        load_scenario(SCENARIO_DIR / "PRINCES.SCN", FOUR_PLAYERS)
+
+
+# --- The introduction pass ---------------------------------------------------
+
+
+def test_tokens_before_begintext_are_discarded():
+    """Nebula.SCN carries a column ruler between the header and its intro. It
+    is not a directive and never reaches the dispatch, because the intro scan
+    swallows everything up to BEGINTEXT."""
+    body = (
+        'ANACREON 16 SCENARIO\n"T" 0 1 1 20 10 1 1 1 4021\n'
+        "1234567890123456789012345678901234567890\n"
+        "BeginText\nhello\nEndText\nEndScenario\n"
+    )
+    loader = ScenarioLoader(game=blank_game(size=20), reader=TokenReader(body))
+    loader.read_header()
+    pages = loader.read_introduction()
+    loader.run()
+
+    assert not loader.failed, loader.errors
+    assert pages == ["hello"]
+
+
+def test_newpage_splits_the_introduction():
+    body = (
+        'ANACREON 16 SCENARIO\n"T" 0 1 1 20 10 1 1 1 4021\n'
+        "BeginText\none\nNewPage\ntwo\nEndText\nEndScenario\n"
+    )
+    loader = ScenarioLoader(game=blank_game(size=20), reader=TokenReader(body))
+    loader.read_header()
+
+    assert loader.read_introduction() == ["one", "two"]
+
+
+def test_endtext_is_matched_anywhere_in_a_line():
+    """Pos(), not a token comparison -- a line merely containing the word ends
+    the page."""
+    body = (
+        'ANACREON 16 SCENARIO\n"T" 0 1 1 20 10 1 1 1 4021\n'
+        "BeginText\nkeep\n   EndText   ; done\nEndScenario\n"
+    )
+    loader = ScenarioLoader(game=blank_game(size=20), reader=TokenReader(body))
+    loader.read_header()
+
+    assert loader.read_introduction() == ["keep"]
+
+
+def test_a_scenario_with_no_introduction_is_an_error():
+    body = 'ANACREON 16 SCENARIO\n"T" 0 1 1 20 10 1 1 1 4021\nEndScenario\n'
+    loader = ScenarioLoader(game=blank_game(size=20), reader=TokenReader(body))
+    loader.read_header()
+    loader.read_introduction()
+
+    assert loader.failed
+    assert "BEGINTEXT" in loader.errors[0]
+
+
+# --- Reproducibility ---------------------------------------------------------
+
+
+def test_every_shipped_scenario_is_unseeded():
+    """All 13 carry Seed 0, which means Randomize. Porting Turbo Pascal's
+    generator therefore does *not* recover the galaxies players saw in 2004 --
+    those were rolled fresh on every new game and never existed twice. What it
+    buys is that our own seeded scenarios draw from the sequence the original
+    would have drawn from."""
+    for name in ORIGINAL_SCENARIOS:
+        loader = ScenarioLoader(
+            game=blank_game(size=20),
+            reader=TokenReader.from_path(SCENARIO_DIR / f"{name}.SCN"),
+        )
+        loader.read_header()
+        assert loader.header.seed == 0, name
+
+
+def test_a_seeded_scenario_regenerates_the_same_galaxy():
+    """The point of porting Turbo Pascal's generator: a fixed Seed gives the
+    same galaxy every run. frontier.scn carries one; none of the originals do."""
+    first = load_scenario(DEFAULT_SCENARIO, FOUR_PLAYERS)
+    second = load_scenario(DEFAULT_SCENARIO, FOUR_PLAYERS)
+
+    def fingerprint(game):
+        return [
+            (p.XY.x, p.XY.y, int(p.Cls), int(p.Tech), p.Pop, p.TriReserve)
+            for p in game.Universe.Planet[1 : game.NoOfPlanets + 1]
+        ]
+
+    assert fingerprint(first) == fingerprint(second)
+    assert len(fingerprint(first)) > 1
+
+
+def test_a_seeded_galaxy_survives_an_intervening_draw():
+    """Seeding happens inside the loader, so unrelated RNG use before the load
+    cannot shift the galaxy."""
+    baseline = load_scenario(DEFAULT_SCENARIO, FOUR_PLAYERS)
+    set_rand_seed(999)
+    rnd(1, 100)
+    again = load_scenario(DEFAULT_SCENARIO, FOUR_PLAYERS)
+
+    assert [p.XY.x for p in again.Universe.Planet[1:20]] == [
+        p.XY.x for p in baseline.Universe.Planet[1:20]
+    ]
+
+
+def test_an_unseeded_scenario_still_loads():
+    """INTRO.SCN carries Seed 0, which means Randomize -- a different galaxy
+    every run, but a valid one."""
+    game = load_scenario(SCENARIO_DIR / "INTRO.SCN", FOUR_PLAYERS)
+    assert game.NoOfPlanets == 50
