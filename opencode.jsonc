@@ -1,0 +1,26 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "bash": {
+      "*": "allow",
+      "git commit *": "ask",
+      "git push *": "ask",
+      "git *amend*": "ask",
+      "git tag *": "ask"
+    },
+    "edit": {
+      "original/**": "deny"
+    }
+  },
+  "watcher": {
+    "ignore": [
+      "node_modules/**",
+      ".venv/**",
+      "__pycache__/**",
+      ".pytest_cache/**",
+      ".ruff_cache/**",
+      ".opencode/node_modules/**"
+    ]
+  },
+  "subagent_depth": 2
+}

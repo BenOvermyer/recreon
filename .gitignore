@@ -6,3 +6,6 @@ __pycache__/
 
 # uv
 .venv/
+
+# opencode stray plugin cruft
+.opencode/node_modules/
