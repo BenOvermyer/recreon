@@ -10,10 +10,11 @@ where the original read the ``Universe`` and ``Sector`` globals.
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import TYPE_CHECKING
 
 from .datacnst import DEFAULT_ISSP, ObjName
-from .datastrc import MAXINT16, NameRecord
+from .datastrc import MAXINT16, DefenseRecord, NameRecord
 from .galaxy import Location, XYCoord, limbo, nebula_of
 from .misc import same_id, same_location, same_xy
 from .types import (
@@ -22,6 +23,7 @@ from .types import (
     MAX_RESOURCES,
     PLAYER_EMPIRES,
     Empire,
+    EmpireModifiers,
     FleetStatus,
     FleetTypes,
     IDNumber,
@@ -157,10 +159,17 @@ def get_status(game: GameEnvironment, obj: IDNumber) -> Empire:
 
 
 def get_class(game: GameEnvironment, obj: IDNumber) -> WorldClass:
+    """World class. Anything that is not a planet is ``ArtCls`` -- artificial.
+
+    Starbases have no ``Cls`` field of their own, and the class they answer
+    with is load-bearing: it selects the ``ClassIndAdj`` row that sizes their
+    industry. ``ArtCls`` is the shipyard-heavy row, which is what makes an
+    industrial complex worth building.
+    """
     entity = _entity(game, obj)
     if obj.ObjTyp == ObjectTypes.Pln:
         return entity.Cls
-    return WorldClass.BarCls
+    return WorldClass.ArtCls
 
 
 def get_type(game: GameEnvironment, obj: IDNumber) -> WorldTypes:
@@ -531,6 +540,31 @@ def get_capital(game: GameEnvironment, emp: Empire) -> IDNumber:
 
 def set_capital(game: GameEnvironment, emp: Empire, cap_id: IDNumber) -> None:
     game.Universe.EmpireData[emp].Capital = cap_id
+
+
+def centralized_capital(game: GameEnvironment, emp: Empire) -> bool:
+    """Whether losing the capital destroys the empire outright.
+
+    Set from the scenario's empire modifiers. ``ConquerEmpire`` checks this
+    before looking for a successor world.
+    """
+    return EmpireModifiers.CentralEMD in game.Universe.EmpireData[emp].Modifiers
+
+
+def get_defense_settings(game: GameEnvironment, emp: Empire) -> DefenseRecord:
+    """The empire's standing orders for spreading ships across the shells.
+
+    Returns a copy: the original assigns the whole record, which in Pascal
+    copies it, and ``GetEnemy`` would otherwise be able to rewrite the
+    empire's settings through the value it was handed.
+    """
+    return deepcopy(game.Universe.EmpireData[emp].DefenseSettings)
+
+
+def set_defense_settings(
+    game: GameEnvironment, emp: Empire, defense: DefenseRecord
+) -> None:
+    game.Universe.EmpireData[emp].DefenseSettings = deepcopy(defense)
 
 
 def next_empire(game: GameEnvironment, player: Empire) -> Empire:

@@ -24,6 +24,7 @@ from .datacnst import (
     TechAdj2,
     ThgAdj,
     TypeData,
+    YearsToBuild,
 )
 from .galaxy import Location, XYCoord
 from .misc import fleet_cargo_space, total_prod
@@ -42,6 +43,7 @@ from .primintr import (
     get_warp_link_freq,
 )
 from .types import (
+    MAX_NO_OF_CONSTR_SITES,
     Empire,
     IndusTypes,
     IDNumber,
@@ -49,6 +51,7 @@ from .types import (
     SpecialConditions,
     TechnologyTypes,
     WorldTypes,
+    empty_quadrant,
 )
 
 if TYPE_CHECKING:
@@ -297,6 +300,17 @@ def create_stargate(
     game.GlobalSets.SetOfActiveGates.add(obj.Index)
 
 
+def destroy_stargate(game: GameEnvironment, gte_id: IDNumber) -> None:
+    """Remove a stargate, emptying the sector it stood in.
+
+    The gate record itself is left as it was; only the sector pointer and the
+    active set are cleared, so the slot is free for reuse.
+    """
+    gate = game.Universe.Stargate[gte_id.Index]
+    game.Galaxy.sector(gate.XY).Obj = empty_quadrant()
+    game.GlobalSets.SetOfActiveGates.discard(gte_id.Index)
+
+
 def create_planet(game: GameEnvironment, obj: IDNumber, new_xy: XYCoord) -> None:
     """Place a planet into the world and register it in its sector."""
     game.Galaxy.sector(new_xy).Obj = obj
@@ -335,6 +349,63 @@ def create_starbase(
     base.Emp = new_emp
     game.GlobalSets.SetOfActiveStarbases.add(obj.Index)
     game.GlobalSets.SetOfStarbasesOf[new_emp].add(obj.Index)
+
+
+# --- Construction ------------------------------------------------------------
+
+
+def next_constr_slot(game: GameEnvironment) -> int:
+    """Highest free construction-site index, or 0 when all are taken.
+
+    Counts down from the top like the starbase and stargate allocators, so
+    slot assignment matches when comparing runs side by side.
+    """
+    slot = MAX_NO_OF_CONSTR_SITES
+    while slot > 0 and slot in game.GlobalSets.SetOfActiveConstructionSites:
+        slot -= 1
+    return slot
+
+
+def construction(
+    game: GameEnvironment,
+    empr: Empire,
+    cons_type: TechnologyTypes,
+    loc: XYCoord,
+) -> IDNumber:
+    """Break ground on a construction site. Returns its ID, or EmptyQuadrant.
+
+    The site occupies its sector immediately -- it is a real object that can
+    be scouted, named and attacked from the moment it exists, long before it
+    finishes. Only the builder knows about it to begin with.
+
+    Silently does nothing when every slot is in use, as the original does.
+    """
+    i = next_constr_slot(game)
+    if i == 0:
+        return empty_quadrant()
+
+    con_id = IDNumber(ObjectTypes.Con, i)
+    site = game.Universe.Constr[i]
+    site.XY = loc
+    site.Emp = empr
+    site.CTyp = cons_type
+    site.ScoutedBy = {empr}
+    site.KnownBy = {empr}
+    site.TimeToCompletion = YearsToBuild[cons_type]
+
+    game.GlobalSets.SetOfActiveConstructionSites.add(i)
+    game.GlobalSets.SetOfConstructionSitesOf[empr].add(i)
+    game.Galaxy.sector(loc).Obj = con_id
+    return con_id
+
+
+def destroy_construction(game: GameEnvironment, con_id: IDNumber) -> None:
+    """Cancel a construction site, emptying the sector it occupied."""
+    site = game.Universe.Constr[con_id.Index]
+    old_emp = site.Emp
+    game.Galaxy.sector(site.XY).Obj = empty_quadrant()
+    game.GlobalSets.SetOfActiveConstructionSites.discard(con_id.Index)
+    game.GlobalSets.SetOfConstructionSitesOf[old_emp].discard(con_id.Index)
 
 
 # --- Fleet helpers -----------------------------------------------------------
@@ -421,12 +492,61 @@ def passing_through_gate(
     return False
 
 
+def destroy_empire(game: GameEnvironment, emp: Empire) -> None:
+    """Wipe an empire out: worlds go independent, fleets are aborted and lost.
+
+    Starbases change hands but keep their contents. Fleets are unloaded onto
+    whatever object shares their sector before being destroyed, so a fleet
+    dying over a friendly world still hands its cargo over.
+
+    ``CleanUpNPE`` is not called -- the NPE subsystem is Phase 8, and there is
+    nothing yet for it to release.
+    """
+    from .fleet import abort_fleet, destroy_fleet
+    from .news import erase_news
+    from .primintr import (
+        delete_all_names,
+        get_coord,
+        initialize_issp,
+        set_status,
+        set_type,
+    )
+
+    for index in range(1, game.NoOfPlanets + 1):
+        obj = IDNumber(ObjectTypes.Pln, index)
+        if get_status(game, obj) == emp:
+            set_status(game, obj, Empire.Indep)
+            set_type(game, obj, WorldTypes.IndTyp)
+            initialize_issp(game, obj)
+
+    for index in sorted(game.GlobalSets.SetOfStarbasesOf[emp]):
+        set_status(game, IDNumber(ObjectTypes.Base, index), Empire.Indep)
+
+    fleets = game.GlobalSets.SetOfFleetsOf[emp] & game.GlobalSets.SetOfActiveFleets
+    for index in sorted(fleets):
+        flt_id = IDNumber(ObjectTypes.Flt, index)
+        ground = get_object(game, get_coord(game, flt_id))
+        if ground != empty_quadrant():
+            abort_fleet(game, flt_id, ground, True)
+        destroy_fleet(game, flt_id)
+
+    erase_news(game, emp)
+    delete_all_names(game, emp)
+
+    game.Universe.EmpireData[emp].InUse = False
+
+
 __all__ = [
     "CARGO_PRIORITY",
     "Gamma",
     "balance_fleet",
     "create_planet",
     "create_stargate",
+    "construction",
+    "destroy_construction",
+    "destroy_empire",
+    "destroy_stargate",
+    "next_constr_slot",
     "next_stargate_slot",
     "passing_through_fortress",
     "passing_through_gate",
