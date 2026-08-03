@@ -159,10 +159,17 @@ def get_status(game: GameEnvironment, obj: IDNumber) -> Empire:
 
 
 def get_class(game: GameEnvironment, obj: IDNumber) -> WorldClass:
+    """World class. Anything that is not a planet is ``ArtCls`` -- artificial.
+
+    Starbases have no ``Cls`` field of their own, and the class they answer
+    with is load-bearing: it selects the ``ClassIndAdj`` row that sizes their
+    industry. ``ArtCls`` is the shipyard-heavy row, which is what makes an
+    industrial complex worth building.
+    """
     entity = _entity(game, obj)
     if obj.ObjTyp == ObjectTypes.Pln:
         return entity.Cls
-    return WorldClass.BarCls
+    return WorldClass.ArtCls
 
 
 def get_type(game: GameEnvironment, obj: IDNumber) -> WorldTypes:

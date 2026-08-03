@@ -30,6 +30,7 @@ from .datacnst import (
     TECH_LVL_INC,
     BasePop,
     ClassIndAdj,
+    ConsCargoNeeded,
     DefAdj,
     DefBuildRate,
     NewIndRawN,
@@ -39,11 +40,22 @@ from .datacnst import (
     TechDev,
     ThgAdj,
 )
-from .galaxy import Location, limbo
+from .galaxy import Location, XYCoord, limbo
+from .intrface import (
+    create_starbase,
+    create_stargate,
+    get_optimum_indus,
+    next_starbase_slot,
+    next_stargate_slot,
+)
 from .misc import move_things, tech_range, thg_lmt, total_prod
 from .news import NewsTypes, add_global_news, add_news
 from .primintr import (
+    add_name,
     change_rev_index,
+    delete_name,
+    get_defined_name,
+    get_fleets,
     get_base_type,
     get_capital,
     get_cargo,
@@ -58,12 +70,16 @@ from .primintr import (
     get_terraform_target,
     get_type,
     initialize_issp,
+    location2index,
     put_cargo,
+    put_indus,
+    put_mine,
     put_trillum_reserves,
     set_class,
     set_efficiency,
     set_population,
     set_status,
+    set_tech,
     set_type,
     total_rev_index,
     trillum_reserves,
@@ -71,6 +87,8 @@ from .primintr import (
 )
 from .types import (
     CARGO_TYPES,
+    STARBASE_TYPES,
+    STARGATE_TYPES,
     MAX_INDUS_INDEX,
     MAX_RESOURCES,
     SHIP_TYPES,
@@ -83,6 +101,7 @@ from .types import (
     TechnologyTypes,
     WorldClass,
     WorldTypes,
+    empty_quadrant,
     indus_range,
 )
 from .utils.int_utils import greater_int, lesser_int, rnd, rnd_var
@@ -1093,11 +1112,170 @@ def _update_starbase(game: GameEnvironment, world: IDNumber) -> None:
     )
 
 
+# --- Construction ------------------------------------------------------------
+
+
+def construct_starbase(
+    game: GameEnvironment, emp: Empire, styp: TechnologyTypes, xy: XYCoord
+) -> IDNumber:
+    """Turn a finished construction site into a starbase.
+
+    The three kinds start life very differently. An outpost is a single
+    caretaker; an industrial complex arrives already populated and running at
+    its optimum industry, which is what makes it worth ten years of material;
+    a command base or fortress starts as a garrison of ten to twenty. All
+    inherit the empire's technology and open at 10-20% efficiency.
+
+    Returns EmptyQuadrant when no starbase slot is free -- the site is
+    consumed either way, as in the original.
+    """
+    obj = IDNumber(ObjectTypes.Base, next_starbase_slot(game))
+    if obj.Index <= 0:
+        return empty_quadrant()
+
+    create_starbase(game, obj, emp, xy, styp)
+    set_efficiency(game, obj, rnd(10, 20))
+    emp_tech, _ = get_empire_technology(game, emp)
+    set_tech(game, obj, emp_tech)
+
+    if styp == TechnologyTypes.out:
+        set_population(game, obj, 1)
+        set_type(game, obj, WorldTypes.OutTyp)
+    elif styp == TechnologyTypes.cmp:
+        set_population(game, obj, rnd(400, 700))
+        set_type(game, obj, WorldTypes.BseTyp)
+        put_indus(game, obj, get_optimum_indus(game, obj))
+    else:
+        set_population(game, obj, rnd(10, 20))
+        set_type(game, obj, WorldTypes.BseTyp)
+
+    return obj
+
+
+def construct_stargate(
+    game: GameEnvironment, emp: Empire, gtyp: TechnologyTypes, xy: XYCoord
+) -> IDNumber:
+    """Turn a finished construction site into a stargate, link or disrupter."""
+    obj = IDNumber(ObjectTypes.Gate, next_stargate_slot(game))
+    if obj.Index <= 0:
+        return empty_quadrant()
+
+    create_stargate(game, obj, emp, gtyp, xy)
+    return obj
+
+
+def _use_up_raw_material(
+    game: GameEnvironment,
+    typ: TechnologyTypes,
+    sta: Empire,
+    con_id: IDNumber,
+    constr_fleets: set[int],
+) -> bool:
+    """Spend a year's materials off the fleets parked on the site.
+
+    All or nothing: if any one cargo type comes up short the whole draw is
+    abandoned and *nothing* is consumed. The original gets this by working on
+    a copy of every fleet's cargo and jumping past the write-back on failure,
+    so a half-supplied site never quietly eats what did arrive.
+
+    Fleets are drained in index order, so the lowest-numbered fleet on the
+    sector is emptied first.
+    """
+    cargo = {i: get_cargo(game, IDNumber(ObjectTypes.Flt, i)) for i in constr_fleets}
+
+    for thing in tech_range(TechnologyTypes.amb, TechnologyTypes.tri):
+        raw_needed = ConsCargoNeeded[typ][thing]
+        for i in sorted(constr_fleets):
+            cargo_to_use = lesser_int(raw_needed, cargo[i][thing])
+            cargo[i][thing] -= cargo_to_use
+            raw_needed -= cargo_to_use
+
+        if raw_needed > 0:
+            add_news(
+                game,
+                sta,
+                NewsTypes.ConsLack,
+                Location(XY=limbo(), ID=con_id),
+                int(thing),
+            )
+            return False
+
+    for i in sorted(constr_fleets):
+        put_cargo(game, IDNumber(ObjectTypes.Flt, i), cargo[i])
+    return True
+
+
+def update_construction(game: GameEnvironment, i: int) -> None:
+    """Advance one construction site by a year.
+
+    Progress is bought, not waited out: only the owner's fleets sitting on the
+    site count, and a year with insufficient material on hand costs a year of
+    nothing -- the clock does not move.
+
+    The name-transfer step is meant to hand a name the builder gave the site
+    over to whatever it becomes, which is why the name is read and deleted
+    before the sector is cleared. **It never fires.** ``AddName`` normalises a
+    ``Con`` location by overwriting ``XY`` with the site's real coordinate
+    before storing it, while the lookup here passes ``XY = Limbo``, and
+    ``SameLocation`` compares both fields. So the search always misses,
+    ``con_name`` is always empty, and a named site loses its name on
+    completion. Faithful to the original, which has the same mismatch.
+
+    Two consequences worth knowing before "fixing" it: the orphaned
+    ``NameRecord`` still points at a ``Con`` ID whose slot is now free, so a
+    later site that lands in the same slot *at the same coordinate* inherits
+    the old name; and making the lookup succeed would start exercising the
+    ``add_name`` calls below, which have never run.
+    """
+    site = game.Universe.Constr[i]
+    con_id = IDNumber(ObjectTypes.Con, i)
+
+    constr_fleets = get_fleets(game, site.XY) & game.GlobalSets.SetOfFleetsOf[site.Emp]
+    if not _use_up_raw_material(game, site.CTyp, site.Emp, con_id, constr_fleets):
+        return
+
+    site.TimeToCompletion -= 1
+    if site.TimeToCompletion != 0:
+        return
+
+    game.GlobalSets.SetOfActiveConstructionSites.discard(i)
+    game.GlobalSets.SetOfConstructionSitesOf[site.Emp].discard(i)
+
+    name_slot = location2index(game, site.Emp, Location(XY=limbo(), ID=con_id))
+    if name_slot is not None:
+        con_name, _ = get_defined_name(name_slot)
+        delete_name(game, site.Emp, con_name)
+    else:
+        con_name = ""
+
+    game.Galaxy.sector(site.XY).Obj = empty_quadrant()
+
+    new_id = empty_quadrant()
+    if site.CTyp == TechnologyTypes.SRM:
+        put_mine(game, site.XY, site.Emp)
+    elif site.CTyp in STARBASE_TYPES:
+        new_id = construct_starbase(game, site.Emp, site.CTyp, site.XY)
+        if con_name:
+            add_name(game, site.Emp, Location(XY=limbo(), ID=new_id), con_name)
+    elif site.CTyp in STARGATE_TYPES:
+        new_id = construct_stargate(game, site.Emp, site.CTyp, site.XY)
+        if con_name:
+            add_name(game, site.Emp, Location(XY=limbo(), ID=new_id), con_name)
+
+    add_news(
+        game,
+        site.Emp,
+        NewsTypes.ConsDone,
+        Location(XY=site.XY, ID=empty_quadrant()),
+        int(site.CTyp),
+    )
+
+
 def update_universe(game: GameEnvironment) -> None:
     """Advance the whole world by one year.
 
-    Port of UPDATE.PAS ``UpdateUniverse``. Construction sites and empire
-    research are not yet wired in; they arrive in Phases 6 and 3.4.
+    Port of UPDATE.PAS ``UpdateUniverse``. Empire research (``UpdateEmpire``)
+    is still unported, so no empire advances in technology on its own yet.
     """
     game.NewTotalRevIndex = {emp: 0 for emp in Empire}
 
@@ -1108,3 +1286,7 @@ def update_universe(game: GameEnvironment) -> None:
 
     for i in sorted(game.GlobalSets.SetOfActiveStarbases):
         update_world(game, IDNumber(ObjectTypes.Base, i))
+
+    # Iterated over a copy: a site that completes drops out of the set.
+    for i in sorted(game.GlobalSets.SetOfActiveConstructionSites):
+        update_construction(game, i)

@@ -24,6 +24,7 @@ from .datacnst import (
     TechAdj2,
     ThgAdj,
     TypeData,
+    YearsToBuild,
 )
 from .galaxy import Location, XYCoord
 from .misc import fleet_cargo_space, total_prod
@@ -42,6 +43,7 @@ from .primintr import (
     get_warp_link_freq,
 )
 from .types import (
+    MAX_NO_OF_CONSTR_SITES,
     Empire,
     IndusTypes,
     IDNumber,
@@ -350,9 +352,51 @@ def create_starbase(
 
 
 # --- Construction ------------------------------------------------------------
-#
-# ``Construction`` itself belongs to Phase 6; only the teardown is here,
-# because combat can destroy a site in progress.
+
+
+def next_constr_slot(game: GameEnvironment) -> int:
+    """Highest free construction-site index, or 0 when all are taken.
+
+    Counts down from the top like the starbase and stargate allocators, so
+    slot assignment matches when comparing runs side by side.
+    """
+    slot = MAX_NO_OF_CONSTR_SITES
+    while slot > 0 and slot in game.GlobalSets.SetOfActiveConstructionSites:
+        slot -= 1
+    return slot
+
+
+def construction(
+    game: GameEnvironment,
+    empr: Empire,
+    cons_type: TechnologyTypes,
+    loc: XYCoord,
+) -> IDNumber:
+    """Break ground on a construction site. Returns its ID, or EmptyQuadrant.
+
+    The site occupies its sector immediately -- it is a real object that can
+    be scouted, named and attacked from the moment it exists, long before it
+    finishes. Only the builder knows about it to begin with.
+
+    Silently does nothing when every slot is in use, as the original does.
+    """
+    i = next_constr_slot(game)
+    if i == 0:
+        return empty_quadrant()
+
+    con_id = IDNumber(ObjectTypes.Con, i)
+    site = game.Universe.Constr[i]
+    site.XY = loc
+    site.Emp = empr
+    site.CTyp = cons_type
+    site.ScoutedBy = {empr}
+    site.KnownBy = {empr}
+    site.TimeToCompletion = YearsToBuild[cons_type]
+
+    game.GlobalSets.SetOfActiveConstructionSites.add(i)
+    game.GlobalSets.SetOfConstructionSitesOf[empr].add(i)
+    game.Galaxy.sector(loc).Obj = con_id
+    return con_id
 
 
 def destroy_construction(game: GameEnvironment, con_id: IDNumber) -> None:
@@ -498,9 +542,11 @@ __all__ = [
     "balance_fleet",
     "create_planet",
     "create_stargate",
+    "construction",
     "destroy_construction",
     "destroy_empire",
     "destroy_stargate",
+    "next_constr_slot",
     "next_stargate_slot",
     "passing_through_fortress",
     "passing_through_gate",

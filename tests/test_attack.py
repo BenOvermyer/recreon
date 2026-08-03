@@ -50,7 +50,7 @@ from recreon.battle import (
 )
 from recreon.datacnst import CargoSpace, init_defense_record
 from recreon.fleet import deploy_fleet, move_fleet
-from recreon.galaxy import XYCoord
+from recreon.galaxy import XYCoord, limbo
 from recreon.intrface import create_stargate, next_stargate_slot
 from recreon.news import NewsTypes, get_news_list
 from recreon.primintr import (
@@ -788,10 +788,18 @@ def test_losing_a_battle_is_reported_to_the_defender():
         killed,
     )
 
-    headlines = [item.Headline for item in get_news_list(game, Empire.Empire2)]
+    items = get_news_list(game, Empire.Empire2)
+    headlines = [item.Headline for item in items]
     assert NewsTypes.BattleL in headlines
     assert NewsTypes.DestDetail in headlines
     assert get_status(game, target) == Empire.Empire1
+
+    # Location is (XY, ID). Swapping the two type-checks -- both fields hold
+    # dataclasses -- and silently points every combat headline at the wrong
+    # thing, so pin which field the target lands in.
+    battle_item = next(i for i in items if i.Headline == NewsTypes.BattleL)
+    assert battle_item.Loc1.ID == target
+    assert battle_item.Loc1.XY == limbo()
 
 
 def test_an_unseen_raid_is_reported_without_naming_the_attacker():

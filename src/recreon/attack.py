@@ -1060,7 +1060,7 @@ def conquer_empire(
             continue
 
         world_id = IDNumber(ObjectTypes.Pln, i)
-        loc = Location(world_id, limbo())
+        loc = Location(XY=limbo(), ID=world_id)
         xy = get_coord(game, world_id)
 
         dist = distance(xy, cap_xy)
@@ -1104,7 +1104,9 @@ def conquer_empire(
             destroy_empire(game, enemy_emp)
     else:
         _new_capital(game, enemy_emp, new_cap_id)
-        add_news(game, enemy_emp, NewsTypes.NewCap, Location(new_cap_id, limbo()))
+        add_news(
+            game, enemy_emp, NewsTypes.NewCap, Location(XY=limbo(), ID=new_cap_id)
+        )
 
     return booty
 
@@ -1175,7 +1177,7 @@ def resolve_attack(
     either way. An unseen hunter-killer strike is reported without naming who
     did it.
     """
-    loc = Location(target, limbo())
+    loc = Location(XY=limbo(), ID=target)
     emp = get_status(game, flt_id)
     enemy_emp = get_status(game, target)
     empire_conquered = False
@@ -1521,7 +1523,7 @@ def holocaust_world(
         enemy_rev = min((deaths // 7) + rnd(1, 10), 30)
         rev_change = min((deaths // 6) + rnd(-15, 3), 50)
 
-        loc = Location(world_id, limbo())
+        loc = Location(XY=limbo(), ID=world_id)
         add_news(game, enemy_emp, NewsTypes.WHolo, loc, int(emp))
         add_news(game, enemy_emp, NewsTypes.DthHolo, loc, deaths)
         for ind in IndusTypes:
@@ -1602,7 +1604,7 @@ def lam_attack(
     """
     ships_dest = ship_array()
     defns_dest = defns_array()
-    loc = Location(target, limbo())
+    loc = Location(XY=limbo(), ID=target)
     emp = get_status(game, target)
 
     if target.ObjTyp == ObjectTypes.Flt:
@@ -1680,7 +1682,7 @@ def destroy_construction_or_gate(
     Losing a gate is the bigger blow to morale: it is infrastructure the
     empire was already relying on, not something still being built.
     """
-    loc = Location(empty_quadrant(), get_coord(game, target_id))
+    loc = Location(XY=get_coord(game, target_id), ID=empty_quadrant())
     enemy_emp = get_status(game, target_id)
 
     if target_id.ObjTyp == ObjectTypes.Con:
