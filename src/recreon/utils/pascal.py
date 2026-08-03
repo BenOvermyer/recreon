@@ -35,6 +35,18 @@ def pascal_val(s: str) -> int:
     return int(s)
 
 
+def pascal_div(a: int, b: int) -> int:
+    """Turbo Pascal ``DIV``: integer division truncating toward zero.
+
+    Python's ``//`` floors, so the two agree on non-negative operands and
+    disagree on everything else -- ``-5001 DIV 1000`` is -5, but
+    ``-5001 // 1000`` is -6. Most ``DIV`` in the original works on quantities
+    that cannot go negative and can be written as ``//``; call this where the
+    dividend can.
+    """
+    return -(-a // b) if (a < 0) != (b < 0) else a // b
+
+
 def trunc(x: float) -> int:
     """Turbo Pascal ``Trunc``: truncate toward zero.
 

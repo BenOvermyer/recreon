@@ -15,8 +15,9 @@ src/recreon/
 ├── misc.py              # Utility functions (MISC.PAS)
 ├── update.py            # Universe update logic (UPDATE.PAS)
 ├── fleet.py             # Fleet movement and management (FLEET.PAS)
-├── attack.py            # Combat resolution (ATTACK.PAS)
-├── battle.py            # Simplified combat (BATTLE.PAS)
+├── attack.py            # Combat mechanics (ATTACK.PAS)
+├── attnpe.py            # Automatic battle driver (ATTNPE.PAS)
+├── battle.py            # Simplified combat, unused in v2.0 (BATTLE.PAS)
 ├── design.py            # World designation, ISSP (DESIGN.PAS)
 ├── resource.py          # Cargo, production (RESOURCE.PAS)
 ├── constr.py            # Construction sites (CONSTR.PAS)
@@ -197,16 +198,22 @@ anything sitting on a gate move for the *incoming* empire; jump and HK fleets
 move for the *outgoing* one, so a jump ordered this turn lands this turn.
 
 ### attack.py
-Combat resolution from ATTACK.PAS.
+Combat mechanics from ATTACK.PAS. Everything here resolves *one* round at
+*one* shell, or applies an outcome; the loop around it lives in `attnpe.py`.
 
 **Key functions:**
-- `resolve_battle()` - Full combat with 5 orbital shells
-- Targeting priority calculation
-- `ships_destroyed()` - Combat table lookup with tech adjustment
-- GDM/LAM missile mechanics
-- Ground assault logic
-- Surrender algorithm
-- Conquest handling
+- `default_distribution()` - Split a fleet into groups, one per ship type
+- `get_enemy()` - Flatten the defender into per-shell counts
+- `calculate_combat_data()` - Tech, terrain and base modifiers for the fight
+- `get_target_array()` - Two-pass targeting priority; spends LAMs and GDMs
+- `ships_destroyed()` - Combat table lookup with the defender adjustment
+- `battle()` - One simultaneous exchange at one shell
+- `advance_groups()` - Movement, and the transport-to-troops swap on landing
+- `enemy_surrenders()` - Separate tests for fleet and world defenders
+- `restore_combatant()` / `resolve_attack()` - Write losses back; conquest,
+  morale and news
+- `conquer_world()` / `conquer_empire()` - Change of ownership, and breakup
+- `lam_attack()`, `holocaust_world()` - Standalone strikes
 
 **Combat shells (outer to inner):**
 1. Deep Space (DpSpc)
@@ -215,11 +222,27 @@ Combat resolution from ATTACK.PAS.
 4. Sub-Orbit (SbOrb)
 5. Ground (Grnd)
 
-### battle.py
-Simplified combat from BATTLE.PAS.
+### attnpe.py
+The battle driver from ATTNPE.PAS: retreat check, targeting, then one round at
+every shell, repeated until somebody wins. Written for NPEs but consults no AI
+persona, so it resolves any attack headlessly. ATTCOMM.PAS is the interactive
+counterpart, where the player picks targets round by round (Phase 5.3, not yet
+ported).
 
 **Functions:**
-- `calculate_battle_outcome()` - Quick resolution for AI and auto-attack
+- `npe_attack()` - Fight a fleet against a target to a conclusion
+- `group_engage()` - One full round: every shell, then movement
+
+### battle.py
+Simplified combat from BATTLE.PAS: both sides reduced to a power number,
+one round settled in a step. **Nothing in v2.0 calls it** - a second, coarser
+combat model that was written but never wired up. Ported for completeness; its
+`MilitaryPower` table disagrees with both `datacnst.MPower` and
+`attack.CombatPower`, and nothing reconciles the three.
+
+**Functions:**
+- `calc_military_power()` - Total worth of a force
+- `calc_attack_round()` - Casualties in one round
 
 ### design.py
 World designation from DESIGN.PAS.
