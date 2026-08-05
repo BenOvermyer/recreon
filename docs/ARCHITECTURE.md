@@ -26,7 +26,9 @@ src/recreon/
 ├── npe/                 # AI system (NPE*.PAS)
 │   ├── __init__.py
 │   ├── types.py         # AI type definitions (NPETYPES.PAS)
-│   ├── core.py          # AI dispatcher (NPE.PAS, NPEINTR.PAS, NPE00.PAS)
+│   ├── core.py          # Shared AI primitives (NPEINTR.PAS)
+│   ├── dispatch.py      # AI dispatcher (NPE.PAS)
+│   ├── common.py        # Shared persona behaviour (NPE00.PAS)
 │   ├── pirate.py        # Pirate AI (NPE01.PAS)
 │   ├── kingdom.py       # Kingdom AI (NPE02.PAS)
 │   ├── guardian.py      # Guardian AI (NPE03.PAS)
@@ -351,14 +353,54 @@ AI type definitions from NPETYPES.PAS.
 - Neutral → Defend → Harass → Preempt → Conflict → War
 
 ### npe/core.py
-AI dispatcher from NPE.PAS, NPEINTR.PAS, NPE00.PAS.
+Shared AI primitives from NPEINTR.PAS. One module per Pascal unit, so the
+NPE.PAS dispatcher and NPE00.PAS land separately (see below) rather than being
+folded in here.
 
-**Functions:**
-- `implement_npe()` - Main AI entry point
-- Threat assessment
-- World evaluation
-- Fleet mission assignment
-- State Department updates
+**Fleet-data bookkeeping:**
+- `next_fleet_data_slot()`, `already_targetted()`, `enforce_npe_data_links()`
+
+**Composition and assessment:**
+- `get_fleet_composition()` - Build a fleet to a requested power and ground strength
+- `get_potential_res()` - A world's holdings plus everything inbound to it
+- `minimum_defense()`, `average_military_power()`
+
+**Regions:**
+- `create_region_array()` - Base worlds and capital, the AI's frame of reference
+- `get_regional_capital()` - Nearest of those to an object
+
+**Target selection:**
+- `get_best_target()`, `get_best_base()`, `get_best_planet_to_protect()`, `get_best_raider_target()`
+
+**Deployment:**
+- `deploy_battle_fleet()`, `deploy_cargo_fleet()`
+- `deploy_jump_attack()`, `deploy_slow_attack()`, `deploy_hk_raiders()`
+- `deploy_harass_fleet()` - empty in v2.0 (#25)
+
+**Designation:**
+- `get_new_designation()`, `redesignate_empire()`
+
+**Missions** (arrival handlers, one per `MissionTypes`):
+- `implement_conquer_msn()`, `implement_jump_attack_msn()`, `implement_raid_trn_msn()`,
+  `implement_guard_msn()`, `implement_stack_msn()`, `implement_supply_msn()`,
+  `implement_refuel_msn()`, `implement_return_msn()`
+- `set_fleet_return()`, `set_raiding_fleet_new_target()`, `mid_course_correction()`
+- `destroy_all_fleets_in_sector()`, `plunder_world()`
+
+**Diplomacy:**
+- `state_dept_report()` - Refresh strength, world counts and threat scores
+- `state_department()` - Move policy up and down the escalation ladder
+
+**Misc:**
+- `set_empire_defenses()` - Roll one of four defense distributions
+
+### npe/dispatch.py
+AI dispatcher from NPE.PAS — `initialize_npe()`, `implement_npe()`,
+`cleanup_npe()`, dispatching on `NPEmpireTypes` to the persona modules. Also
+`load_npe()`/`save_npe()`, which wait on save/load (§8.4).
+
+### npe/common.py
+Shared persona behaviour from NPE00.PAS.
 
 ### npe/pirate.py, kingdom.py, guardian.py, berserker.py
 Specific AI implementations from NPE01-NPE04.PAS.
@@ -470,6 +512,8 @@ main.py
 │   └── news.py
 ├── npe/
 │   ├── core.py
+│   ├── dispatch.py
+│   ├── common.py
 │   ├── pirate.py
 │   ├── kingdom.py
 │   ├── guardian.py

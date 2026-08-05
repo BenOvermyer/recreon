@@ -21,6 +21,7 @@ from .types import (
     MAX_INDEX,
     MAX_NO_OF_FLEETS,
     MAX_RESOURCES,
+    NO_OF_PROBES_PER_EMPIRE,
     PLAYER_EMPIRES,
     Empire,
     EmpireModifiers,
@@ -30,6 +31,7 @@ from .types import (
     IndusTypes,
     NebulaTypes,
     ObjectTypes,
+    ProbeStatus,
     TechLevel,
     TechnologyTypes,
     WorldClass,
@@ -565,6 +567,29 @@ def set_defense_settings(
     game: GameEnvironment, emp: Empire, defense: DefenseRecord
 ) -> None:
     game.Universe.EmpireData[emp].DefenseSettings = deepcopy(defense)
+
+
+# --- Probes ------------------------------------------------------------------
+
+
+def get_probe(game: GameEnvironment, player: Empire) -> int:
+    """Highest-numbered probe that is ready to launch, or 0 when none is.
+
+    Counts down from the top like the fleet and starbase allocators.
+    """
+    probes = game.Universe.EmpireData[player].Probe
+    num = NO_OF_PROBES_PER_EMPIRE
+    while num > 0 and probes[num].Status != ProbeStatus.PReady:
+        num -= 1
+    return num
+
+
+def launch_probe(game: GameEnvironment, player: Empire, num: int, loc: XYCoord) -> None:
+    """Send probe ``num`` to ``loc``. ``num`` must have come from
+    :func:`get_probe`."""
+    probe = game.Universe.EmpireData[player].Probe[num]
+    probe.Dest = loc
+    probe.Status = ProbeStatus.PInTrans
 
 
 def next_empire(game: GameEnvironment, player: Empire) -> Empire:

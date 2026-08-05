@@ -424,6 +424,15 @@ def deploy_fleet(
     else:
         change_composition_of_fleet(game, flt_id, launch_id, sh, cr, lau_sh, lau_cr)
 
+    if flt_id.Index not in game.GlobalSets.SetOfActiveFleets:
+        # ``change_composition_of_fleet`` destroys a fleet that ends up with no
+        # hulls, which happens whenever ``sh`` was empty to begin with -- the
+        # AI asking a fighter-only world for a jump fleet is the live case.
+        # The original reads the freed record on the next line; returning the
+        # "could not deploy" signal callers already test for is the defined
+        # reading of that. See issue #30.
+        return empty_quadrant()
+
     if get_fleet_fuel(game, flt_id) == 0:
         # A fleet launched with no fuel at all would be stranded on the spot
         # and impossible to recover; the original hands it a token 10.
