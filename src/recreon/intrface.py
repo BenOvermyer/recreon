@@ -20,6 +20,7 @@ from .datacnst import (
     AMBROSIA_ADJ,
     CargoSpace,
     ClassIndAdj,
+    FltMovementRate,
     PrincipalIndustry,
     TechAdj2,
     ThgAdj,
@@ -44,6 +45,8 @@ from .primintr import (
 )
 from .types import (
     MAX_NO_OF_CONSTR_SITES,
+    MAX_NO_OF_STARBASES,
+    SHIP_TYPES,
     Empire,
     IndusTypes,
     IDNumber,
@@ -52,7 +55,13 @@ from .types import (
     TechnologyTypes,
     WorldTypes,
     empty_quadrant,
+    indus_range,
+    ship_array,
 )
+from .utils.pascal import pascal_round
+
+#: Pascal's ``SYGInd TO SYTInd`` -- the four shipyard industries.
+SHIPYARD_INDUSTRIES = indus_range(IndusTypes.SYGInd, IndusTypes.SYTInd)
 
 if TYPE_CHECKING:
     from .environ import GameEnvironment
@@ -490,6 +499,125 @@ def passing_through_gate(
             != get_warp_link_freq(game, get_status(game, dest_obj), dest_obj)
         )
     return False
+
+
+# --- Travel estimates --------------------------------------------------------
+
+
+def estimated_date_of_arrival(game: GameEnvironment, obj: IDNumber) -> int:
+    """Years until ``obj`` reaches its destination.
+
+    A fleet riding a gate always arrives next year whatever the distance. A
+    fortress shortens the trip by the four sectors it catapults the fleet --
+    ``passing_through_fortress`` is checked at the fleet's *current* position,
+    so the boost only counts while the fleet is still standing on it.
+
+    Bases move one sector a year, so their estimate is the raw Chebyshev
+    distance. The original leaves the result uninitialised for any other
+    object type; every caller passes a fleet or a base.
+    """
+    from .fleet import type_of_fleet
+
+    if obj.ObjTyp == ObjectTypes.Flt:
+        fleet = game.Universe.Fleet[obj.Index]
+        if passing_through_gate(game, obj, fleet.XY, fleet.Dest):
+            return 1
+
+        dist = max(abs(fleet.XY.x - fleet.Dest.x), abs(fleet.XY.y - fleet.Dest.y))
+        if passing_through_fortress(game, fleet.XY):
+            dist = max(dist - 4, 1)
+
+        quads_per_year = FltMovementRate[type_of_fleet(game, obj)]
+        eda = dist // quads_per_year
+        if dist % quads_per_year > 0:
+            eda += 1
+        return eda
+
+    if obj.ObjTyp == ObjectTypes.Base:
+        base = game.Universe.Starbase[obj.Index]
+        return max(abs(base.XY.x - base.Dest.x), abs(base.XY.y - base.Dest.y))
+
+    return 0
+
+
+def estimated_range(game: GameEnvironment, obj: IDNumber) -> int:
+    """How many years of travel ``obj`` has fuel for.
+
+    ``fuel_consumption`` starts at 1 rather than 0, so this cannot divide by
+    zero even for an empty fleet. A base burns a flat 100 tons a year, which
+    is where its divisor comes from.
+    """
+    from .fleet import get_fleet_fuel
+    from .misc import fuel_consumption
+    from .primintr import get_cargo, get_ships
+    from .utils.pascal import trunc
+
+    ships = get_ships(game, obj)
+    cargo = get_cargo(game, obj)
+
+    if obj.ObjTyp == ObjectTypes.Flt:
+        return trunc(get_fleet_fuel(game, obj) / fuel_consumption(ships, cargo))
+    if obj.ObjTyp == ObjectTypes.Base:
+        return cargo[TechnologyTypes.tri] // 100
+    return 0
+
+
+# --- Empire totals -----------------------------------------------------------
+
+
+def get_empire_status(
+    game: GameEnvironment, emp: Empire
+) -> tuple[int, int, int, dict[TechnologyTypes, int]]:
+    """Vital statistics for an empire.
+
+    Returns ``(planets, total_pop, ship_ind, total_ships)`` -- world count,
+    population in tens of millions, shipyard industry in tenths, and every
+    ship the empire owns wherever it is standing.
+
+    Starbases count toward ``planets`` alongside worlds, so the "number of
+    worlds" this reports is really "number of holdings". Only a ``cmp``
+    industrial complex contributes shipyard industry; other base types are
+    counted as holdings but build nothing.
+    """
+    planets = 0
+    total_pop = 0
+    ship_ind = 0.0
+    total_ships = ship_array()
+
+    universe = game.Universe
+
+    for i in range(1, game.NoOfPlanets + 1):
+        if i not in game.GlobalSets.SetOfPlanetsOf[emp]:
+            continue
+        planet = universe.Planet[i]
+        planets += 1
+        total_pop += planet.Pop
+        ip = (TechAdj2[planet.Tech] / 100) * ((planet.Eff + 250) / 100) / K6
+        for ind in SHIPYARD_INDUSTRIES:
+            ship_ind += ip * (planet.Indus[ind] + K4) ** 2
+        for shp in SHIP_TYPES:
+            total_ships[shp] += planet.Ships[shp]
+
+    for i in range(1, MAX_NO_OF_STARBASES + 1):
+        if i not in game.GlobalSets.SetOfStarbasesOf[emp]:
+            continue
+        base = universe.Starbase[i]
+        planets += 1
+        total_pop += base.Pop
+        for shp in SHIP_TYPES:
+            total_ships[shp] += base.Ships[shp]
+        if base.STyp == TechnologyTypes.cmp:
+            ip = (TechAdj2[base.Tech] / 100) * ((base.Eff + 250) / 100) / K6
+            for ind in SHIPYARD_INDUSTRIES:
+                ship_ind += ip * (base.Indus[ind] + K4) ** 2
+
+    active = game.GlobalSets.SetOfFleetsOf[emp] & game.GlobalSets.SetOfActiveFleets
+    for i in sorted(active):
+        fleet = universe.Fleet[i]
+        for shp in SHIP_TYPES:
+            total_ships[shp] += fleet.Ships[shp]
+
+    return planets, total_pop, pascal_round(ship_ind), total_ships
 
 
 def destroy_empire(game: GameEnvironment, emp: Empire) -> None:
