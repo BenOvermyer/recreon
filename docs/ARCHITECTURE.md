@@ -21,6 +21,7 @@ src/recreon/
 ├── design.py            # World designation, ISSP (DESIGN.PAS)
 ├── resource.py          # Cargo, production (RESOURCE.PAS)
 ├── constr.py            # Construction sites (CONSTR.PAS)
+├── sbase.py             # Starbase movement, self-destruct (SBASE.PAS)
 ├── orders.py            # Fleet order scripting (ORDERS.PAS)
 ├── npe/                 # AI system (NPE*.PAS)
 │   ├── __init__.py
@@ -273,6 +274,22 @@ Construction system from CONSTR.PAS.
 - Completion logic
 - Warp link frequency management
 
+### sbase.py
+Starbase movement and self-destruct from SBASE.PAS.
+
+**Functions:**
+- `self_destruct_object()` - Scuttle a starbase or stargate, destroying every fleet in its sector
+- `xy2dir()` - Bearing from one coordinate to another
+- `get_new_base_pos()` - One step toward a destination, with the two-deep sidestep lookahead
+- `move_base()` - Reseat a base in a new sector
+- `move_player_starbases()` - Advance an empire's command bases and fortresses one sector
+
+Command bases and fortresses are the only towable installations. They burn a
+flat 100 tons of trillum a year regardless of distance and cannot enter an
+occupied sector at all, which is why base pathing needs a sidestep that fleet
+pathing does not. Called from `main.update_turn` for the *incoming* empire,
+alongside `update_all_fleets`.
+
 **Construction types:**
 - SRM field (2 years)
 - Command base (6 years)
@@ -447,6 +464,10 @@ main.py
 ├── constr.py
 │   ├── primintr.py
 │   └── datacnst.py
+├── sbase.py
+│   ├── primintr.py
+│   ├── fleet.py
+│   └── news.py
 ├── npe/
 │   ├── core.py
 │   ├── pirate.py
