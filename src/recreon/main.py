@@ -17,6 +17,7 @@ from .fleet import update_all_fleets
 from .newgame import load_scenario
 from .news import erase_news
 from .primintr import empire_active, empire_player, next_empire, no_more_players
+from .sbase import move_player_starbases
 from .types import PLAYER_EMPIRES, Empire
 from .update import update_universe
 
@@ -39,7 +40,7 @@ def update_turn(game: GameEnvironment) -> None:
     if empire_active(game, game.Player):
         erase_news(game, game.Player)
         update_all_fleets(game, game.Player, next_empire(game, game.Player))
-        # MovePlayerStarbases is Phase 6, with construction.
+        move_player_starbases(game, next_empire(game, game.Player))
 
     game.EmpiresToMove.discard(game.Player)
 
@@ -58,6 +59,7 @@ def update_turn(game: GameEnvironment) -> None:
             # is Phase 7, but its fleets still move on schedule.
             erase_news(game, game.Player)
             update_all_fleets(game, game.Player, next_empire(game, game.Player))
+            move_player_starbases(game, next_empire(game, game.Player))
 
         if not any(empire_active(game, emp) for emp in PLAYER_EMPIRES):
             # Nothing left to rotate to; bail rather than spin forever.
