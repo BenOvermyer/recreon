@@ -45,7 +45,9 @@ from .primintr import (
 )
 from .types import (
     MAX_NO_OF_CONSTR_SITES,
+    MAX_NO_OF_FLEETS,
     MAX_NO_OF_STARBASES,
+    MAX_NO_OF_STARGATES,
     SHIP_TYPES,
     Empire,
     IndusTypes,
@@ -358,6 +360,225 @@ def update_probes(game: GameEnvironment, emp: Empire) -> None:
         if probe.Status == ProbeStatus.PInTrans:
             probe_scout(game, emp, probe.Dest)
             probe.Status = ProbeStatus.PReady
+
+
+def in_range_of_starbase(game: GameEnvironment, emp: Empire, obj_xy: XYCoord) -> bool:
+    """Whether any of ``emp``'s scanning starbases covers ``obj_xy``.
+
+    Industrial complexes do not scan -- only command bases, fortresses,
+    outposts and the rest. The radius is under 6, so 5 sectors.
+    """
+    from .misc import distance
+    from .primintr import get_base_type, get_coord
+
+    for i in range(1, MAX_NO_OF_STARBASES + 1):
+        if i not in game.GlobalSets.SetOfStarbasesOf[emp]:
+            continue
+        base_id = IDNumber(ObjectTypes.Base, i)
+        if distance(get_coord(game, base_id), obj_xy) < 6:
+            if get_base_type(game, base_id) != TechnologyTypes.cmp:
+                return True
+    return False
+
+
+def in_range_of_planet(
+    game: GameEnvironment, emp: Empire, f_typ, obj_xy: XYCoord
+) -> bool:
+    """Whether one of ``emp``'s worlds can *detect* a fleet at ``obj_xy``.
+
+    Weaker than scouting: it tells the empire something is there without
+    revealing what. Hunter-killers and penetrators are built to slip this, and
+    any nebula at all defeats it.
+    """
+    from .misc import distance
+    from .primintr import get_coord, get_nebula
+    from .types import FleetTypes, NebulaTypes
+
+    if f_typ in (FleetTypes.HKFleet, FleetTypes.Penetrator):
+        return False
+    if get_nebula(game, obj_xy) != NebulaTypes.NoNeb:
+        return False
+
+    for i in range(1, game.NoOfPlanets + 1):
+        if i not in game.GlobalSets.SetOfPlanetsOf[emp]:
+            continue
+        base_id = IDNumber(ObjectTypes.Pln, i)
+        if distance(get_coord(game, base_id), obj_xy) <= 5:
+            return True
+    return False
+
+
+def determine_if_scouted(game: GameEnvironment, emp: Empire, obj: IDNumber) -> None:
+    """Decide whether ``emp`` can see ``obj`` in detail this turn.
+
+    Two quite different paths, keyed on whether the empire knows the object
+    exists at all:
+
+    - **Known already**: it is scouted if the empire owns it, or it is within 5
+      sectors of the capital, or a scanning starbase covers it. So an empire
+      sees its own space and its border in detail and nothing else.
+    - **Not known**: only a starbase scan can reveal it, and only on a coin
+      flip -- ``Rnd(1,2)=1``. This is the one path by which an empire discovers
+      something it had no idea was there, and it files an ``OutProbe``
+      headline when it does.
+
+    The coin flip means a newly-built starbase takes a few years to map its
+    surroundings rather than revealing everything at once.
+    """
+    from .misc import distance
+    from .news import NewsTypes, add_news
+    from .primintr import get_capital, get_coord, get_status, known, scout_object, scouted
+    from .utils.int_utils import rnd
+
+    obj_xy = get_coord(game, obj)
+
+    if known(game, emp, obj):
+        if scouted(game, emp, obj):
+            return
+        cap_xy = get_coord(game, get_capital(game, emp))
+        if get_status(game, obj) == emp:
+            scout_object(game, emp, obj)
+        elif distance(cap_xy, obj_xy) < 6:
+            scout_object(game, emp, obj)
+        elif in_range_of_starbase(game, emp, obj_xy):
+            scout_object(game, emp, obj)
+    elif rnd(1, 2) == 1 and in_range_of_starbase(game, emp, obj_xy):
+        add_news(game, emp, NewsTypes.OutProbe, Location(XY=XYCoord(0, 0), ID=obj), 0, 0, 0)
+        scout_object(game, emp, obj)
+
+
+def scout_fleets(game: GameEnvironment, player_emp: Empire) -> None:
+    """Recompute which fleets ``player_emp`` can see, and how well.
+
+    Three tiers, and the difference between them is the whole of fleet fog of
+    war:
+
+    - **Own fleets** are always both scouted and known.
+    - **Scouted** (you see what it is made of): the fleet is adjacent to one of
+      your worlds or fleets -- but *only if it is not a hunter-killer group*,
+      which is what lets HK raiders sit next to a world unseen -- or it is
+      inside a starbase's scan.
+    - **Known only** (you see something is there): `in_range_of_planet` picks
+      it up at 5 sectors, unless it is an HK or penetrator fleet or sitting in
+      a nebula.
+
+    Both flags are cleared for this empire first, so a fleet that has moved out
+    of range this turn is genuinely forgotten rather than remembered forever.
+
+    A fleet spotted next to your territory files a ``FltDet`` headline. The
+    location it reports is the *observer*: the world that saw it, or -- when
+    the spotter was a fleet rather than a world -- the highest-numbered of your
+    fleets in that sector, found by counting down from ``MaxNoOfFleets``.
+    """
+    from .datacnst import DirX, DirY
+    from .news import NewsTypes, add_news
+    from .primintr import get_fleets, get_status, type_of_fleet
+    from .types import Directions, FleetTypes
+
+    for i in range(1, MAX_NO_OF_FLEETS + 1):
+        if i not in game.GlobalSets.SetOfActiveFleets:
+            continue
+
+        fleet = game.Universe.Fleet[i]
+        flt_id = IDNumber(ObjectTypes.Flt, i)
+        f_typ = type_of_fleet(game, flt_id)
+
+        fleet.ScoutedBy.discard(player_emp)
+        fleet.KnownBy.discard(player_emp)
+
+        if fleet.Emp == player_emp:
+            fleet.ScoutedBy.add(player_emp)
+            fleet.KnownBy.add(player_emp)
+            continue
+
+        spotted = False
+        if f_typ != FleetTypes.HKFleet:
+            for direction in Directions:
+                x = fleet.XY.x + DirX[direction]
+                y = fleet.XY.y + DirY[direction]
+                if not game.Galaxy.in_galaxy(x, y):
+                    continue
+
+                sector = game.Galaxy.sector(XYCoord(x, y))
+                if get_status(game, sector.Obj) != player_emp and (
+                    player_emp not in sector.Flts
+                ):
+                    continue
+
+                fleet.ScoutedBy.add(player_emp)
+                fleet.KnownBy.add(player_emp)
+
+                loc_id = sector.Obj
+                if get_status(game, sector.Obj) != player_emp:
+                    # Spotted by a fleet, not a world: report the highest-
+                    # numbered friendly fleet in that sector.
+                    mine = get_fleets(game, XYCoord(x, y)) & (
+                        game.GlobalSets.SetOfFleetsOf[player_emp]
+                    )
+                    j = MAX_NO_OF_FLEETS
+                    while j > 0 and j not in mine:
+                        j -= 1
+                    loc_id = IDNumber(ObjectTypes.Flt, j)
+
+                add_news(
+                    game,
+                    player_emp,
+                    NewsTypes.FltDet,
+                    Location(XY=XYCoord(0, 0), ID=loc_id),
+                    int(fleet.Emp),
+                    0,
+                    0,
+                )
+                spotted = True
+                break
+
+        if spotted:
+            continue
+
+        if in_range_of_starbase(game, player_emp, fleet.XY):
+            fleet.ScoutedBy.add(player_emp)
+            fleet.KnownBy.add(player_emp)
+            continue
+
+        if in_range_of_planet(game, player_emp, f_typ, fleet.XY):
+            fleet.KnownBy.add(player_emp)
+
+
+def scout_objects(game: GameEnvironment, emp: Empire) -> None:
+    """Sweep the space around everything ``emp`` owns, then rescan for the rest.
+
+    Two halves. First :func:`scout` runs from every world and every fleet the
+    empire holds, revealing the ring of sectors around each. Then every world,
+    starbase and stargate in the galaxy is put through
+    :func:`determine_if_scouted`, which is what picks up objects at a distance
+    via capital and starbase scans.
+
+    Note the second half sweeps **every** world, not only known ones -- that is
+    how an empire first learns a world exists.
+    """
+    from .primintr import get_coord
+
+    for i in range(1, game.NoOfPlanets + 1):
+        if i in game.GlobalSets.SetOfPlanetsOf[emp]:
+            scout(game, emp, get_coord(game, IDNumber(ObjectTypes.Pln, i)))
+
+    active_empire_fleets = (
+        game.GlobalSets.SetOfFleetsOf[emp] & game.GlobalSets.SetOfActiveFleets
+    )
+    for i in range(1, MAX_NO_OF_FLEETS + 1):
+        if i in active_empire_fleets:
+            scout(game, emp, get_coord(game, IDNumber(ObjectTypes.Flt, i)))
+
+    for i in range(1, game.NoOfPlanets + 1):
+        determine_if_scouted(game, emp, IDNumber(ObjectTypes.Pln, i))
+
+    for i in range(1, MAX_NO_OF_STARBASES + 1):
+        if i in game.GlobalSets.SetOfActiveStarbases:
+            determine_if_scouted(game, emp, IDNumber(ObjectTypes.Base, i))
+
+    for i in range(1, MAX_NO_OF_STARGATES + 1):
+        if i in game.GlobalSets.SetOfActiveGates:
+            determine_if_scouted(game, emp, IDNumber(ObjectTypes.Gate, i))
 
 
 def probes_return(game: GameEnvironment, emp: Empire) -> None:
