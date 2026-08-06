@@ -13,6 +13,7 @@ from textual.widget import Widget
 from ..datacnst import ClassStr, IndusNames, TechN, ThingNames, TypeName
 from ..environ import GameEnvironment
 from ..galaxy import XYCoord
+from ..news import NewsTypes
 from ..misc import hi_lo, military_power
 from ..primintr import (
     empire_name,
@@ -142,3 +143,44 @@ class EmpirePanel(Widget):
         if data.TotalRevIndex:
             text.append(f"unrest {data.TotalRevIndex}\n", style="yellow")
         return text
+
+
+class NewsPanel(Widget):
+    """The year's headlines, rendered into prose.
+
+    Simplified port of NWSWIND.PAS. The original pages through a scrolling
+    window; this shows the tail of the feed, which is what matters when the
+    list is short and is the part a player reads first when it is long.
+
+    News is per-empire and cleared at the start of each of that empire's
+    turns, so this is always "what happened since you last looked".
+    """
+
+    def __init__(self, game: GameEnvironment) -> None:
+        super().__init__()
+        self.game = game
+
+    #: Headlines that are continuation lines for the item above them. The
+    #: original indents them with three spaces; they are dimmed here so a long
+    #: casualty list does not drown the headline it belongs to.
+    DETAIL_HEADLINES = frozenset(
+        {NewsTypes.DestDetail, NewsTypes.Trns2, NewsTypes.DthHolo, NewsTypes.IndDs}
+    )
+
+    def render(self) -> Text:
+        from ..intrface import get_news_line
+        from ..news import get_news_list
+
+        feed = get_news_list(self.game, self.game.Player)
+        if not feed:
+            return Text("no news", style="dim italic")
+
+        text = Text()
+        for item in feed:
+            rendered = get_news_line(self.game, self.game.Player, item)
+            if not rendered:
+                continue
+            style = "dim" if item.Headline in self.DETAIL_HEADLINES else ""
+            text.append(f"{rendered}\n", style=style)
+
+        return text or Text("no news", style="dim italic")

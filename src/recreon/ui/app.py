@@ -16,7 +16,7 @@ from ..environ import GameEnvironment
 from ..primintr import empire_name, get_object
 from ..types import ObjectTypes
 from .map_view import MapView
-from .status import EmpirePanel, WorldPanel
+from .status import EmpirePanel, NewsPanel, WorldPanel
 
 
 class StatusBar(Static):
@@ -51,6 +51,7 @@ class RecreonApp(App):
     #side { width: 34; height: 1fr; border-left: solid $panel; padding: 0 1; }
     WorldPanel { height: 1fr; }
     EmpirePanel { height: auto; border-top: solid $panel; }
+    #news { height: 10; border-top: solid $panel; padding: 0 1; overflow-y: auto; }
     StatusBar { dock: bottom; height: 1; background: $panel; color: $text; padding: 0 1; }
     """
 
@@ -73,12 +74,15 @@ class RecreonApp(App):
         self.map_view.id = "map"
         self.world_panel = WorldPanel(self.game)
         self.empire_panel = EmpirePanel(self.game)
+        self.news_panel = NewsPanel(self.game)
+        self.news_panel.id = "news"
         self.status_bar = StatusBar(self.game, self.map_view)
 
         yield Horizontal(
             self.map_view,
             Vertical(self.world_panel, self.empire_panel, id="side"),
         )
+        yield self.news_panel
         yield self.status_bar
         yield Footer()
 
@@ -89,6 +93,7 @@ class RecreonApp(App):
         self.map_view.refresh()
         self.world_panel.look_at(self.map_view.cursor_x, self.map_view.cursor_y)
         self.empire_panel.refresh()
+        self.news_panel.refresh()
         self.status_bar.refresh_status()
 
     def action_move(self, dx: int, dy: int) -> None:

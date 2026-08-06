@@ -477,6 +477,14 @@ def _review_news(game: GameEnvironment, emp: Empire, data: PirateDataRecord) -> 
         item = news_list[i]
         if item.Headline == NewsTypes.FltBlocked:
             flt_id = item.Loc1.ID
+            # ORIGINAL BUG, deviated from -- see issue #39. A headline names
+            # the object it was filed about, and news is read at the end of
+            # the year, so that object may have died in between. Only fleets
+            # matter here: they are the one entity the port frees outright,
+            # and this handler writes through the pointer twice.
+            if flt_id.Index not in game.GlobalSets.SetOfActiveFleets:
+                i += 1
+                continue
             bx, by, new_xy = _get_patrol_destination(game, data.HuntingGround)
             set_fleet_destination(game, flt_id, new_xy)
             entry = data.FleetData[npe_data_index(game, flt_id)]

@@ -226,7 +226,17 @@ def _send_rescue_fleet(
     rcap: list[IDNumber],
     fleet_data: list,
 ) -> None:
-    """Send a tanker to a fleet that has run dry, if the capital can spare one."""
+    """Send a tanker to a fleet that has run dry, if the capital can spare one.
+
+    ORIGINAL BUG, deviated from -- see issue #39. News is read at the *end* of
+    the year it was filed, and a fleet that reported itself out of fuel is a
+    prime candidate for having been destroyed in between -- by an attack, or
+    by an earlier item in this same review. The original sizes a tanker off the
+    wreck's ship array; there is nothing to rescue, so the port returns.
+    """
+    if flt_id.Index not in game.GlobalSets.SetOfActiveFleets:
+        return
+
     base_id = get_regional_capital(game, flt_id, rcap)
     sh = get_ships(game, flt_id)
     fuel_needed = 1 + pascal_round(fuel_capacity(sh) / FUEL_PER_TON)

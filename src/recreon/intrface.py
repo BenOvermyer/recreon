@@ -12,6 +12,10 @@ from typing import TYPE_CHECKING
 
 from .datacnst import (
     DEFAULT_ISSP,
+    IndusNames,
+    TechN,
+    TechnologyName,
+    ThingNames,
     ISSP,
     K4,
     K6,
@@ -45,6 +49,7 @@ from .primintr import (
 )
 from .types import (
     MAX_NO_OF_CONSTR_SITES,
+    TechLevel,
     MAX_NO_OF_FLEETS,
     MAX_NO_OF_STARBASES,
     MAX_NO_OF_STARGATES,
@@ -360,6 +365,210 @@ def update_probes(game: GameEnvironment, emp: Empire) -> None:
         if probe.Status == ProbeStatus.PInTrans:
             probe_scout(game, emp, probe.Dest)
             probe.Status = ProbeStatus.PReady
+
+
+#: GetNewsLine's own cargo-name table, which is *not* `ThingNames`. Troops and
+#: ninjas are deliberately blank: no headline that uses this table can be
+#: about them, so the slots exist only to keep the array indexed by CargoTypes.
+_THG_N: dict[TechnologyTypes, str] = {
+    TechnologyTypes.men: "",
+    TechnologyTypes.nnj: "",
+    TechnologyTypes.amb: "ambrosia",
+    TechnologyTypes.che: "chemicals",
+    TechnologyTypes.met: "metals",
+    TechnologyTypes.sup: "supplies",
+    TechnologyTypes.tri: "trillum",
+}
+
+#: The five ways a world can complain about a shortage, picked at random so
+#: repeated years of the same shortage do not read identically.
+_LACK_VERBS = (
+    " needs more ",
+    " lacks ",
+    " has run out of ",
+    " requires more ",
+    " has used up all its ",
+)
+
+
+def _death_toll(parm1: int) -> str:
+    """Population figures, which are stored in hundreds of millions.
+
+    Under 100 the figure is rendered in millions as a plain integer; at or
+    above it, in billions to one decimal at width 4 -- so the billions form
+    carries a leading space, e.g. ``" 1.5 billion"``. Transcribed as written,
+    including that space.
+    """
+    if parm1 < 100:
+        return f"{parm1 * 10} million"
+    return f"{parm1 / 100:4.1f} billion"
+
+
+def get_news_line(game: GameEnvironment, player: Empire, item) -> str:
+    """Render one news item as the sentence the player reads.
+
+    Port of INTRFACE.PAS ``GetNewsLine``. Each headline has a template in
+    which ``*`` stands for the location and ``@`` for an empire -- the empire
+    named by ``Parm1``, which is why nearly every combat headline files the
+    attacker there. Both are substituted at the end, after the template is
+    chosen.
+
+    ``Parm2`` and ``Parm3`` carry whatever else the headline needs: a resource
+    for the detail lines, an industry for ``IndDs``, a second empire for the
+    global ``GLB*`` bulletins.
+
+    Two notes on faithfulness:
+
+    **Substitution uses Python's ``str.replace``, not the original's
+    ``StringReplace``.** That routine caches the line's length before its
+    replacement loop and never refreshes it, so a template containing the same
+    marker twice truncates the tail on the second pass -- and it loops
+    ``while pos(Find,Line) <> 0``, so a *name* containing ``*`` or ``@`` never
+    terminates. Neither is reachable from the shipped templates (none has a
+    repeated marker), but the second becomes reachable the moment the player
+    can name a world; see issue #44.
+
+    **Nine headline types have no arm and no ``ELSE``.** ``GTech``, ``CLost``,
+    ``LostP``, ``SMnR``, ``JumpDm``, ``JumpDs``, ``ELost``, ``TriAcc`` and
+    ``LostF`` are declared in NEWS.PAS and fall straight through, leaving the
+    caller's buffer untouched -- so the previous item's line would be shown
+    twice. Nothing in the game ever files one of them, so they are vestiges of
+    an earlier design; the port returns an empty string rather than inventing
+    prose for a headline that cannot occur.
+    """
+    from .news import NewsTypes
+    from .primintr import empire_name, get_name
+    from .utils.int_utils import rnd
+
+    N = NewsTypes
+    headline = item.Headline
+    p1, p2 = item.Parm1, item.Parm2
+
+    loc_n = get_name(game, player, item.Loc1, True)
+    emp_n = empire_name(game, Empire(p1)) if 0 <= p1 <= 8 else ""
+    deaths = _death_toll(p1)
+
+    def thg(value: int) -> str:
+        try:
+            return _THG_N[TechnologyTypes(value)]
+        except (KeyError, ValueError):
+            return ""
+
+    def lack() -> str:
+        # The verb is drawn before the sentence is built, so this consumes a
+        # draw from the generator whether or not the line is ever displayed.
+        return f"*{_LACK_VERBS[rnd(1, 5) - 1]}{thg(p1)}."
+
+    simple = {
+        N.DefLack: lambda: f"* needs {thg(p1)} to build defenses.",
+        N.IndLack: lambda: "* cannot build up its industry due to a lack of metals.",
+        N.Starv: lambda: f"{deaths} people have died of starvation on *.",
+        N.NTech: lambda: f"* has advanced to {TechN[TechLevel(p1)]} level technology.",
+        N.RTech: lambda: f"* has regressed to {TechN[TechLevel(p1)]} level technology.",
+        N.Lack: lack,
+        N.ConsLack: lack,
+        N.ConsDone: lambda: "Construction at * has been completed.",
+        N.RebelW1: lambda: "The people of * are dissatisfied with the empire.",
+        N.RebelW2: lambda: "Riots and demonstrations are widespread on *.",
+        N.RebelW3: lambda: "Some signs of organized rebellion detected on *.",
+        N.RebelW4: lambda: "Rebel forces on * are well organized and plan an attack.",
+        N.Rebel: lambda: "Rebel forces on * have succeeded in taking over.",
+        N.URebel: lambda: f"Imperial troops ended a rebellion on *.  {p1} legions lost.",
+        N.POk: lambda: "Imperial probe has scouted *.",
+        N.NCapTech: lambda: (
+            f"* has developed {TechnologyName[TechnologyTypes(p1)]} technology."
+        ),
+        N.NCapLvl: lambda: f"* has developed {TechN[TechLevel(p1)]} level technology.",
+        N.BattleW1: lambda: "* was attacked by @.  Attack force destroyed.",
+        N.BattleW2: lambda: "* was attacked by @.  Attack force retreated.",
+        N.BattleL: lambda: "* has been conquered by the empire of @.",
+        N.WAddict: lambda: "The people of * are now addicted to ambrosia.",
+        N.UAddict: lambda: "* is no longer addicted to ambrosia.",
+        N.AddictDie: lambda: f"{deaths} people have died on * of ambrosia withdrawal.",
+        N.RiotsDie: lambda: f"{deaths} people have died in large-scale riots on *.",
+        N.IndDs: lambda: (
+            f"   {p1} {IndusNames[IndusTypes(p2)]} have been destroyed on *."
+        ),
+        N.DInd: lambda: "* has declared independence.",
+        N.Join: lambda: "* has joined the empire of @.",
+        N.NewCap: lambda: "* has become the temporary capital of the empire.",
+        N.EndEmp: lambda: "The empire has been conquered.",
+        N.NoFuel: lambda: "* is out of fuel.",
+        N.FltDet: lambda: "@ fleet has been scanned near *.",
+        N.MinesDm: lambda: "* suffered damage from @ SRM field.",
+        N.MinesDs: lambda: "* was destroyed in @ SRM field.",
+        N.Mines: lambda: "@ fleet damaged in SRM field at *.",
+        N.ConDs: lambda: "@ has attacked and destroyed construction at *.",
+        N.GteDs: lambda: "Stargate at * has been destroyed by @.",
+        N.LAMDm: lambda: "* was damaged by @ LAMs.",
+        N.LAMDs: lambda: "* has been destroyed by a @ LAM attack.",
+        N.LAMDef: lambda: "* has been hit by @ LAMs.",
+        N.DestDetail: lambda: (
+            f"   {p1} {ThingNames[TechnologyTypes(p2)]} destroyed."
+        ),
+        N.TrnsShp: lambda: "* has received the following resources from @:",
+        N.Trns2: lambda: f"   {p1} {ThingNames[TechnologyTypes(p2)]}",
+        N.NSellTech: lambda: (
+            "@ has given the empire "
+            f"{TechnologyName[TechnologyTypes(p2)]} technology."
+        ),
+        N.GInd: lambda: "@ has granted this empire the rights to *.",
+        N.NewPlEmp: lambda: "The empire of @ has been formed on *.",
+        N.PCap: lambda: "Enemy probe from @ destroyed at *.",
+        N.PDest: lambda: "Lost contact with probe at *.",
+        N.MessR: lambda: "Message received from @.",
+        N.MessI: lambda: "* has intercepted a message from @.",
+        N.ConDsUNK: lambda: "Construction at * has been destroyed by unknown force.",
+        N.GteDsUNK: lambda: "Unknown forces have destroyed stargate at *.",
+        N.BattleW2UNK: lambda: "* has been attacked by unknown forces.",
+        N.BattleLUNK: lambda: "Lost contact with *.  Presume destroyed.",
+        N.HLPopKill: lambda: f"Native alien life-forms have killed {deaths} on *.",
+        N.HLMenKill: lambda: (
+            f"Aliens on * attack.  Casualties: {p1} men, {p2} ninja."
+        ),
+        N.HLJoin: lambda: f"{p1} alien legions have joined imperial forces on *.",
+        N.BseFuel: lambda: "* is out of trillum.",
+        N.BseBlocked: lambda: "* blocked in transit.",
+        N.SRMClear: lambda: "SRMs at * have been cleared by @.",
+        N.OrdersSRMClear: lambda: "* sweeped SRMs as ordered.",
+        N.OrdersNoSRMs: lambda: "SRM sweep by * failed - no SRMs found.",
+        N.OrdersNoSSP: lambda: "SRM sweep by * failed - not enough starships.",
+        N.FltBlocked: lambda: "* blocked by dense nebula.",
+        N.NebGate: lambda: "* unable to gate to inpenetrable nebula.",
+        N.BseSD: lambda: "@ has destroyed *.",
+        N.FltSD: lambda: "* destroyed by explosion.",
+        N.WHolo: lambda: "Population centers on * have been bombarded by @.",
+        N.DthHolo: lambda: f"   {deaths} people were killed in the attack.",
+        N.Disrupt: lambda: "* has been stopped by @ disrupter.",
+        N.NoTriRes: lambda: "All trillum deposits on * have been exhausted.",
+        N.TriResWarn1: lambda: "Trillum deposits on * are nearly depleted.",
+        N.TriResWarn2: lambda: "Trillum deposits on * are very low.",
+        N.MilitRev: lambda: (
+            "Demonstrations on * call for removal of imperial troops."
+        ),
+        N.RevControl: lambda: "Imperial troops on * disband angry rioters.",
+        N.GLBDest: lambda: (
+            f"@ has attacked * ({empire_name(game, Empire(p2))}). Attack Failed."
+        ),
+        N.GLBConq: lambda: f"@ has conquered * ({empire_name(game, Empire(p2))}).",
+        N.GLBCapConq: lambda: (
+            "@ has attacked and conquered the "
+            f"{empire_name(game, Empire(p2))} capital."
+        ),
+        N.GLBLAMStrk: lambda: (
+            f"@ has hit * ({empire_name(game, Empire(p2))}) with LAMs."
+        ),
+        N.GLBRev: lambda: "* has declared independence from @.",
+        N.OutProbe: lambda: "* has been scouted by outpost scanners.",
+        N.TerChaos: lambda: "Terraforming on * catastrophically failed.",
+        N.TerSuccess: lambda: "Terraforming on * has been completed successfully.",
+    }
+
+    build = simple.get(headline)
+    if build is None:
+        return ""
+
+    return build().replace("*", loc_n).replace("@", emp_n)
 
 
 def in_range_of_starbase(game: GameEnvironment, emp: Empire, obj_xy: XYCoord) -> bool:
