@@ -1076,6 +1076,10 @@ def _update_starbase(game: GameEnvironment, world: IDNumber) -> None:
             temp_cargo,
             other_reports,
         )
+        # UPDATE.PAS:1527 calls SurplusLink(World,TempCargo) here, between
+        # Production and PutTotalCargo -- it returns an industrial complex's
+        # surplus to nearby raw-material worlds. Unported (see #3), so a
+        # complex currently hoards what it does not consume.
         for c in CARGO_TYPES:
             base.Cargo[c] = thg_lmt(temp_cargo[c])
 

@@ -627,8 +627,11 @@ def destroy_empire(game: GameEnvironment, emp: Empire) -> None:
     whatever object shares their sector before being destroyed, so a fleet
     dying over a friendly world still hands its cargo over.
 
-    ``CleanUpNPE`` is not called -- the NPE subsystem is Phase 8, and there is
-    nothing yet for it to release.
+    ``CleanUpNPE`` is not called. The NPE subsystem is Phase 7, and while
+    ``npe/core.py`` is now ported nothing drives it yet, so there is still
+    nothing for it to release. This needs wiring once the personas own
+    per-empire state -- ``conquer_empire`` reaches here whenever a non-player
+    empire's capital falls with no successor world.
     """
     from .fleet import abort_fleet, destroy_fleet
     from .news import erase_news
