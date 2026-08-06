@@ -404,7 +404,26 @@ AI dispatcher from NPE.PAS — `initialize_npe()`, `implement_npe()`,
 `load_npe()`/`save_npe()`, which wait on save/load (§8.4).
 
 ### npe/common.py
-Shared persona behaviour from NPE00.PAS.
+Shared persona behaviour from NPE00.PAS. Where `core.py` holds the primitives,
+this decides *when* to use them; a persona is largely a matter of which of these
+it calls, in what order, and how often.
+
+**Functions:**
+- `review_news()` - React to the year's headlines: escalate policy against attackers, send tankers to stranded fleets, freight metal to worlds short of it
+- `defend_empire()` - Sweep every world, compare defenses against what the persona wants, shuttle ships to and from the regional capital, engage enemy fleets found overhead
+- `imperial_expansion()` - Roll against `Imperialist` and take one independent world; drifts the persona afterwards
+- `war_cabinet()` - Per enemy empire, deploy raiders and battle fleets by policy, and probe their capital
+- `cargo_supply_fleet()` - Move a specific cargo to a world, directly or by first sending empty transports to a world that has it
+- `npe_conquest()` - Redesignate a world just taken
+- `exploration_and_probing()` - Spend every remaining probe around the regional capitals
+
+Persona is threaded through as an `NPECharacterRecord` and consulted at each
+branch; `imperial_expansion` mutates it, so temperament drifts over a game.
+
+Three original defects are reproduced here and filed: #33 (`AttackSeverity`
+indexes `MPower` past its end on ground losses), #34 (`DefendEmpire` will not
+reinforce a world that has no ships), #35 (`ExplorationAndProbing` hangs for an
+empire with no regions).
 
 ### npe/pirate.py, kingdom.py, guardian.py, berserker.py
 Specific AI implementations from NPE01-NPE04.PAS.
