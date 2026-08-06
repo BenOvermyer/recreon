@@ -20,7 +20,7 @@ from ..primintr import (
     get_status,
     scouted,
 )
-from ..types import CARGO_TYPES, SHIP_TYPES, Empire, IndusTypes, ObjectTypes
+from ..types import CARGO_TYPES, SHIP_TYPES, IndusTypes, ObjectTypes
 
 
 class WorldPanel(Widget):

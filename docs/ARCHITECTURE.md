@@ -36,7 +36,7 @@ src/recreon/
 ├── ui/                  # Textual UI layer
 │   ├── __init__.py
 │   ├── app.py           # Main Textual application
-│   ├── map_view.py      # Galaxy map (MAPWIND.PAS)
+│   ├── map_view.py      # Galaxy map buffer, 3 columns/sector (MAPWIND.PAS)
 │   ├── menus.py         # Menu system (MENU.PAS, PULLDOWN.PAS)
 │   ├── status.py        # Status windows (STAWIND.PAS, FLTWIND.PAS, EMPWIND.PAS)
 │   ├── command.py       # Command input (DISPLAY.PAS)
