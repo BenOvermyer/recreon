@@ -20,7 +20,7 @@ src/recreon/
 ├── battle.py            # Simplified combat, unused in v2.0 (BATTLE.PAS)
 ├── design.py            # World designation, ISSP (DESIGN.PAS)
 ├── resource.py          # Cargo, production (RESOURCE.PAS)
-├── constr.py            # Construction sites (CONSTR.PAS)
+├── constr.py            # Construction commands, UI only (CONSTR.PAS)
 ├── sbase.py             # Starbase movement, self-destruct (SBASE.PAS)
 ├── orders.py            # Fleet order scripting (ORDERS.PAS)
 ├── npe/                 # AI system (NPE*.PAS)
@@ -267,14 +267,18 @@ Resource calculations from RESOURCE.PAS.
 - Resource trading logic
 
 ### constr.py
-Construction system from CONSTR.PAS.
+Construction commands from CONSTR.PAS. **Unported — a Phase 8 file, not a Phase 6 one.**
 
-**Functions:**
-- `start_construction()` - Create new construction site
-- `update_construction()` - Annual progress update
-- Material delivery from fleets
-- Completion logic
-- Warp link frequency management
+Despite the unit name, CONSTR.PAS holds *only* interactive command handlers:
+`ConstructCommand`, `AbortConstructionCommand`, `ConstrStatusCommand`,
+`WarpLinkFrequencyCommand`. Construction's mechanics are done and live elsewhere:
+
+- `intrface.construction()`, `destroy_construction()`, `next_constr_slot()` - create and tear down a site
+- `update.update_construction()` - annual progress, material draw and completion, driven from `update_universe`
+- `update.construct_starbase()` / `construct_stargate()` - what a finished site becomes
+
+So this module is the four menus and nothing else, and it arrives with the rest
+of the UI in Phase 8.
 
 ### sbase.py
 Starbase movement and self-destruct from SBASE.PAS.

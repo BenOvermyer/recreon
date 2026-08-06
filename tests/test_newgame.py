@@ -409,6 +409,11 @@ BROKEN_SCENARIOS = {"AWAKEN", "PRINCES"}
 
 ORIGINAL_SCENARIOS = sorted(p.stem for p in SCENARIO_DIR.glob("*.SCN"))
 
+#: How many unseeded rolls a scenario gets to place its worlds before the load
+#: is called a genuine failure. GAUNTLET is the tight one at roughly 8% per
+#: roll, so three attempts leaves a ~1-in-2000 flake.
+RANDOMIZE_ATTEMPTS = 3
+
 FOUR_PLAYERS = {
     Empire.Empire1: "A",
     Empire.Empire2: "B",
@@ -426,12 +431,27 @@ def test_the_scenario_directory_is_populated():
     "name", [n for n in ORIGINAL_SCENARIOS if n not in BROKEN_SCENARIOS]
 )
 def test_shipped_scenarios_load(name):
-    # Every shipped scenario carries Seed 0, so the loader would call
-    # Randomize and roll a different galaxy each run. Pinning the seed here
-    # keeps the test deterministic; see the test below for what varies when
-    # it is not pinned.
-    set_rand_seed(20260802)
-    game = load_scenario(SCENARIO_DIR / f"{name}.SCN", FOUR_PLAYERS)
+    # This test cannot be seeded. Every shipped scenario carries Seed 0, so
+    # `ScenarioLoader.run` calls Randomize itself and discards whatever seed
+    # was set beforehand -- an earlier `set_rand_seed` here was dead code, and
+    # left the test rolling a fresh galaxy every run.
+    #
+    # That matters because placement can legitimately fail: GetRandomXY gives
+    # up after 101 tries, and GAUNTLET packs 172 worlds tightly enough to trip
+    # it on a few per cent of rolls (see the test below). So retry rather than
+    # pin -- an unlucky roll is not a regression, but failing every attempt is.
+    for attempt in range(RANDOMIZE_ATTEMPTS):
+        try:
+            game = load_scenario(SCENARIO_DIR / f"{name}.SCN", FOUR_PLAYERS)
+            break
+        except ScenarioError as exc:
+            if "No room for random world" not in str(exc):
+                raise
+            if attempt == RANDOMIZE_ATTEMPTS - 1:
+                raise AssertionError(
+                    f"{name} failed to place its worlds on "
+                    f"{RANDOMIZE_ATTEMPTS} consecutive rolls: {exc}"
+                ) from exc
 
     assert game.Galaxy.size > 0
     assert game.NoOfPlanets > 0
