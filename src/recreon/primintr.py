@@ -42,6 +42,7 @@ from .types import (
     indus_array,
     ship_array,
 )
+from .utils.int_utils import rnd
 from .utils.pascal import pascal_val, trunc
 
 if TYPE_CHECKING:
@@ -559,6 +560,58 @@ def empire_name(game: GameEnvironment, emp: Empire) -> str:
 def empire_age(game: GameEnvironment, emp: Empire) -> int:
     """Years since founding."""
     return game.Year - game.Universe.EmpireData[emp].Founding
+
+
+#: How a minister addresses an emperor, and an empress. Rolled fresh on every
+#: line of dialogue -- see :func:`my_lord`.
+MY_LORD_EMPRESS = ("My Lady", "Your Highness", "Your Excellency", "My Empress")
+MY_LORD_EMPEROR = (
+    "My Lord",
+    "Your Highness",
+    "Your Majesty",
+    "My Liege",
+    "Your Excellency",
+    "Sir",
+)
+
+
+def my_lord(game: GameEnvironment, emp: Empire) -> str:
+    """How the empire's staff address its ruler, picked at random.
+
+    **This draws from the generator**, once per call: ``Rnd(1,4)`` for an
+    empress and ``Rnd(1,6)`` for an emperor. It is the one piece of pure
+    presentation in the game that moves the LCG, and the command handlers call
+    it constantly -- so in the original, how many times a player opened a
+    window shifted every subsequent roll in the galaxy.
+
+    Ported with the draws intact, because the alternative is worse: a
+    ``my_lord`` that did not draw would make *this* module's call sites
+    diverge from the Pascal's for no gain. But it does mean the port's stream
+    can only match the original's if the UI makes the same calls in the same
+    order, which it cannot -- one more reason a DOS-era galaxy is not
+    reproducible here (see CLAUDE.md on the LCG).
+    """
+    if game.Universe.EmpireData[emp].IsAnEmpress:
+        return MY_LORD_EMPRESS[rnd(1, len(MY_LORD_EMPRESS)) - 1]
+    return MY_LORD_EMPEROR[rnd(1, len(MY_LORD_EMPEROR)) - 1]
+
+
+# --- Construction sites -------------------------------------------------------
+
+
+def get_constr_type(game: GameEnvironment, con_id: IDNumber) -> TechnologyTypes:
+    """What is being built. ``SRM`` for anything that is not a site, which is
+    the original's fallback rather than an error."""
+    if con_id.ObjTyp != ObjectTypes.Con:
+        return TechnologyTypes.SRM
+    return game.Universe.Constr[con_id.Index].CTyp
+
+
+def get_constr_time_left(game: GameEnvironment, con_id: IDNumber) -> int:
+    """Years still to run, or 0 for anything that is not a site."""
+    if con_id.ObjTyp != ObjectTypes.Con:
+        return 0
+    return game.Universe.Constr[con_id.Index].TimeToCompletion
 
 
 def get_capital(game: GameEnvironment, emp: Empire) -> IDNumber:

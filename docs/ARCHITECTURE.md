@@ -20,7 +20,7 @@ src/recreon/
 ├── battle.py            # Simplified combat, unused in v2.0 (BATTLE.PAS)
 ├── design.py            # World designation, ISSP (DESIGN.PAS)
 ├── resource.py          # Cargo, production (RESOURCE.PAS)
-├── constr.py            # Construction commands, UI only (CONSTR.PAS)
+├── constr.py            # Construction commands (CONSTR.PAS)
 ├── sbase.py             # Starbase movement, self-destruct (SBASE.PAS)
 ├── orders.py            # Fleet order scripting (ORDERS.PAS)
 ├── mess.py              # Diplomatic messages (MESS.PAS)
@@ -42,6 +42,7 @@ src/recreon/
 │   ├── map_view.py      # Galaxy map buffer, 3 columns/sector (MAPWIND.PAS)
 │   ├── newgame.py       # Scenario picker, intro, naming (NEWGAME.PAS front end)
 │   ├── prologue.py      # The menu before and between games (PROLOG.PAS)
+│   ├── construction.py  # Construction status, warp links (CONSTR.PAS)
 │   ├── menus.py         # Menu system (MENU.PAS, PULLDOWN.PAS)
 │   ├── status.py        # Status windows (STAWIND.PAS, FLTWIND.PAS, EMPWIND.PAS)
 │   ├── command.py       # Command input (DISPLAY.PAS)
@@ -272,18 +273,32 @@ Resource calculations from RESOURCE.PAS.
 - Resource trading logic
 
 ### constr.py
-Construction commands from CONSTR.PAS. **Unported — a Phase 8 file, not a Phase 6 one.**
+Construction commands from CONSTR.PAS — a Phase 8 file, not a Phase 6 one.
 
-Despite the unit name, CONSTR.PAS holds *only* interactive command handlers:
-`ConstructCommand`, `AbortConstructionCommand`, `ConstrStatusCommand`,
-`WarpLinkFrequencyCommand`. Construction's mechanics are done and live elsewhere:
+Despite the unit name, CONSTR.PAS holds *only* interactive command handlers.
+Construction's mechanics live elsewhere and were done in Phase 6:
 
-- `intrface.construction()`, `destroy_construction()`, `next_constr_slot()` - create and tear down a site
-- `update.update_construction()` - annual progress, material draw and completion, driven from `update_universe`
-- `update.construct_starbase()` / `construct_stargate()` - what a finished site becomes
+- `intrface.construction()`, `destroy_construction()`, `next_constr_slot()` — create and tear down a site
+- `update.update_construction()` — annual progress, material draw and completion, driven from `update_universe`
+- `update.construct_starbase()` / `construct_stargate()` — what a finished site becomes
 
-So this module is the four menus and nothing else, and it arrives with the rest
-of the UI in Phase 8.
+**Functions:** `available_constr_types()` (gated on the empire's technology
+*set*, not its level, so a scenario can grant one type on its own),
+`sector_is_free()`, `construct_command()`, `abort_construction_command()`,
+`constr_status_rows()`, `warp_link_freq_list()`, `set_warp_link_frequency()`,
+`warp_link_advice()`. `ConsName` is the display table; `noun()` is STRG.PAS's
+article-picker, which counts Y as a vowel.
+
+Two details worth knowing. **A name pinned to the sector follows the site** —
+the label moves off the bare coordinate onto the site's ID, because a finished
+site becomes a base or a gate and can then move. And **the status table's
+shortfall column is the mechanic made legible**: a site consumes material per
+year and only the owner's fleets parked on it can supply it, so the column is
+"how much more must be sitting there when the year turns".
+
+The warp-link command is filed here because a warp link is a construction type,
+but it applies to any stargate the player knows of, including other empires' —
+matching your frequency to theirs is how you get to use their gate.
 
 ### sbase.py
 Starbase movement and self-destruct from SBASE.PAS.
@@ -590,6 +605,13 @@ The prologue menu, plus the three little windows it opens: `Attention`
 (`AttentionWindow`, acknowledgement or yes/no), `TextPrompt` (`InputString`),
 and `ChooseFrom` (`ChoosePlayer` and the save-file picker). `PrologueScreen`
 dismisses with `"begin"` or `"quit"` — the two ways `Prologue`'s loop ends.
+
+### ui/construction.py
+`ConstructionScreen` (the status table, with construct and abort on it) and
+`WarpLinkScreen`. Reached from the map with `b` and `w`; the original hangs
+them off the Build and Empire pull-downs, which are MENU.PAS and still to come.
+`_interpret_xy` is DISPLAY.PAS's `InterpretXY` for the one form it needs —
+capital-relative coordinates, where the two axes convert differently.
 
 ### ui/menus.py
 Menu system from MENU.PAS, PULLDOWN.PAS.

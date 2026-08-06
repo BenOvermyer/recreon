@@ -67,6 +67,8 @@ class RecreonApp(App):
         Binding("q", "quit", "Quit"),
         Binding("n", "next_turn", "Next turn"),
         Binding("g", "prologue", "Menu"),
+        Binding("b", "construction", "Build"),
+        Binding("w", "warp_links", "Warp links"),
         Binding("up,k", "move(0,-1)", "Up", show=False),
         Binding("down,j", "move(0,1)", "Down", show=False),
         Binding("left,h", "move(-1,0)", "Left", show=False),
@@ -165,6 +167,35 @@ class RecreonApp(App):
             self.status_bar,
         ):
             widget.game = game
+        self._refresh_all()
+
+    def action_construction(self) -> None:
+        """Construction status, with construct and abort on it (CONSTR.PAS).
+
+        The original hangs this off the Build pull-down; MENU.PAS is still to
+        come, so it is bound directly for now.
+        """
+        if not self.started:
+            return
+        from .construction import ConstructionScreen
+
+        self.push_screen(
+            ConstructionScreen(self.game, self.game.Player), self._after_command
+        )
+
+    def action_warp_links(self) -> None:
+        """Warp link frequencies (CONSTR.PAS `WarpLinkFrequencyCommand`)."""
+        if not self.started:
+            return
+        from .construction import WarpLinkScreen
+
+        self.push_screen(
+            WarpLinkScreen(self.game, self.game.Player), self._after_command
+        )
+
+    def _after_command(self, _result=None) -> None:
+        """A command screen closed: the galaxy may have changed under the map."""
+        self.prologue.game_modified = True
         self._refresh_all()
 
     def _refresh_all(self) -> None:
