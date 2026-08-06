@@ -251,6 +251,36 @@ def get_optimum_indus(game: GameEnvironment, obj: IDNumber) -> dict[IT, int]:
     return indus
 
 
+def clear_known_set(game: GameEnvironment, emp: Empire) -> None:
+    """Wipe everything ``emp`` knows *of*, not merely what it can see.
+
+    The harder counterpart to :func:`~recreon.primintr.clear_scout_set`, which
+    runs every turn: this drops ``KnownBy``, the level the map itself keys on,
+    so an empire that has had this done to it starts blind rather than merely
+    out of touch. Its one caller is ``AddPlayerEmpire`` -- an empire joining a
+    galaxy mid-game must not inherit the previous occupant's charts.
+
+    Fleets are untouched, though ``FleetRecord`` carries a ``KnownBy`` too.
+    Faithful to the original, which sweeps planets, starbases, gates and
+    construction sites and stops there; a fleet the new empire "knows" is
+    transient enough that the next ``set_up_turn`` settles it either way.
+    """
+    universe = game.Universe
+
+    for planet in universe.Planet[1 : game.NoOfPlanets + 1]:
+        if planet is not None:
+            planet.KnownBy.discard(emp)
+
+    for index in game.GlobalSets.SetOfActiveStarbases:
+        universe.Starbase[index].KnownBy.discard(emp)
+
+    for index in game.GlobalSets.SetOfActiveGates:
+        universe.Stargate[index].KnownBy.discard(emp)
+
+    for index in game.GlobalSets.SetOfActiveConstructionSites:
+        universe.Constr[index].KnownBy.discard(emp)
+
+
 def scout(game: GameEnvironment, emp: Empire, xy: XYCoord) -> None:
     """Reveal the eight sectors around ``xy`` to ``emp``.
 

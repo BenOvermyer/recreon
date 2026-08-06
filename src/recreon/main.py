@@ -163,6 +163,11 @@ def main() -> None:
         default=SCENARIO_DIR,
         help=f"directory the picker scans for *.SCN (default: {SCENARIO_DIR})",
     )
+    parser.add_argument(
+        "--save-dir",
+        default=Path.cwd(),
+        help="directory saved games are written to and read from (default: .)",
+    )
     parser.add_argument("--name", default="Player", help="your empire's name")
     parser.add_argument(
         "--no-ui", action="store_true", help="advance one turn and exit, without the UI"
@@ -180,13 +185,15 @@ def main() -> None:
 
     from .ui.app import RecreonApp
 
-    # With no --scenario the app opens on the picker, which is where the
-    # original starts too: ANACREON.PAS runs Prologue before anything else.
+    # With no --scenario the app opens on the prologue menu, which is where
+    # the original starts: ANACREON.PAS runs Prologue before anything else.
     game = None
     if args.scenario:
         game = new_game(args.scenario, {Empire.Empire1: args.name})
 
-    RecreonApp(game, scenario_dir=args.scenario_dir).run()
+    RecreonApp(
+        game, scenario_dir=args.scenario_dir, save_dir=args.save_dir
+    ).run()
 
 
 if __name__ == "__main__":

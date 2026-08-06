@@ -17,6 +17,18 @@ def deterministic():
     set_rand_seed(4021)
 
 
+async def open_picker(app, pilot, directory=SCENARIOS):
+    """Push the picker directly, as the prologue's 'New game' command does.
+
+    Driving it through the prologue would test the menu rather than the
+    picker; `test_ui_prologue.py` covers that path.
+    """
+    screen = NewGameScreen(directory)
+    app.push_screen(screen, lambda game: game and app.adopt_game(game))
+    await pilot.pause()
+    return screen
+
+
 async def walk_to_naming(pilot, screen, players: int | None = None):
     """Pick the first scenario, page past the intro, answer the count."""
     await pilot.press("enter")
@@ -33,23 +45,12 @@ async def walk_to_naming(pilot, screen, players: int | None = None):
         await pilot.pause()
 
 
-async def test_the_app_opens_on_the_picker_when_no_scenario_is_given():
+async def test_the_picker_starts_on_the_scenario_list():
     app = RecreonApp(None, scenario_dir=SCENARIOS)
     async with app.run_test() as pilot:
-        await pilot.pause()
-        assert isinstance(app.screen, NewGameScreen)
-        assert app.screen.step == "scenario"
+        screen = await open_picker(app, pilot)
+        assert screen.step == "scenario"
         assert not app.started
-
-
-async def test_the_app_skips_the_picker_when_handed_a_game():
-    from recreon.main import new_game
-
-    app = RecreonApp(new_game(), scenario_dir=SCENARIOS)
-    async with app.run_test() as pilot:
-        await pilot.pause()
-        assert not isinstance(app.screen, NewGameScreen)
-        assert app.started
 
 
 async def test_the_status_bar_says_so_before_a_game_exists():
@@ -64,8 +65,7 @@ async def test_the_status_bar_says_so_before_a_game_exists():
 async def test_picking_a_scenario_shows_its_introduction():
     app = RecreonApp(None, scenario_dir=SCENARIOS)
     async with app.run_test() as pilot:
-        await pilot.pause()
-        screen = app.screen
+        screen = await open_picker(app, pilot)
 
         await pilot.press("enter")
         await pilot.pause()
@@ -78,8 +78,7 @@ async def test_picking_a_scenario_shows_its_introduction():
 async def test_the_whole_flow_builds_a_galaxy():
     app = RecreonApp(None, scenario_dir=SCENARIOS)
     async with app.run_test() as pilot:
-        await pilot.pause()
-        screen = app.screen
+        screen = await open_picker(app, pilot)
 
         await walk_to_naming(pilot, screen, players=2)
         assert screen.step == "name"
@@ -105,8 +104,7 @@ async def test_an_empty_name_takes_the_suggestion():
 
     app = RecreonApp(None, scenario_dir=SCENARIOS)
     async with app.run_test() as pilot:
-        await pilot.pause()
-        screen = app.screen
+        screen = await open_picker(app, pilot)
 
         await walk_to_naming(pilot, screen, players=1)
         suggestion = screen.suggestion
@@ -122,8 +120,7 @@ async def test_a_typed_name_is_capitalised():
     """`Name[1]:=UpCase(Name[1])` runs whichever way the name arrived."""
     app = RecreonApp(None, scenario_dir=SCENARIOS)
     async with app.run_test() as pilot:
-        await pilot.pause()
-        screen = app.screen
+        screen = await open_picker(app, pilot)
 
         await walk_to_naming(pilot, screen, players=1)
         for ch in "sarkhon":
@@ -137,8 +134,7 @@ async def test_a_typed_name_is_capitalised():
 async def test_a_bad_player_count_is_rejected_without_advancing():
     app = RecreonApp(None, scenario_dir=SCENARIOS)
     async with app.run_test() as pilot:
-        await pilot.pause()
-        screen = app.screen
+        screen = await open_picker(app, pilot)
 
         await pilot.press("enter")
         await pilot.pause()
@@ -159,8 +155,7 @@ async def test_a_bad_player_count_is_rejected_without_advancing():
 async def test_a_non_numeric_player_count_is_rejected():
     app = RecreonApp(None, scenario_dir=SCENARIOS)
     async with app.run_test() as pilot:
-        await pilot.pause()
-        screen = app.screen
+        screen = await open_picker(app, pilot)
 
         await pilot.press("enter")
         await pilot.pause()
@@ -180,8 +175,7 @@ async def test_escape_at_the_name_prompt_opens_the_suggestions():
     """The help line reads '<Esc>:Suggestions', not '<Esc>:Exit'."""
     app = RecreonApp(None, scenario_dir=SCENARIOS)
     async with app.run_test() as pilot:
-        await pilot.pause()
-        screen = app.screen
+        screen = await open_picker(app, pilot)
 
         await walk_to_naming(pilot, screen, players=1)
         await pilot.press("escape")
@@ -198,8 +192,7 @@ async def test_escape_at_the_name_prompt_opens_the_suggestions():
 async def test_escape_during_the_intro_goes_back_to_the_list():
     app = RecreonApp(None, scenario_dir=SCENARIOS)
     async with app.run_test() as pilot:
-        await pilot.pause()
-        screen = app.screen
+        screen = await open_picker(app, pilot)
 
         await pilot.press("enter")
         await pilot.pause()
@@ -214,8 +207,8 @@ async def test_an_empty_directory_says_so(tmp_path):
     """AttentionWindow('There are no Anacreon scenario', 'files in "…"')."""
     app = RecreonApp(None, scenario_dir=tmp_path)
     async with app.run_test() as pilot:
-        await pilot.pause()
-        prompt = str(app.screen.query_one("#prompt").content)
+        screen = await open_picker(app, pilot, tmp_path)
+        prompt = str(screen.query_one("#prompt").content)
         assert "no Anacreon scenario files" in prompt
 
 
@@ -223,7 +216,7 @@ async def test_backing_out_of_the_picker_leaves_the_app_running():
     """`StartNewGame`'s Exit flag returns to the prologue, it does not quit."""
     app = RecreonApp(None, scenario_dir=SCENARIOS)
     async with app.run_test() as pilot:
-        await pilot.pause()
+        await open_picker(app, pilot)
         await pilot.press("escape")
         await pilot.pause()
 

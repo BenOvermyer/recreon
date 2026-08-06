@@ -1063,9 +1063,15 @@ def update_state_department(game: GameEnvironment, empire: Empire, other_empire:
 - Scouting/fog of war (only show what player has scouted)
 - Multi-empire fleet tracking
 
-### 8.2 Complete menu system
+### 8.2 Complete menu system — *prologue done*
 
-Implement all 7 menus with all commands:
+The prologue menu (PROLOG.PAS) is ported: `prolog.py` and `ui/prologue.py`.
+It is the front door — new game, load, save, quit, time limit, add/delete a
+player empire, and the autosave/pause/sequential-play toggles — and it is what
+finally makes save/load reachable by a player.
+
+Still to do: the seven in-game pull-downs below, which are MENU.PAS plus the
+`*COMM.PAS` command handlers.
 
 1. **Info** - About, DOS shell
 2. **Game** - Pause, Print, Next Turn, Quit
