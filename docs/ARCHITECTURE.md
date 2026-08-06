@@ -25,6 +25,7 @@ src/recreon/
 ├── orders.py            # Fleet order scripting (ORDERS.PAS)
 ├── mess.py              # Diplomatic messages (MESS.PAS)
 ├── prolog.py            # Game lifecycle, prologue commands (PROLOG.PAS)
+├── msccomm.py           # Defense settings, self-destruct (MSCCOMM.PAS)
 ├── loadsave.py          # Save/load a game (LOADSAVE.PAS)
 ├── npe/                 # AI system (NPE*.PAS)
 │   ├── __init__.py
@@ -43,6 +44,7 @@ src/recreon/
 │   ├── newgame.py       # Scenario picker, intro, naming (NEWGAME.PAS front end)
 │   ├── prologue.py      # The menu before and between games (PROLOG.PAS)
 │   ├── construction.py  # Construction status, warp links (CONSTR.PAS)
+│   ├── defenses.py      # Shell distribution grid, self-destruct (MSCCOMM.PAS)
 │   ├── menus.py         # Menu system (MENU.PAS, PULLDOWN.PAS)
 │   ├── status.py        # Status windows (STAWIND.PAS, FLTWIND.PAS, EMPWIND.PAS)
 │   ├── command.py       # Command input (DISPLAY.PAS)
@@ -369,6 +371,27 @@ plus a `MessI` headline. Worlds near a capital are how a third party reads
 someone else's diplomacy. Four original bugs live in this unit — #47, #48, #49
 and #50 — of which #50 is the one that changes play.
 
+### msccomm.py
+MSCCOMM.PAS's live half. The unit declares five commands but three --
+`HolocaustCommand`, `ArtifactCommand`, `TransactionCommand` -- sit inside the
+`(* ... *)` block at lines 533-655 and are unreachable in v2.0.
+
+**Functions:** `normalize_defenses()`, `illegal_amounts()`, `clamp_percent()`,
+`shell_total()`, `defense_settings_for_editing()`, `save_defense_settings()`;
+`can_self_destruct()`, `self_destruct_warning()`, `self_destruct_command()`,
+`destructible_objects()`.
+
+The defense distribution is the empire's standing orders for spreading each
+ship type across the five orbital shells, and combat reads them whenever a
+world or base is attacked. `normalize_defenses` forces each row to total 100 in
+three steps, all of which fall back to **sub-orbit**: ground percentages for
+ships that cannot land move there, a shortfall goes there, and the remainder
+`Trunc` loses when scaling a surplus goes there too.
+
+Self-destruct covers starbases and stargates but **not an industrial complex**
+-- `cmp` is excluded by name, since a complex sits on a world rather than
+standing alone.
+
 ### prolog.py
 The prologue from PROLOG.PAS: the game's lifecycle and the settings that live
 outside a game.
@@ -612,6 +635,15 @@ dismisses with `"begin"` or `"quit"` — the two ways `Prologue`'s loop ends.
 them off the Build and Empire pull-downs, which are MENU.PAS and still to come.
 `_interpret_xy` is DISPLAY.PAS's `InterpretXY` for the one form it needs —
 capital-relative coordinates, where the two axes convert differently.
+
+### ui/defenses.py
+`DefenseScreen` (the shell distribution grid: arrows move, digits edit, Esc
+normalises then leaves) and `SelfDestructScreen`. Reached from the map with
+`d` and `x`.
+
+The grid's Esc behaviour follows the original's `UNTIL (Ch=EscKey) AND NOT
+(Error)`: the first Esc on an illegal grid reports what is wrong, normalises,
+and stays; only a second one saves and leaves.
 
 ### ui/menus.py
 Menu system from MENU.PAS, PULLDOWN.PAS.
