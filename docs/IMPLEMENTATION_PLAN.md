@@ -1070,8 +1070,11 @@ It is the front door — new game, load, save, quit, time limit, add/delete a
 player empire, and the autosave/pause/sequential-play toggles — and it is what
 finally makes save/load reachable by a player.
 
-Still to do: the seven in-game pull-downs below, which are MENU.PAS plus the
-`*COMM.PAS` command handlers.
+**CONSTR.PAS is done** — `constr.py` and `ui/construction.py`, covering the
+Build menu's three commands plus the warp-link frequency command.
+
+Still to do: the rest of the pull-downs below, which are MENU.PAS plus
+CLSCOMM, FLTCOMM, MSCCOMM and ATTCOMM.
 
 1. **Info** - About, DOS shell
 2. **Game** - Pause, Print, Next Turn, Quit
