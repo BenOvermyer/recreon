@@ -136,12 +136,21 @@ def _military_value(parm2: int) -> int:
     covers (it is read everywhere else only over ``LAM..trn``). Any battle with
     ground casualties therefore indexes the table out of range.
 
-    ``MPower`` is one of the tables with no declaration anywhere in
-    ``original/``, so what the DOS build read there cannot be recovered -- it
-    is either two real entries whose values are lost, or adjacent memory.
-    Troops carry no military power anywhere else in the game (``MilitaryPower``
-    sums ships and defenses only), so 0 is the reading consistent with the rest
-    of the unit, and it keeps a normal ground battle from raising a KeyError.
+    ``MPower`` is declared ``ARRAY [LAM..trn] OF Byte`` at DATACNST.PAS:198,
+    so this is an out-of-bounds read of adjacent memory rather than a lookup
+    of undocumented entries -- and with range checking off nothing traps it.
+
+    Returning 0 is very probably what the DOS build did anyway.
+    ``CombatTable`` is declared immediately after ``MPower`` in the same
+    ``CONST`` block, and its first row -- the ``NUL`` attacker -- is all
+    zeroes, so the bytes just past an 11-byte ``MPower`` are zero whether or
+    not the compiler pads between them. 0 is also the reading consistent with
+    the rest of the unit: troops carry no military power anywhere else in the
+    game, since ``MilitaryPower`` sums ships and defenses only.
+
+    (This docstring used to say ``MPower`` was declared nowhere in
+    ``original/``. It is; DATACNST.PAS is one of ten files ``grep`` treats as
+    binary, so plain searches did not see it.)
     """
     try:
         return MPower[T(parm2)]
