@@ -14,9 +14,17 @@ from pathlib import Path
 
 from .environ import GameEnvironment
 from .fleet import update_all_fleets
+from .intrface import update_probes
 from .newgame import load_scenario
 from .news import erase_news
-from .primintr import empire_active, empire_player, next_empire, no_more_players
+from .npe.dispatch import implement_npe
+from .primintr import (
+    clear_scout_set,
+    empire_active,
+    empire_player,
+    next_empire,
+    no_more_players,
+)
 from .sbase import move_player_starbases
 from .types import PLAYER_EMPIRES, Empire
 from .update import update_universe
@@ -55,8 +63,19 @@ def update_turn(game: GameEnvironment) -> None:
         if empire_active(game, game.Player):
             if empire_player(game, game.Player):
                 return
-            # An NPE's turn resolves without stopping the loop. ImplementNPE
-            # is Phase 7, but its fleets still move on schedule.
+            # An NPE's turn resolves without stopping the loop, in the order
+            # ANACREON.PAS:240-251 runs it: refresh what the empire can see,
+            # let the AI act on it, then clear the news and move.
+            #
+            # ScoutFleets and ScoutObjects are not ported (Phase 8, #5 §8.1),
+            # so probes are currently an NPE's only way to learn anything --
+            # which is why update_probes has to be here rather than waiting
+            # with them. Until they land the AI is fighting half-blind: every
+            # decision gated on Known() or Scouted() sees less than it should.
+            clear_scout_set(game, game.Player)
+            update_probes(game, game.Player)
+            implement_npe(game, game.Player)
+
             erase_news(game, game.Player)
             update_all_fleets(game, game.Player, next_empire(game, game.Player))
             move_player_starbases(game, next_empire(game, game.Player))

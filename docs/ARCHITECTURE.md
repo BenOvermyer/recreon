@@ -426,7 +426,32 @@ reinforce a world that has no ships), #35 (`ExplorationAndProbing` hangs for an
 empire with no regions).
 
 ### npe/pirate.py, kingdom.py, guardian.py, berserker.py
-Specific AI implementations from NPE01-NPE04.PAS.
+The four personas, from NPE01-NPE04.PAS. Each exposes
+`initialize_*`, `implement_*` and `clean_up_*` for the dispatcher.
+
+**`pirate.py` (NPE01)** — commerce raiding. Patrols a 5x5 block of the galaxy
+on `WaitForTrnMSN`, intercepts a convoy where it is *going* rather than where it
+is, strips it and runs. Blocks that pay get more attractive, blocks that do not
+get less: the `HuntingGround` grid is the only memory a pirate keeps between
+years, and both updates wrap (#37). Separately raids rich, poorly defended
+worlds and strips them via `plunder_world`. Never repairs a stranded fleet --
+`NoFuel` means the fleet is destroyed.
+
+**`kingdom.py` (NPE02)** — the reference persona, and the only one that uses the
+whole stack. `implement_kingdom1_npe` is the clearest single statement of what
+an AI turn is: fleets, news, state department, war cabinet, defense, expansion,
+a seventh-year review, probing. Kingdom1 and Kingdom2 share every line and
+differ only in the persona rolled at initialisation.
+
+**`guardian.py` (NPE03)** — LAMs and nothing else. No fleets, no expansion, no
+diplomacy, no persona. Fires on *any* fleet within 5 sectors that is not its
+own, hardest target first, including neutrals and independents.
+
+**`berserker.py` (NPE04)** — the only persona built around starbases. Command
+bases and fortresses crawl the galaxy under `sbase.move_player_starbases`, each
+running a `BaseMissionTypes` state machine, launching strikes at whatever they
+park next to. One conquest in three ends in `_bsrk_destroy_world`: half the
+population killed, industry gutted, technology thrown back to pre-atomic.
 
 ## UI Layer (ui/)
 

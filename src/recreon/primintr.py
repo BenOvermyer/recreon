@@ -303,9 +303,34 @@ def set_efficiency(game: GameEnvironment, obj: IDNumber, eff: int) -> None:
 
 
 def set_status(game: GameEnvironment, obj: IDNumber, emp: Empire) -> None:
+    """Hand ``obj`` to ``emp``, moving it between the per-empire index sets.
+
+    Planets, starbases and construction sites each carry a set per empire
+    (``SetOfPlanetsOf`` and friends), and almost everything that sweeps an
+    empire's holdings iterates those rather than scanning for a matching
+    ``Emp``. The original moves the index out of the old owner's set and into
+    the new one right here (PRIMINTR.PAS:724-750); leaving that out desynchs
+    every such sweep from the moment a world first changes hands -- which for a
+    scenario is at load, since worlds are created independent and assigned
+    owners afterwards.
+    """
     entity = _entity(game, obj)
-    if entity is not None:
-        entity.Emp = emp
+    if entity is None:
+        return
+
+    sets = None
+    if obj.ObjTyp == ObjectTypes.Pln:
+        sets = game.GlobalSets.SetOfPlanetsOf
+    elif obj.ObjTyp == ObjectTypes.Base:
+        sets = game.GlobalSets.SetOfStarbasesOf
+    elif obj.ObjTyp == ObjectTypes.Con:
+        sets = game.GlobalSets.SetOfConstructionSitesOf
+
+    if sets is not None:
+        sets[entity.Emp].discard(obj.Index)
+        sets[emp].add(obj.Index)
+
+    entity.Emp = emp
 
 
 def set_type(game: GameEnvironment, obj: IDNumber, typ: WorldTypes) -> None:

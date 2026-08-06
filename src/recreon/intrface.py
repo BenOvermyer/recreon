@@ -285,6 +285,96 @@ def scout(game: GameEnvironment, emp: Empire, xy: XYCoord) -> None:
             return
 
 
+def probe_scout(game: GameEnvironment, emp: Empire, xy: XYCoord) -> None:
+    """Reveal the sectors around ``xy`` to ``emp``, at risk of losing the probe.
+
+    Like :func:`scout` but with two differences that matter. It sweeps
+    ``NoDir`` first, so the probe's own sector is revealed as well as the eight
+    around it. And a garrisoned world can shoot it down: the chance is
+    ``ISqrt(Cargo[men])`` percent, so a world holding 2500 troops destroys a
+    probe half the time. An independent world never fires -- only an owned one.
+
+    A destroyed probe stops the whole sweep, so everything the pass had not yet
+    reached stays hidden. A dark nebula ends it the same way.
+    """
+    from .datacnst import DirX, DirY
+    from .misc import same_xy
+    from .news import NewsTypes, add_news
+    from .primintr import (
+        get_cargo,
+        get_nebula,
+        get_object,
+        get_status,
+        known,
+        scout_object,
+        scouted,
+    )
+    from .types import Directions, NebulaTypes
+    from .utils.int_utils import isqrt, rnd
+
+    if same_xy(xy, XYCoord(0, 0)):
+        return
+
+    for direction in Directions:
+        x = xy.x + DirX[direction]
+        y = xy.y + DirY[direction]
+        if not game.Galaxy.in_galaxy(x, y):
+            continue
+
+        temp = XYCoord(x, y)
+        obj = get_object(game, temp)
+        other_emp = get_status(game, obj)
+
+        if not scouted(game, emp, obj) and obj.ObjTyp != ObjectTypes.Void:
+            loc = Location(XY=XYCoord(0, 0), ID=obj)
+            chance_to_destroy = isqrt(get_cargo(game, obj)[TechnologyTypes.men])
+            if other_emp != Empire.Indep and rnd(1, 100) < chance_to_destroy:
+                add_news(game, emp, NewsTypes.PDest, loc, 0, 0, 0)
+                add_news(game, other_emp, NewsTypes.PCap, loc, int(emp), 0, 0)
+                return
+
+            if not known(game, emp, obj) and other_emp != emp:
+                add_news(game, emp, NewsTypes.POk, loc, 0, 0, 0)
+
+            scout_object(game, emp, obj)
+
+        if get_nebula(game, temp) == NebulaTypes.DarkNebula:
+            return
+
+
+def update_probes(game: GameEnvironment, emp: Empire) -> None:
+    """Land every probe in transit and free it for relaunch.
+
+    Probes are not really in flight -- one launched last turn arrives here at
+    the start of the next, reveals what it found and is immediately ``PReady``
+    again. Without this an empire launches its whole stock once and is blind
+    from then on, since :func:`~recreon.primintr.get_probe` only ever returns a
+    ``PReady`` one.
+    """
+    from .types import NO_OF_PROBES_PER_EMPIRE, ProbeStatus
+
+    for i in range(1, NO_OF_PROBES_PER_EMPIRE + 1):
+        probe = game.Universe.EmpireData[emp].Probe[i]
+        if probe.Status == ProbeStatus.PInTrans:
+            probe_scout(game, emp, probe.Dest)
+            probe.Status = ProbeStatus.PReady
+
+
+def probes_return(game: GameEnvironment, emp: Empire) -> None:
+    """Free any probe sitting at its destination for relaunch.
+
+    Nothing in v2.0 sets ``PAtDest`` -- :func:`update_probes` takes a probe
+    straight from ``PInTrans`` back to ``PReady`` -- so this never has anything
+    to do. Ported as part of the unit's interface.
+    """
+    from .types import NO_OF_PROBES_PER_EMPIRE, ProbeStatus
+
+    for i in range(1, NO_OF_PROBES_PER_EMPIRE + 1):
+        probe = game.Universe.EmpireData[emp].Probe[i]
+        if probe.Status == ProbeStatus.PAtDest:
+            probe.Status = ProbeStatus.PReady
+
+
 def next_stargate_slot(game: GameEnvironment) -> int:
     """Highest free stargate index, or 0 when all are taken."""
     slot = len(game.Universe.Stargate) - 1
@@ -560,6 +650,45 @@ def estimated_range(game: GameEnvironment, obj: IDNumber) -> int:
     if obj.ObjTyp == ObjectTypes.Base:
         return cargo[TechnologyTypes.tri] // 100
     return 0
+
+
+def get_nearest_worlds(
+    game: GameEnvironment, xy: XYCoord, n: int, set_to_consider: set[int]
+) -> list[IDNumber]:
+    """The ``n`` worlds in ``set_to_consider`` closest to ``xy``.
+
+    A bucket sort by distance rather than a comparison sort: every world is
+    dropped into the bucket for its distance, then the buckets are read out in
+    order until ``n`` have been taken. Worlds tie-break by index, because the
+    original appends to each bucket's list rather than prepending.
+
+    A world sitting exactly on ``xy`` lands in bucket 0 and so comes back
+    first. Returns fewer than ``n`` when the set holds fewer -- and an empty
+    list for an empty set, which is where the original hands its caller a nil
+    pointer to dereference.
+    """
+    from .misc import distance
+    from .primintr import get_coord
+
+    size = game.Galaxy.size
+    buckets: list[list[IDNumber]] = [[] for _ in range(size + 1)]
+
+    for i in range(1, game.NoOfPlanets + 1):
+        if i not in set_to_consider:
+            continue
+        pln_id = IDNumber(ObjectTypes.Pln, i)
+        dist = distance(get_coord(game, pln_id), xy)
+        if dist <= size:
+            buckets[dist].append(pln_id)
+
+    near: list[IDNumber] = []
+    for bucket in buckets:
+        for pln_id in bucket:
+            if len(near) >= n:
+                return near
+            near.append(pln_id)
+
+    return near
 
 
 # --- Empire totals -----------------------------------------------------------
