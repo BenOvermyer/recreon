@@ -16,7 +16,7 @@ from enum import IntEnum
 from typing import TYPE_CHECKING
 
 from .galaxy import Location
-from .types import MAX_NO_OF_NEWS_ITEMS, Empire, IDNumber
+from .types import MAX_NO_OF_NEWS_ITEMS, PLAYER_EMPIRES, Empire, IDNumber
 
 if TYPE_CHECKING:
     from .environ import GameEnvironment
@@ -187,3 +187,30 @@ def erase_news(game: GameEnvironment, player: Empire) -> None:
 
 def get_news_list(game: GameEnvironment, emp: Empire) -> list[NewsRecord]:
     return game.News[emp]
+
+
+# --- Save/load ---------------------------------------------------------------
+
+
+def save_news_data(game: GameEnvironment) -> dict:
+    """Every empire's feed, for the save file. Port of ``SaveNewsData``.
+
+    The original saves Empire1..Empire8 only; ``Indep`` never has a feed
+    because :func:`add_news` drops its items. Following that keeps a save from
+    carrying a section that can only ever be empty.
+    """
+    from .utils.serial import encode
+
+    return {
+        str(int(emp)): [encode(item) for item in game.News[emp]]
+        for emp in PLAYER_EMPIRES
+    }
+
+
+def load_news_data(game: GameEnvironment, data: dict) -> None:
+    """Restore every empire's feed. Port of ``LoadNewsData``."""
+    from .utils.serial import decode
+
+    game.News = {emp: [] for emp in Empire}
+    for key, items in data.items():
+        game.News[Empire(int(key))] = [decode(NewsRecord, item) for item in items]

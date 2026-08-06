@@ -61,6 +61,25 @@ class GameEnvironment:
         #: are kept here for the Phase 8 UI to show.
         self.ScenarioIntroduction: list[str] = []
 
+        #: Scenario this game was built from. Saved and restored, as the
+        #: original saves ``ScenaFilename``; nothing reads it back yet.
+        self.ScenaFilename: str = ""
+
+        #: Diplomatic messages in flight, newest first. MESS.PAS keeps this in
+        #: a global ``MessageList``; the records are in :mod:`recreon.mess`.
+        self.MessageList: list = []
+
+        #: Save file this game is playing out of; autosave writes the ``.BAK``
+        #: beside it. A typed constant in ENVIRON.PAS, and session state rather
+        #: than saved state -- a loaded game takes the name of the file it came
+        #: from, not the name it had when it was saved.
+        self.CurrentGame: str = "recreon.sav"
+
+        #: Directory the save files live in. ENVIRON.PAS reads this from
+        #: ANACREON.CNF along with the scenario and help paths; the config file
+        #: itself belongs with the options UI and is not ported.
+        self.SavDirect: str = ""
+
         # Session flags, from the ENVIRON.PAS typed constants.
         self.AutoSave: bool = True
         self.PauseActive: bool = True
@@ -106,6 +125,40 @@ class GameEnvironment:
         indep = self.Universe.EmpireData[Empire.Indep]
         indep.EmpireName = "Independent"
         indep.DefenseSettings = init_defense_record()
+
+    # --- Save/load -----------------------------------------------------------
+
+    def save_environment(self) -> dict:
+        """The loose globals, for the save file. Port of ``SaveEnvironment``.
+
+        The original writes exactly nine values here, and this writes the same
+        nine. ``NoOfPlanets`` is *not* among them: LoadPlanets recounts it from
+        the records it reads, so a save carries no separate world count to fall
+        out of step with the worlds themselves.
+        """
+        return {
+            "Year": self.Year,
+            "Player": int(self.Player),
+            "EmpiresToMove": sorted(int(emp) for emp in self.EmpiresToMove),
+            "ScenaFilename": self.ScenaFilename,
+            "TimePerTurn": self.TimePerTurn,
+            "AutoSave": self.AutoSave,
+            "AsyncTurns": self.AsyncTurns,
+            "PauseActive": self.PauseActive,
+            "ReEnterGame": self.ReEnterGame,
+        }
+
+    def load_environment(self, data: dict) -> None:
+        """Restore the loose globals. Port of ``LoadEnvironment``."""
+        self.Year = data["Year"]
+        self.Player = Empire(data["Player"])
+        self.EmpiresToMove = {Empire(emp) for emp in data["EmpiresToMove"]}
+        self.ScenaFilename = data["ScenaFilename"]
+        self.TimePerTurn = data["TimePerTurn"]
+        self.AutoSave = data["AutoSave"]
+        self.AsyncTurns = data["AsyncTurns"]
+        self.PauseActive = data["PauseActive"]
+        self.ReEnterGame = data["ReEnterGame"]
 
     # --- Turn order ----------------------------------------------------------
 

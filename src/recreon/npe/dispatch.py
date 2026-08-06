@@ -18,7 +18,8 @@ scenario that creates an NPE without declaring a type still gets an AI. The
 same arm catches ``TraderNPE``, which is declared in `NPEmpireTypes` and has no
 implementation anywhere in the original -- a trader empire plays as a pirate.
 
-``LoadNPE``/``SaveNPE`` are Phase 8 and belong with the rest of LOADSAVE.PAS.
+``LoadNPE``/``SaveNPE`` are the same ``CASE`` again, and are at the foot of this
+module.
 """
 
 from __future__ import annotations
@@ -124,3 +125,63 @@ def implement_npe(game: GameEnvironment, emp: Empire) -> None:
         guardian.implement_guardian_npe(game, emp, data.Data)
     else:
         pirate.implement_pirate_npe(game, emp, data.Data)
+
+
+# --- Save/load ---------------------------------------------------------------
+
+
+def save_npe_data(game: GameEnvironment) -> dict:
+    """Every AI's type and its persona payload. Port of ``SaveNPEData``.
+
+    The original writes the whole ``NPEData`` array first -- which is the
+    ``Typ`` beside a heap *pointer*, saved as a raw address and meaningless on
+    the next run -- and then walks the active NPEs writing each payload. The
+    type map is what survives, and it has to be written first because
+    ``LoadNPE`` needs the ``Typ`` to know which record it is about to read.
+    """
+    from ..primintr import empire_active, empire_player
+    from ..types import PLAYER_EMPIRES
+    from ..utils.serial import encode
+
+    types = {str(int(emp)): int(game.NPEData[emp].Typ) for emp in PLAYER_EMPIRES}
+    payloads = {
+        str(int(emp)): encode(game.NPEData[emp].Data)
+        for emp in PLAYER_EMPIRES
+        if empire_active(game, emp) and not empire_player(game, emp)
+    }
+    return {"types": types, "data": payloads}
+
+
+def load_npe_data(game: GameEnvironment, data: dict) -> None:
+    """Restore every AI's persona. Port of ``LoadNPEData`` plus ``LoadNPE``.
+
+    The record class is chosen from the empire's own ``Typ``, exactly as
+    NPE.PAS's ``CASE`` does -- including its ``ELSE``, so an empire saved with
+    an unrecognised type reloads as a pirate, matching how it would have been
+    *run*.
+
+    The version<12 shim in the persona loaders -- which reads an eight-byte
+    ``FleetData`` entry and recomputes ``Index`` from the empire ordinal -- has
+    no counterpart here: it exists to reinterpret a byte layout, and this
+    format has none. See :mod:`recreon.loadsave` on why DOS-era saves are not
+    readable at all.
+    """
+    from ..primintr import empire_active, empire_player
+    from ..types import PLAYER_EMPIRES, Empire
+    from ..utils.serial import decode
+
+    for key, typ in data["types"].items():
+        game.NPEData[Empire(int(key))].Typ = NPEmpireTypes(typ)
+
+    for emp in PLAYER_EMPIRES:
+        record = game.NPEData[emp]
+        if not (empire_active(game, emp) and not empire_player(game, emp)):
+            record.Data = None
+            continue
+
+        payload = data["data"].get(str(int(emp)))
+        if payload is None:
+            record.Data = None
+            continue
+
+        record.Data = decode(_DATA_CLASS.get(record.Typ, PirateDataRecord), payload)

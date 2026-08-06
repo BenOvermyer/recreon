@@ -1082,27 +1082,40 @@ Implement all 7 menus with all commands:
 - Military status summary
 - Production info for worlds
 
-### 8.4 Save/Load system
+### 8.4 Save/Load system — **done**
 
-**Source files**: LOADSAVE.PAS
+**Source files**: LOADSAVE.PAS, MESS.PAS
 
-```python
-def save_game(game: GameEnvironment, slot: int):
-    # Serialize game state to file
-    import pickle
-    with open(f"saves/save_{slot}.pkl", "wb") as f:
-        pickle.dump(game, f)
+Ported as `loadsave.py`, with the sections that belong to another unit living in
+that unit as the original has them: `environ.save_environment()`,
+`galaxy.Galaxy.save_sector()`, `news.save_news_data()`,
+`mess.save_message_data()`, `npe.dispatch.save_npe_data()`. MESS.PAS came along
+because `LoadGame` calls into it and it was unported; the windows around it are
+still §8.2.
 
-def load_game(slot: int) -> GameEnvironment:
-    # Load game state from file
-    import pickle
-    with open(f"saves/save_{slot}.pkl", "rb") as f:
-        return pickle.load(f)
+**The pickle sketch this section used to carry was not taken.** Pickle is
+fragile across dataclass refactors and executes arbitrary code on load, and
+neither is acceptable for a file a player keeps for years. The format is JSON,
+via a small annotation-walking codec in `utils/serial.py`.
 
-def auto_backup(game: GameEnvironment):
-    # Automatic backup before each turn
-    pass
-```
+**Byte compatibility with the DOS build was never on the table**, which is worth
+stating because it reads like a missed opportunity. The original writes records
+with `BlockWrite` straight out of memory; reproducing that would mean
+hand-rolling every record's DOS-era packing — packed sets, the length-prefixed
+strings, the `Reserved` padding `datastrc.py` deliberately dropped — to read
+files that do not exist. `original/` ships no `.SAV` or `.BAK`, and none can be
+produced without a DOS build. So the port has its own signature and its own
+version line starting at 1, and the original's version shims (`> 13`, `> 14`,
+`< 12`) are unportable rather than unported.
+
+What *is* ported is the structure and the behaviour: sections in the original's
+order, per-empire sets rebuilt from the records rather than saved, `NoOfPlanets`
+recounted on load, `LoadFleets`' repair of a fleet saved at Limbo, `AutoBackup`
+after each completed turn, and both version warnings.
+
+Five original bugs came out of it: #46 (`LoadGame` never cleans up the universe
+it replaces, and the previous game's inbox survives into the new one), #47–#50
+in the message subsystem.
 
 ### 8.5 Scenario front end
 
