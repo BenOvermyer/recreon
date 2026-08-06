@@ -39,6 +39,8 @@ A scenario file loads into a populated galaxy — worlds, empires with capitals,
 
 Neither is a parser bug — don't "fix" the parser to accept them, and don't edit the shipped files.
 
+**A third, `GAUNTLET.SCN`, loads about 92% of the time and genuinely fails the rest.** It packs 172 worlds into small zones, and `GetRandomXY` gives up after 101 tries rather than looping — so an unlucky roll reports `No room for random world in zone`. This is faithful; the DOS build failed on the same rolls. Because every shipped scenario carries `Seed 0`, **a test cannot pin its way out of this**: `ScenarioLoader.run` calls `randomize()` itself and discards any seed set beforehand. `test_shipped_scenarios_load` retries three times for that reason; don't "simplify" it back to a single attempt, and treat a red GAUNTLET as a roll rather than a regression.
+
 **Galaxy generation runs on Turbo Pascal's own RNG** (`utils/pascal.py`), not Python's: seed update `s = s*134775813 + 1 mod 2^32`, and `Random(N)` is the top 32 bits of `s * N`, *not* `s mod N`. Every draw in the game funnels through `int_utils.rnd`, so this governs combat and the economy as well as generation. Verified against the published Borland Pascal 7 sequence in `tests/test_pascal.py`.
 
 Note what this does *not* buy: **all 13 shipped scenarios carry `Seed 0`**, meaning `Randomize`. The galaxies players saw in 2004 were rolled fresh on every new game and never existed twice, so there is nothing there to reproduce. What the LCG gives is that our own seeded scenarios draw the sequence the original would have drawn, and that quirks call sites depend on — `Random(1)` is always 0, which `ATTACK.PAS` relies on — behave correctly.
