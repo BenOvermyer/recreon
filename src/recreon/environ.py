@@ -80,6 +80,9 @@ class GameEnvironment:
         #: itself belongs with the options UI and is not ported.
         self.SavDirect: str = ""
 
+        #: Directory the scenario picker scans for ``*.SCN``.
+        self.SceDirect: str = ""
+
         # Session flags, from the ENVIRON.PAS typed constants.
         self.AutoSave: bool = True
         self.PauseActive: bool = True

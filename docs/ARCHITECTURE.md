@@ -39,6 +39,7 @@ src/recreon/
 │   ├── __init__.py
 │   ├── app.py           # Main Textual application
 │   ├── map_view.py      # Galaxy map buffer, 3 columns/sector (MAPWIND.PAS)
+│   ├── newgame.py       # Scenario picker, intro, naming (NEWGAME.PAS front end)
 │   ├── menus.py         # Menu system (MENU.PAS, PULLDOWN.PAS)
 │   ├── status.py        # Status windows (STAWIND.PAS, FLTWIND.PAS, EMPWIND.PAS)
 │   ├── command.py       # Command input (DISPLAY.PAS)
@@ -544,6 +545,19 @@ Galaxy map from MAPWIND.PAS.
 - Name labels
 - Scouting/fog of war
 - Cursor navigation
+
+### ui/newgame.py
+The scenario front end from NEWGAME.PAS — `GetScenarios`,
+`ScenarioIntroduction`, `InputEmpireName`, `SuggestionsWindow`. `NewGameScreen`
+walks four steps in the original's order: pick a scenario, page the
+introduction, choose a player count (skipped when the scenario is fixed, as
+`NoChoice` does), name each empire. `SuggestionsScreen` is the Esc-from-naming
+name list.
+
+What the steps *decide* is in `newgame.py`; this draws it. The screens read the
+header and intro first via `read_scenario_intro` rather than answering from
+inside the parse, which an event loop cannot do — safe because neither draws
+from the generator.
 
 ### ui/menus.py
 Menu system from MENU.PAS, PULLDOWN.PAS.

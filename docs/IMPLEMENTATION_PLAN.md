@@ -1117,17 +1117,33 @@ Five original bugs came out of it: #46 (`LoadGame` never cleans up the universe
 it replaces, and the previous game's inbox survives into the new one), #47–#50
 in the message subsystem.
 
-### 8.5 Scenario front end
+### 8.5 Scenario front end — **done**
 
-**Source files**: NEWGAME.PAS (interactive parts), SCENA.PAS
+**Source files**: NEWGAME.PAS (interactive parts)
 
-The parser and universe generation are Phase 3.5 — this is only the UI around
-them, listed in §3.5.6:
+- Scenario selection menu (`GetScenarios`) — `newgame.get_scenarios`, with
+  `ScenarioEntry` reproducing the menu's fixed column widths
+- Paged scenario introduction (`ScenarioIntroduction`)
+- Empire naming with the suggestions window (`InputEmpireName`)
+- New-game flow (`StartNewGame`) — `newgame.start_new_game`
+- Drawing all of it: `ui/newgame.py`
 
-- Scenario selection menu (`GetScenarios`, scans a directory for `*.SCN`)
-- Paged scenario introduction text (`ScenarioIntroduction`)
-- Empire naming, with the suggestions window (`InputEmpireName`)
-- New-game flow (`StartNewGame`)
+**The front end is a hook, not a wrapper.** The original asks for the player
+count and the empire names between the header and the first directive, in the
+same forward pass, so a front end that ran first would parse twice.
+`ScenarioFrontEnd` is what `load_scenario` calls into at those points. The
+Textual screens cannot answer from inside a blocking parse, so they read the
+header and intro up front and hand the answers back — safe only because
+neither draws from the generator.
+
+Three fidelity fixes fell out of porting it, all RNG-affecting: the `RndName`
+table was 16 invented names rather than the original's 59; the draw filtered
+rather than rejecting-and-retrying; and `CreatePlayerEmpire` rolled `Rnd(0,1)`
+for a player's sex where the original takes it from the naming prompt.
+
+SCENA.PAS is **not** this. Despite the name it is the conditional background-text
+system — `DisplayBackground` shows flavour text for a world against a set of
+conditions. Unported, and not part of §8.5.
 
 **Not planned**: the artifact and transaction scripting engine (CODE.PAS,
 ARTIFACT.PAS, CDETYPES.PAS). Its directives are commented out of the scenario

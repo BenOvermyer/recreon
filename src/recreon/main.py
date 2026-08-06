@@ -129,9 +129,14 @@ def play(game: GameEnvironment) -> list[str]:
     return warnings
 
 
-#: Shipped with the package; the only scenario that exists (see
-#: IMPLEMENTATION_PLAN.md §3.5 for why the originals are not available).
-DEFAULT_SCENARIO = Path(__file__).parent / "data" / "scenarios" / "frontier.scn"
+#: Where the scenario picker looks, and where the shipped scenario lives.
+#: The 13 originals are in ``original/scenarios`` and are not installed with
+#: the package; point ``--scenario-dir`` at them to play those.
+SCENARIO_DIR = Path(__file__).parent / "data" / "scenarios"
+
+#: Loaded when no scenario is chosen. Authored content, not a port -- it
+#: reproduces no galaxy the original shipped. See IMPLEMENTATION_PLAN.md §3.5.
+DEFAULT_SCENARIO = SCENARIO_DIR / "frontier.scn"
 
 
 def new_game(
@@ -151,8 +156,12 @@ def main() -> None:
     parser.add_argument("--version", action="version", version=f"Re:creon {__version__}")
     parser.add_argument(
         "--scenario",
-        default=DEFAULT_SCENARIO,
-        help=f"scenario file to load (default: {DEFAULT_SCENARIO.name})",
+        help="scenario file to load, skipping the picker",
+    )
+    parser.add_argument(
+        "--scenario-dir",
+        default=SCENARIO_DIR,
+        help=f"directory the picker scans for *.SCN (default: {SCENARIO_DIR})",
     )
     parser.add_argument("--name", default="Player", help="your empire's name")
     parser.add_argument(
@@ -160,9 +169,8 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    game = new_game(args.scenario, {Empire.Empire1: args.name})
-
     if args.no_ui:
+        game = new_game(args.scenario or DEFAULT_SCENARIO, {Empire.Empire1: args.name})
         update_turn(game)
         print(
             f"Re:creon {__version__} -- year {game.Year}, "
@@ -172,7 +180,13 @@ def main() -> None:
 
     from .ui.app import RecreonApp
 
-    RecreonApp(game).run()
+    # With no --scenario the app opens on the picker, which is where the
+    # original starts too: ANACREON.PAS runs Prologue before anything else.
+    game = None
+    if args.scenario:
+        game = new_game(args.scenario, {Empire.Empire1: args.name})
+
+    RecreonApp(game, scenario_dir=args.scenario_dir).run()
 
 
 if __name__ == "__main__":

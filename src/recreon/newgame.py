@@ -15,16 +15,19 @@ Loading is a single forward pass over the file: header, then the introduction
 number of tokens desynchronises everything after it -- which is how both of
 the two unloadable shipped scenarios fail.
 
-Deliberately not ported:
+The front end -- ``GetScenarios``, ``ScenarioIntroduction``,
+``InputEmpireName`` and ``StartNewGame`` -- is here too, as
+:func:`get_scenarios` and the :class:`ScenarioFrontEnd` protocol. The original
+interleaves it with the parse: the intro pages, the player count and the
+empire names are all read or asked for *between* the header and the first
+directive, in the same forward pass. So the front end cannot be a wrapper
+around loading; it has to be something loading calls into, which is what the
+protocol is for. Drawing the screens is :mod:`recreon.ui.newgame`.
 
-* The interactive front end -- scenario menu, empire naming prompts, and the
-  paging of the introduction text. :func:`load_scenario` takes names as an
-  argument and hands the intro pages to the caller. Phase 8.
-* ``BEGINARTIFACTS`` / ``BEGINTRANSACTIONS`` / ``BEGINVICTORYCONDITIONS``.
-  These are commented out of the dispatch in v2.0, so the artifact scripting
-  engine is unreachable dead code. This is why ``cdetypes.py`` has no caller.
-* ``CheckSum``, an anti-tamper check the demo build ran over shipped
-  scenarios.
+``BEGINARTIFACTS`` / ``BEGINTRANSACTIONS`` / ``BEGINVICTORYCONDITIONS`` are
+deliberately not ported: they are commented out of the dispatch in v2.0, so
+the artifact scripting engine is unreachable dead code. This is why
+``cdetypes.py`` has no caller.
 """
 
 from __future__ import annotations
@@ -107,13 +110,52 @@ RndMilTechAdj: dict[TechLevel, float] = {
     TechLevel.GteTchLvl: 1.00,
 }
 
-#: Fallback empire names for `RndName`. The original ships a table of these;
-#: it is not in the source, so these are authored.
+#: Names an empire declared ``RndName`` draws from, transcribed from
+#: ``RndEmpireName`` at NEWGAME.PAS:62. All 59, in the original's order --
+#: ``GetRandomEmpireName`` indexes it with ``Rnd(1, 59)``, so the order is
+#: load-bearing and the count doubly so.
+#:
+#: This comment used to say the table "is not in the source, so these are
+#: authored", and 16 invented names stood here. It is in the source; every
+#: `RndName` empire in every shipped scenario had been getting a name Anacreon
+#: never used.
 RND_EMPIRE_NAMES = (
-    "Thessaly", "Kaldor", "Nyx", "Orrin", "Pell", "Quorum",
-    "Auroch", "Belisar", "Cygnet", "Drachma", "Eridan", "Fenrith",
-    "Gorlan", "Hespera", "Iskar", "Jarn",
+    "Aaraavon", "Antramis", "Azores",
+    "Bok", "Brekandi", "Byzantium",
+    "Cal'Dulmas", "Cerberon", "Chulron",
+    "Dol Parem", "Doramis", "Drii",
+    "Earon", "Entares", "Esperance",
+    "Fahron", "First Sun", "Freberon",
+    "Geldtried", "Gen-Tarem", "Ghaza",
+    "Haar", "Hasarem", "Highguard", "Horace",
+    "Iileron", "Illissia",
+    "Jamin", "Jasper", "Jool Den",
+    "Kandii", "Kendrezani",
+    "Lazarus", "Lililth",
+    "Moorline", "Mu", "Mutara",
+    "Ny", "N'zares",
+    "Occem", "Ovaris",
+    "Palanhoth", "Pell", "Pharo",
+    "Quezelquan",
+    "Rho Kandii", "Rosseri",
+    "Sarlok", "Sol-Terra",
+    "Terminus", "Terra", "Trantor",
+    "Ultarion",
+    "Vex", "Vlandis",
+    "Whorl",
+    "Xi",
+    "Yew", "Yolandis",
 )
+
+
+#: The original's scenario menu is a fixed `ARRAY [1..MaxNoOfScenarios]`, so a
+#: directory with more than 20 loadable `.SCN` files silently drops the rest.
+#: Kept as a documented limit rather than enforced -- see :func:`get_scenarios`.
+MAX_NO_OF_SCENARIOS = 20
+
+#: Difficulty labels in the scenario menu, from ``DiffStr`` in ``GetScenarios``.
+#: Padded to 14 in the original; the padding is applied at format time here.
+DIFFICULTY_NAMES = ("Beginner", "Intermediate", "Advanced", "Expert")
 
 
 class ScenarioError(Exception):
@@ -147,6 +189,209 @@ class ScenarioHeader:
     first_year: int = 4021
 
 
+@dataclass(slots=True)
+class EmpireIdentity:
+    """What ``InputEmpireName`` collects for one player empire.
+
+    Three parallel arrays in the original -- ``EmpireName``, ``Password`` and
+    ``Sex`` -- bundled, because they are always filled and read together. A
+    new Python-level structure rather than a ported record, so snake_case.
+    """
+
+    name: str = ""
+    password: str = ""
+    #: ``Sex[Emp]`` in the original: False is an emperor, True an empress.
+    is_empress: bool = False
+
+
+class ScenarioAborted(Exception):
+    """The player escaped out of the front end rather than starting a game.
+
+    The original signals this by returning ``Indep`` from
+    ``ScenarioIntroduction``'s player-count prompt, or by leaving the name
+    blank, and unwinds to the prologue menu.
+    """
+
+
+class ScenarioFrontEnd:
+    """What loading asks the player, between the header and the directives.
+
+    Not a wrapper around :func:`load_scenario` but something it calls into,
+    because the original interleaves the two: ``ScenarioIntroduction`` pages
+    the intro text and asks for a player count, then ``InputEmpireName`` runs
+    once per player, and only then does the directive loop start -- all in one
+    forward pass over the open file. A front end that ran first would have to
+    read the file twice and hope it parsed the same way both times.
+
+    This base class is the non-interactive default: it answers from names
+    supplied up front, which is what tests and ``--scenario`` on the command
+    line want. :mod:`recreon.ui.newgame` has the Textual implementation.
+    """
+
+    def __init__(self, identities: dict[Empire, EmpireIdentity] | None = None) -> None:
+        self.identities = dict(identities or {})
+
+    def introduction(self, header: ScenarioHeader, pages: list[str]) -> None:
+        """Show the intro. The original pages it with "press any key"."""
+
+    def no_of_players(self, header: ScenarioHeader) -> int:
+        """How many player empires to create.
+
+        The original prompts only when the scenario allows a range; a fixed
+        scenario just says "This is a scenario for N players" and waits for a
+        keypress. Raise :class:`ScenarioAborted` for the Esc path.
+        """
+        if header.min_players < header.max_players and self.identities:
+            return min(len(self.identities), header.max_players)
+        return header.min_players
+
+    def empire_identity(self, emp: Empire, taken: set[str]) -> EmpireIdentity:
+        """Name, password and sex for one player empire.
+
+        ``taken`` is the names already claimed, which the original uses to
+        keep its suggestion distinct.
+        """
+        return self.identities.get(emp) or EmpireIdentity(
+            name=f"Empire {int(emp) + 1}"
+        )
+
+
+@dataclass(slots=True)
+class ScenarioEntry:
+    """One `.SCN` in the scenario directory, as ``GetScenarios`` lists it."""
+
+    path: Path
+    header: ScenarioHeader
+
+    @property
+    def difficulty(self) -> str:
+        names = DIFFICULTY_NAMES
+        index = self.header.difficulty
+        return names[index] if 0 <= index < len(names) else str(index)
+
+    @property
+    def players(self) -> str:
+        """"3 Players" or "1-4 Players", as the menu column reads.
+
+        The original pluralises on ``MaxPlay > 1``, so a scenario for exactly
+        one player reads "1 Player" and a 1-4 scenario reads "1-4 Players".
+        """
+        low, high = self.header.min_players, self.header.max_players
+        count = str(low) if low == high else f"{low}-{high}"
+        return f"{count} Player" + ("s" if high > 1 else "")
+
+    @property
+    def duration(self) -> str:
+        """"200-400 years", or "200+ years" when there is no upper bound."""
+        low, high = self.header.min_length, self.header.max_length
+        return f"{low}+ years" if high == 0 else f"{low}-{high} years"
+
+    def menu_line(self) -> str:
+        """The row ``GetScenarios`` builds, at the original's column widths.
+
+        ``AdjustString`` pads with spaces or truncates to exactly the width,
+        so a long title loses its tail rather than pushing the columns out.
+        """
+        title = _adjust(self.header.title, 23)
+        difficulty = _adjust(self.difficulty, 14)
+        players = _adjust(self.players, 11)
+        return f"{title} {difficulty}{players} {self.duration}"
+
+
+def _adjust(text: str, width: int) -> str:
+    """Port of STRG.PAS ``AdjustString``: pad or truncate to exactly ``width``."""
+    return text[:width].ljust(width)
+
+
+def check_sum(path: str | Path) -> int:
+    """Sum of every byte in a scenario file. Port of ``CheckSum``.
+
+    **Unreachable in the retail build.** Its only call site sits inside
+    ``{$IFDEF Demo}`` in ``LoadScenario``, where the demo refused to load
+    anything whose sum was not 43171, 6792 or 44304 -- three shipped
+    scenarios, so the demo would play those and nothing else.
+
+    Ported because it is cheap and it documents what the demo did, not because
+    anything calls it. It cannot be validated: no demo build survives, and
+    which three scenarios those sums identify is not recorded. Turbo Pascal's
+    ``Read`` on a text file also stops at a ``#26`` end-of-file marker, which
+    a DOS-authored `.SCN` may carry and this does not emulate -- so treat a
+    computed sum as indicative, not authoritative.
+    """
+    return sum(Path(path).read_bytes())
+
+
+#: The three checksums the demo build accepted. See :func:`check_sum`.
+DEMO_CHECKSUMS = (43171, 6792, 44304)
+
+
+def read_scenario_intro(path: str | Path) -> tuple[ScenarioHeader, list[str]]:
+    """The header and introduction pages, without executing any directive.
+
+    The original never does this: it parses in one forward pass over an open
+    file, so the intro is displayed as it is consumed and the directives run
+    off the same handle. An event-driven UI cannot answer a question from
+    inside that pass without blocking its own loop, so the front end reads
+    this much first, asks what it needs, and then hands the answers to
+    :func:`load_scenario` to make the real pass.
+
+    Reading twice is safe because **neither the header nor the introduction
+    touches the generator** -- ``run`` is what seeds it, from the scenario's
+    own ``Seed`` -- so the galaxy this produces is the one a single pass would
+    have produced.
+
+    Raises :class:`ScenarioError` if either part is malformed.
+    """
+    loader = ScenarioLoader(game=GameEnvironment(), reader=TokenReader.from_path(path))
+
+    loader.read_header()
+    if loader.failed:
+        raise ScenarioError("\n".join(loader.errors))
+
+    pages = loader.read_introduction()
+    if loader.failed:
+        raise ScenarioError("\n".join(loader.errors))
+
+    return loader.header, pages
+
+
+def get_scenarios(directory: str | Path) -> list[ScenarioEntry]:
+    """Every Anacreon scenario in ``directory``. Port of ``GetScenarios``.
+
+    A file counts if its first line starts with ``ANACREON``; anything else in
+    the directory is skipped silently, as the original's check does. Files
+    whose header will not parse are skipped too -- the original would read
+    garbage into its menu columns, but it also could not have been handed a
+    directory of arbitrary files the way a modern install can.
+
+    Sorted by filename, which the original gets for free from DOS's
+    ``FindFirst``/``FindNext`` order and this does not.
+
+    The original's menu is an ``ARRAY [1..20]`` filled without a bounds check,
+    so a 21st scenario writes past it. That is not reproduced: the list is
+    returned whole, and :data:`MAX_NO_OF_SCENARIOS` records the limit the
+    window was sized for.
+    """
+    entries: list[ScenarioEntry] = []
+
+    for path in sorted(Path(directory).glob("*.[sS][cC][nN]")):
+        try:
+            with path.open("r", encoding="latin-1") as handle:
+                if not handle.readline().startswith("ANACREON"):
+                    continue
+        except OSError:
+            continue
+
+        loader = ScenarioLoader(game=GameEnvironment(), reader=TokenReader.from_path(path))
+        loader.read_header()
+        if loader.failed:
+            continue
+
+        entries.append(ScenarioEntry(path=path, header=loader.header))
+
+    return entries
+
+
 @dataclass
 class ScenarioLoader:
     """Executes one scenario file against a game.
@@ -170,7 +415,7 @@ class ScenarioLoader:
     first_world: int = 1
     first_base: int = 1
     no_of_players: Empire = Empire.Empire1
-    player_names: dict[Empire, str] = field(default_factory=dict)
+    player_identities: dict[Empire, EmpireIdentity] = field(default_factory=dict)
     empire_names: dict[Empire, str] = field(default_factory=dict)
     #: Pascal's ``NextEmpToCreate``: how many empires have been created so
     #: far. RANDOMIZEPLAYERS uses it as the first slot it is allowed to
@@ -625,18 +870,23 @@ class ScenarioLoader:
         known = self._read_known_techs(tech)
         modifiers = self._read_modifier_list()
 
-        name = self.player_names.get(emp)
-        if not name:
+        identity = self.player_identities.get(emp)
+        if not identity or not identity.name:
             # The original skips empires the player did not name, which is how
             # a scenario supports fewer players than it defines.
             return
 
+        # No Rnd here, unlike CreateNPEmpire: a player's sex comes from
+        # InputEmpireName, so the original makes no draw at this point. Rolling
+        # one would consume a step of the LCG the original never consumes and
+        # shift every draw in the rest of the scenario.
         create_empire(
-            self.game, emp, is_player=True, is_empress=bool(rnd(0, 1)),
-            name=name, password="", tech=tech, tech_set=known,
-            rev_factor=rev_factor, modifiers=modifiers, year_founded=self.game.Year,
+            self.game, emp, is_player=True, is_empress=identity.is_empress,
+            name=identity.name, password=identity.password, tech=tech,
+            tech_set=known, rev_factor=rev_factor, modifiers=modifiers,
+            year_founded=self.game.Year,
         )
-        self.empire_names[emp] = name
+        self.empire_names[emp] = identity.name
         self.next_empire_to_create += 1
 
     def do_create_np_empire(self) -> None:
@@ -672,9 +922,24 @@ class ScenarioLoader:
         self.next_empire_to_create += 1
 
     def _random_empire_name(self) -> str:
+        """An unused name from the table. Port of ``GetRandomEmpireName``.
+
+        Rolls ``Rnd(1, 59)`` and rejects a name already in use, rather than
+        drawing once from a filtered list. The distinction is not cosmetic:
+        a filtered draw calls ``Rnd`` with a smaller bound and calls it exactly
+        once, so both the value and the *number of draws* differ from the
+        original the moment two empires collide -- and every draw after it in
+        the whole scenario shifts. With 59 names and at most 8 empires a
+        collision is likelier than not over a full galaxy.
+
+        Cannot spin: there are 59 names and never more than 8 empires, which
+        is why the original has no escape either.
+        """
         taken = set(self.empire_names.values())
-        available = [n for n in RND_EMPIRE_NAMES if n not in taken]
-        return rnd_choice(available) if available else "Unnamed"
+        while True:
+            name = RND_EMPIRE_NAMES[rnd(1, len(RND_EMPIRE_NAMES)) - 1]
+            if name not in taken:
+                return name
 
     def do_create_nebula(self) -> None:
         neb_type = NebulaTypes(self.reader.next_integer())
@@ -766,10 +1031,13 @@ class ScenarioLoader:
                 if all(order[j] != order[i] for j in range(first, i)):
                     break
 
-        names = dict(self.player_names)
+        # The original permutes EmpNames, Passes and Sexes in step, so a
+        # player's password and sex follow their name into the new slot. One
+        # identity per empire makes that automatic.
+        was = dict(self.player_identities)
         for i in range(first, last + 1):
             src = PLAYER_EMPIRES[order[i]]
-            self.player_names[PLAYER_EMPIRES[i]] = names.get(src, "")
+            self.player_identities[PLAYER_EMPIRES[i]] = was.get(src, EmpireIdentity())
 
     def _skip_until(self, marker: str) -> None:
         while True:
@@ -927,30 +1195,35 @@ class ScenarioLoader:
         self.debug = True
 
 
-def rnd_choice(items):
-    """Pick one item, via the ported Rnd so seeding stays consistent."""
-    return items[rnd(1, len(items)) - 1]
-
-
 def load_scenario(
     path: str | Path,
     player_names: dict[Empire, str] | None = None,
     game: GameEnvironment | None = None,
+    front_end: ScenarioFrontEnd | None = None,
 ) -> GameEnvironment:
-    """Build a game from a scenario file.
+    """Build a game from a scenario file. Port of ``LoadScenario``.
 
     ``player_names`` maps empire slots to the names their players chose;
     ``CREATEPLAYEREMPIRE`` skips any slot with no name, which is how a
-    scenario supports fewer players than it defines. The interactive prompt
-    that collects these is Phase 8.
+    scenario supports fewer players than it defines.
 
-    Raises :class:`ScenarioError` if the file is malformed.
+    ``front_end`` is asked for the player count and the empire identities at
+    the point the original asks -- after the introduction, before the first
+    directive. Passing both is allowed: the names seed the default front end.
+
+    Raises :class:`ScenarioError` if the file is malformed, and lets
+    :class:`ScenarioAborted` through if the player backs out.
     """
     game = game or GameEnvironment()
     reader = TokenReader.from_path(path)
 
+    if front_end is None:
+        names = player_names or {Empire.Empire1: "Player"}
+        front_end = ScenarioFrontEnd(
+            {emp: EmpireIdentity(name=name) for emp, name in names.items()}
+        )
+
     loader = ScenarioLoader(game=game, reader=reader)
-    loader.player_names = dict(player_names or {Empire.Empire1: "Player"})
 
     loader.read_header()
     if loader.failed:
@@ -970,12 +1243,28 @@ def load_scenario(
     # the wrong order to rely on.
     game.ScenaFilename = str(path)
 
-    # The introduction sits between the header and the first directive in the
-    # same forward pass, so it has to be consumed even though nothing displays
-    # it yet. Its pages are kept for the Phase 8 UI.
+    # The introduction is consumed here, in the same forward pass, and shown
+    # before anything is asked -- the intro is what the player decides on.
     game.ScenarioIntroduction = loader.read_introduction()
     if loader.failed:
         raise ScenarioError("\n".join(loader.errors))
+
+    front_end.introduction(loader.header, game.ScenarioIntroduction)
+
+    count = front_end.no_of_players(loader.header)
+    count = max(loader.header.min_players, min(count, loader.header.max_players))
+    loader.no_of_players = Empire(count - 1)
+
+    # InputEmpireName runs once per player, in slot order, before any
+    # directive is executed. `taken` is the running set the original keeps so
+    # its suggestion never repeats a name already chosen.
+    taken: set[str] = set()
+    for i in range(count):
+        emp = PLAYER_EMPIRES[i]
+        identity = front_end.empire_identity(emp, taken)
+        loader.player_identities[emp] = identity
+        if identity.name:
+            taken.add(identity.name)
 
     loader.run()
     if loader.failed:
@@ -983,4 +1272,24 @@ def load_scenario(
 
     game.Player = Empire.Empire1
     game.reset_empires_to_move()
+    return game
+
+
+def start_new_game(
+    directory: str | Path,
+    scenario: ScenarioEntry,
+    front_end: ScenarioFrontEnd | None = None,
+    game: GameEnvironment | None = None,
+) -> GameEnvironment:
+    """Load the chosen scenario. The tail of ``StartNewGame``.
+
+    The original loops -- list scenarios, pick one, load it, and go round
+    again if loading was escaped out of -- with the menu inline. The listing
+    and the picking are the UI's (:mod:`recreon.ui.newgame`); this is the part
+    that happens once a choice is made, and it sets ``ScenaFilename`` to the
+    bare filename the way ``StartNewGame`` does rather than the full path.
+    """
+    game = load_scenario(scenario.path, game=game, front_end=front_end)
+    game.ScenaFilename = scenario.path.name
+    game.SceDirect = str(directory)
     return game

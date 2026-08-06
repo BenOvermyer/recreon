@@ -7,6 +7,8 @@ the status windows are Phase 8.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
@@ -29,11 +31,17 @@ class StatusBar(Static):
 
     def refresh_status(self) -> None:
         game = self.game
-        name = empire_name(game, game.Player) or game.Player.name
         x, y = self.map_view.cursor_x, self.map_view.cursor_y
+
+        # Before a scenario is chosen the galaxy is unallocated, and asking it
+        # for a sector raises rather than wrapping to the far edge.
+        if not game.Galaxy.in_galaxy(x, y):
+            self.update("No game loaded -- press G to start one")
+            return
 
         from ..galaxy import XYCoord
 
+        name = empire_name(game, game.Player) or game.Player.name
         obj = get_object(game, XYCoord(x, y))
         where = "empty space" if obj.ObjTyp == ObjectTypes.Void else obj.ObjTyp.name
 
@@ -58,15 +66,24 @@ class RecreonApp(App):
     BINDINGS = [
         Binding("q", "quit", "Quit"),
         Binding("n", "next_turn", "Next turn"),
+        Binding("g", "new_game", "New game"),
         Binding("up,k", "move(0,-1)", "Up", show=False),
         Binding("down,j", "move(0,1)", "Down", show=False),
         Binding("left,h", "move(-1,0)", "Left", show=False),
         Binding("right,l", "move(1,0)", "Right", show=False),
     ]
 
-    def __init__(self, game: GameEnvironment) -> None:
+    def __init__(
+        self,
+        game: GameEnvironment | None = None,
+        scenario_dir: str | Path | None = None,
+    ) -> None:
         super().__init__()
-        self.game = game
+        #: A blank environment stands in until the picker builds a real one,
+        #: so every widget has something to render against on first mount.
+        self.game = game or GameEnvironment()
+        self.started = game is not None
+        self.scenario_dir = Path(scenario_dir) if scenario_dir else None
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -87,6 +104,38 @@ class RecreonApp(App):
         yield Footer()
 
     def on_mount(self) -> None:
+        self._refresh_all()
+        if not self.started and self.scenario_dir is not None:
+            self.action_new_game()
+
+    def action_new_game(self) -> None:
+        """Open the scenario picker. ``StartANewGame`` in the prologue menu."""
+        from .newgame import NewGameScreen
+
+        self.push_screen(
+            NewGameScreen(self.scenario_dir or Path.cwd()), self._game_started
+        )
+
+    def _game_started(self, game: GameEnvironment | None) -> None:
+        """The picker dismissed. ``None`` means the player backed out.
+
+        Backing out with no game to return to leaves the app on an empty
+        galaxy rather than quitting, which is where the original's prologue
+        menu sits when you cancel out of ``StartANewGame``.
+        """
+        if game is None:
+            return
+
+        self.game = game
+        self.started = True
+        for widget in (
+            self.map_view,
+            self.world_panel,
+            self.empire_panel,
+            self.news_panel,
+            self.status_bar,
+        ):
+            widget.game = game
         self._refresh_all()
 
     def _refresh_all(self) -> None:
