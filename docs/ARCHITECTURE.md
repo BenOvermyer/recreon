@@ -398,6 +398,14 @@ folded in here.
 **Misc:**
 - `set_empire_defenses()` - Roll one of four defense distributions
 
+### intrface.py — scouting and probes
+`scout()`, `probe_scout()` reveal the ring of sectors around a point (both
+start at `NoDir`, so the point itself is included); `in_range_of_starbase()`
+and `in_range_of_planet()` are the two scan tests; `determine_if_scouted()`
+decides an object's fog level; `scout_fleets()` and `scout_objects()` are the
+per-turn sweeps, driven from `main.set_up_turn`. `update_probes()` lands probes
+in flight and frees them for relaunch; `probes_return()` is unreachable in v2.0.
+
 ### npe/dispatch.py
 AI dispatcher from NPE.PAS — `initialize_npe()`, `implement_npe()`,
 `cleanup_npe()`, dispatching on `NPEmpireTypes` to the persona modules. Also

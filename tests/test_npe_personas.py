@@ -46,6 +46,11 @@ BM = BaseMissionTypes
 
 CAP_XY = XYCoord(10, 10)
 
+#: How many unseeded 200-turn runs a conquest gets before the AI is called
+#: broken. About one run in five sees none, so four attempts leaves a
+#: ~1-in-600 flake.
+CONQUEST_ATTEMPTS = 4
+
 
 @pytest.fixture(autouse=True)
 def deterministic():
@@ -617,13 +622,8 @@ def test_the_turn_loop_runs_an_npe(scenario_path):
     assert g.Year > 4021
 
 
-def test_an_npe_conquers_worlds_over_a_full_game():
-    """End to end through the real turn loop: an AI that starts with one world
-    should be visibly bigger after 200 years.
-
-    This is the test that would have caught the `set_status` slip in #11 -- with
-    the per-empire sets broken every AI read as landless and nothing moved.
-    """
+def _run_intro(turns=200):
+    """Load INTRO.SCN and run it. Returns (game, before, after) world counts."""
     import pathlib
 
     from recreon.main import update_turn
@@ -633,13 +633,45 @@ def test_an_npe_conquers_worlds_over_a_full_game():
     g = load_scenario(scn / "INTRO.SCN", {Empire.Empire1: "A"})
 
     before = {e: len(s) for e, s in g.GlobalSets.SetOfPlanetsOf.items()}
-    for _ in range(200):
+    for _ in range(turns):
         update_turn(g)
     after = {e: len(s) for e, s in g.GlobalSets.SetOfPlanetsOf.items()}
+    return g, before, after
 
-    grew = [e for e in game_npes(g) if after[e] > before[e]]
-    assert grew, f"no NPE gained a world: {before} -> {after}"
-    assert after[Empire.Indep] < before[Empire.Indep]
+
+def test_an_npe_acts_over_a_full_game():
+    """The deterministic half: the AI puts fleets in space and spends probes.
+
+    INTRO.SCN's four NPEs are all Kingdom2, which expand hard, so *something*
+    should be flying after 200 years whatever the rolls.
+    """
+    g, _, _ = _run_intro()
+
+    assert g.GlobalSets.SetOfActiveFleets, "no AI fleet ever launched"
+
+
+def test_an_npe_conquers_worlds_over_a_full_game():
+    """End to end through the real turn loop: an AI should be visibly bigger.
+
+    This is the test that would have caught the `set_status` slip in #11 -- with
+    the per-empire sets broken every AI read as landless and nothing moved.
+
+    It cannot be seeded. INTRO.SCN carries `Seed 0`, so `ScenarioLoader.run`
+    calls Randomize and discards anything set beforehand -- the same reason
+    `test_shipped_scenarios_load` retries. Whether a conquest actually lands
+    inside 200 years is a roll, and about one run in five sees none, so this
+    takes several attempts and fails only if every one of them is barren.
+    """
+    for attempt in range(CONQUEST_ATTEMPTS):
+        g, before, after = _run_intro()
+        if any(after[e] > before[e] for e in game_npes(g)):
+            assert after[Empire.Indep] < before[Empire.Indep]
+            return
+
+    raise AssertionError(
+        f"no NPE gained a world on {CONQUEST_ATTEMPTS} consecutive runs: "
+        f"{before} -> {after}"
+    )
 
 
 def game_npes(g):

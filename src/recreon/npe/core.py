@@ -1178,7 +1178,15 @@ def set_raiding_fleet_new_target(
     The chance of pressing on is the persona's ``Offensive``. Note the new
     mission is always ``JumpAttackMSN`` whatever the fleet was flying, so a
     raider that finds a second target converts into an invasion force.
+
+    ORIGINAL BUG, deviated from -- see issue #39. A jump attack that returns
+    ``NoART`` has not necessarily left the fleet alive: the attacker can die
+    clearing the sector, and ``ImplementJumpAttackMSN`` reports ``NoART``
+    either way. The kingdom's arrival handler then retargets the wreck.
     """
+    if flt_id.Index not in game.GlobalSets.SetOfActiveFleets:
+        return
+
     enemy_emp = get_status(game, target_id)
     fleet_power = military_power(get_ships(game, flt_id), defns_array())
 
@@ -1211,6 +1219,12 @@ def destroy_all_fleets_in_sector(
     all_destroyed = True
 
     for i in range(1, MAX_NO_OF_FLEETS + 1):
+        # ORIGINAL BUG, deviated from -- see issue #39. The attacker can lose
+        # one of these fights, and the original keeps working down the sector
+        # with a freed fleet pointer. A dead attacker plainly did not clear the
+        # sector, so the sweep stops and reports failure.
+        if flt_id.Index not in game.GlobalSets.SetOfActiveFleets:
+            return False
         if i not in game.GlobalSets.SetOfActiveFleets:
             continue
         enemy_id = IDNumber(ObjectTypes.Flt, i)

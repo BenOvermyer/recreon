@@ -14,7 +14,7 @@ from pathlib import Path
 
 from .environ import GameEnvironment
 from .fleet import update_all_fleets
-from .intrface import update_probes
+from .intrface import scout_fleets, scout_objects, update_probes
 from .newgame import load_scenario
 from .news import erase_news
 from .npe.dispatch import implement_npe
@@ -28,6 +28,25 @@ from .primintr import (
 from .sbase import move_player_starbases
 from .types import PLAYER_EMPIRES, Empire
 from .update import update_universe
+
+
+def set_up_turn(game: GameEnvironment, player: Empire) -> None:
+    """Refresh what ``player`` can see, at the start of its turn.
+
+    Port of ANACREON.PAS ``SetUpTurn``. Scouting is recomputed from scratch
+    every turn rather than accumulated: ``clear_scout_set`` drops everything
+    the empire had *observed* (``KnownBy`` persists), then the two sweeps
+    rebuild it from where its worlds and fleets actually are. So an empire that
+    pulls back genuinely loses sight of what it was watching.
+
+    Order matters. ``scout_objects`` runs the ring sweep from every world and
+    fleet before rescanning the galaxy, and ``update_probes`` lands last
+    because a probe reveals what it flew over regardless of the rest.
+    """
+    clear_scout_set(game, player)
+    scout_fleets(game, player)
+    scout_objects(game, player)
+    update_probes(game, player)
 
 
 def update_turn(game: GameEnvironment) -> None:
@@ -62,18 +81,14 @@ def update_turn(game: GameEnvironment) -> None:
 
         if empire_active(game, game.Player):
             if empire_player(game, game.Player):
+                # ANACREON.PAS runs SetUpTurn before PlayerTakesTurn; the port
+                # returns control here instead, so this is the same point.
+                set_up_turn(game, game.Player)
                 return
             # An NPE's turn resolves without stopping the loop, in the order
             # ANACREON.PAS:240-251 runs it: refresh what the empire can see,
             # let the AI act on it, then clear the news and move.
-            #
-            # ScoutFleets and ScoutObjects are not ported (Phase 8, #5 §8.1),
-            # so probes are currently an NPE's only way to learn anything --
-            # which is why update_probes has to be here rather than waiting
-            # with them. Until they land the AI is fighting half-blind: every
-            # decision gated on Known() or Scouted() sees less than it should.
-            clear_scout_set(game, game.Player)
-            update_probes(game, game.Player)
+            set_up_turn(game, game.Player)
             implement_npe(game, game.Player)
 
             erase_news(game, game.Player)
