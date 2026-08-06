@@ -659,12 +659,17 @@ class ScenarioLoader:
             name=name, password="", tech=tech, tech_set=known,
             rev_factor=rev_factor, modifiers=modifiers, year_founded=self.game.Year,
         )
-        self.empire_names[emp] = name
-        self.next_empire_to_create += 1
-
+        # InitializeNPE sits between CreateEmpire and Inc(NextEmp) in the
+        # original (NEWGAME.PAS:1278). It rolls the persona and the empire's
+        # defense distribution, so it draws from the generator here -- moving
+        # it would desynchronise every draw after it.
+        from .npe.dispatch import initialize_npe
         from .npe.types import NPEmpireTypes
 
-        self.game.NPEData[emp].Typ = NPEmpireTypes(npe_type)
+        initialize_npe(self.game, emp, NPEmpireTypes(npe_type))
+
+        self.empire_names[emp] = name
+        self.next_empire_to_create += 1
 
     def _random_empire_name(self) -> str:
         taken = set(self.empire_names.values())

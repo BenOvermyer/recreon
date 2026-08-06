@@ -53,7 +53,6 @@ from ..fleet import (
     refuel_fleet,
     set_fleet_destination,
 )
-from ..galaxy import XYCoord
 from ..intrface import (
     balance_fleet,
     estimated_date_of_arrival,
@@ -124,7 +123,6 @@ from ..types import (
 from ..utils.int_utils import greater_int, lesser_int, rnd
 from ..utils.pascal import pascal_random_real, pascal_round, trunc
 from .types import (
-    FleetDataRecord,
     MissionTypes,
     NPECharacterRecord,
     PolicyTypes,
@@ -1131,11 +1129,36 @@ def redesignate_empire(
 # --- Mission implementations -------------------------------------------------
 
 
+def fleet_entry(game: GameEnvironment, flt_id: IDNumber, fleet_data: list):
+    """The AI's record for ``flt_id``, or None if the fleet no longer exists.
+
+    ORIGINAL BUG, deviated from -- see issue #39. The mission handlers below
+    fight a battle and then keep working on the attacking fleet without ever
+    asking whether it survived. In the original that is a use-after-free:
+    ``DestroyFleet`` calls ``Dispose`` and leaves the array slot pointing at
+    freed heap, so the writes land on memory the allocator has handed back.
+
+    Python has no equivalent of "usually still intact" -- the slot is ``None``
+    and the write raises. Every such site now goes through here and does
+    nothing when the fleet is gone, which is the closest defined behaviour and
+    matches what ``implement_stack_msn`` already did by hand.
+    """
+    if flt_id.Index not in game.GlobalSets.SetOfActiveFleets:
+        return None
+    return fleet_data[npe_data_index(game, flt_id)]
+
+
 def set_fleet_return(
     game: GameEnvironment, emp: Empire, flt_id: IDNumber, base_id: IDNumber, fleet_data: list
 ) -> None:
-    """Turn ``flt_id`` around and send it home to ``base_id``."""
-    entry = fleet_data[npe_data_index(game, flt_id)]
+    """Turn ``flt_id`` around and send it home to ``base_id``.
+
+    A no-op for a fleet that died in the battle that led here -- see
+    :func:`fleet_entry`.
+    """
+    entry = fleet_entry(game, flt_id, fleet_data)
+    if entry is None:
+        return
     entry.Mission = MissionTypes.ReturnMSN
     entry.TargetID = base_id
     set_fleet_destination(game, flt_id, get_coord(game, base_id))
@@ -1164,8 +1187,10 @@ def set_raiding_fleet_new_target(
             game, emp, game.GlobalSets.SetOfPlanetsOf[enemy_emp], fleet_power, persona, fleet_data
         )
         if not same_id(new_target_id, empty_quadrant()):
+            entry = fleet_entry(game, flt_id, fleet_data)
+            if entry is None:
+                return
             set_fleet_destination(game, flt_id, get_coord(game, new_target_id))
-            entry = fleet_data[npe_data_index(game, flt_id)]
             entry.Mission = MissionTypes.JumpAttackMSN
             entry.TargetID = new_target_id
             return
@@ -1244,7 +1269,20 @@ def implement_refuel_msn(
     Everything after the abort works on ``target_id``, which is correct: the
     tanker's trillum has just been unloaded into the target, and the refuel
     then burns that trillum to fill the target's own tanks.
+
+    ORIGINAL BUG, deviated from -- see issue #39. ``RefuelMSN`` is the one
+    mission whose target is another *fleet*, and a fleet that reported itself
+    out of fuel is quite likely to be gone by the time the tanker arrives. The
+    original aborts into it regardless: ``DestroyFleet`` disposes the pointer
+    without nilling it, so this reads and writes freed heap. The tanker's cargo
+    goes nowhere either way, so the port destroys the tanker and stops --
+    the defined behaviour closest to the original's, on the same grounds as
+    #30. Without the guard this raises ``AttributeError`` on a normal turn.
     """
+    if target_id.Index not in game.GlobalSets.SetOfActiveFleets:
+        destroy_fleet(game, flt_id)
+        return
+
     abort_fleet(game, flt_id, target_id, True)
     destroy_fleet(game, flt_id)
 
@@ -1312,7 +1350,9 @@ def implement_raid_trn_msn(
     if all_destroyed and target_id.ObjTyp in (ObjectTypes.Con, ObjectTypes.Gate):
         npe_attack(game, flt_id, target_id, AttackIntentionTypes.DestTrnAIT)
 
-    entry = fleet_data[npe_data_index(game, flt_id)]
+    entry = fleet_entry(game, flt_id, fleet_data)
+    if entry is None:
+        return
     if entry.Waiting == 5:
         set_fleet_return(game, emp, flt_id, base_id, fleet_data)
     else:
@@ -1361,7 +1401,14 @@ def implement_jump_attack_msn(
             defns[T.LAM],
             2 * enemy_df[T.def_] + enemy_df[T.ion] + (enemy_df[T.GDM] // 2),
         )
-        lam_attack(game, emp, lams_to_use, target_id, enemy_sh, enemy_df)
+        # ORIGINAL BUG, preserved -- see issue #40. LAMAttack takes EnemySh and
+        # EnemyDf as VAR parameters and overwrites both with what it destroyed.
+        # EnemyDf is re-read from the world on the next line; EnemySh never is,
+        # so the strength test below weighs the *casualty list* as if it were
+        # the garrison. Against a world LAMs only hit defenses, so the ships
+        # figure comes back all zeros and the target reads as having no fleet
+        # at all -- which is what makes the AI commit.
+        enemy_sh, enemy_df = lam_attack(game, emp, lams_to_use, target_id)
         defns[T.LAM] -= lams_to_use
         put_defns(game, base_id, defns)
 
@@ -1390,6 +1437,14 @@ def implement_stack_msn(game: GameEnvironment, flt_id: IDNumber, fleet_data: lis
         entry = fleet_data[i]
         if entry.Index in active_fleets and entry.Mission == MissionTypes.GuardMSN:
             no_of_guards += 1
+            # ORIGINAL BUG, deviated from -- see issue #39. `_dump_stuff` ends
+            # in `change_composition_of_fleet`, which destroys a fleet left
+            # with no hulls; pouring everything into the first guard therefore
+            # destroys the donor, and the original keeps dumping from it for
+            # every remaining guard. The count still advances, exactly as the
+            # original's does, so only the freed-memory access is skipped.
+            if flt_id.Index not in game.GlobalSets.SetOfActiveFleets:
+                continue
             _dump_stuff(game, flt_id, IDNumber(ObjectTypes.Flt, entry.Index))
 
     if flt_id.Index in game.GlobalSets.SetOfActiveFleets and no_of_guards < MAX_NO_OF_GUARDS:

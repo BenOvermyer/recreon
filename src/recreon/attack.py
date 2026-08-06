@@ -1043,10 +1043,10 @@ def conquer_empire(
     human player's capital is replaced by a Void ID whose index records who
     beat them.
 
-    Iterates ``SetOfPlanetsOf[enemy_emp]``, which the original only ever
-    rebuilds on load and at planet creation -- so worlds this empire has lost
-    since the game was loaded are still swept, and worlds it has taken are
-    not. Faithful to the original; not a transcription slip.
+    Iterates ``SetOfPlanetsOf[enemy_emp]``, which :func:`~recreon.primintr.set_status`
+    keeps current -- an earlier note here claimed the set went stale within a
+    session, which was wrong, and the port's ``set_status`` had dropped the
+    half of PRIMINTR.PAS:724-750 that maintains it. See issue #11.
     """
     enemy_cap_id = get_capital(game, enemy_emp)
     play_cap_id = get_capital(game, player)
