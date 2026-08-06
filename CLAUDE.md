@@ -28,7 +28,7 @@ What *is* ported is the structure: sections in the original's order, the per-emp
 
 The codec is `utils/serial.py`, which walks *annotations* rather than values so an `IntEnum` comes back as that enum and a `set[Empire]` as a set of `Empire` — a save that round-tripped `Empire.Empire3` as a bare `2` would look right in a diff and fail at the first enum-keyed `dict` lookup. It refuses ambiguous unions instead of inventing a discriminator; the one such field, `NPEDataRecord.Data`, is dispatched on the `Typ` beside it exactly as NPE.PAS's `LoadNPE` does.
 
-**`DoNotSaveGame` is called and declared nowhere.** ANACREON.PAS:411 calls it on the path where the last player has been destroyed, and no unit in `original/` declares it — the same kind of gap as the missing `MPower`/`CargoSpace`/`ObjName` tables, and it means ANACREON.PAS as shipped would not link. Suppressing the autosave is the reading the call site supports, and is what `main.play` does; anything more it might have done cannot be recovered.
+**`DoNotSaveGame` clears the modified flag; it does not touch autosave.** PROLOG.PAS:392 is the whole body — `GameModified := False` — and ANACREON.PAS:411 calls it when the last player has been destroyed, so the prologue does not offer to save a finished game on the way out. The autosave is separate and keys on `AutoSave`; it is skipped on that path only because `AutoBackup` sits in the other branch of the `IF`. `main.play` gets the behaviour right and this file previously got the reason wrong — it claimed the procedure was declared nowhere, which was the grep problem below.
 
 **CONSTR.PAS is all UI.** Despite the name it holds only interactive command handlers — `ConstructCommand`, `AbortConstructionCommand`, `ConstrStatusCommand`, `WarpLinkFrequencyCommand`. Construction's mechanics live in `intrface.py` (`construction`, `destroy_construction`, `next_constr_slot`) and `update.py` (`update_construction`), and are done. `constr.py` is a Phase 8 file, not a Phase 6 one.
 
@@ -123,7 +123,9 @@ These are project-wide decisions already made; don't relitigate them per-file:
 
 10. **Where an integer's *width* changes the answer, model the wrap.** Python ints are unbounded; Pascal's are not, and the build has range checking off, so `Word` and `Index` (0..100, stored as a byte) wrap silently. Most arithmetic never gets near a boundary and needs nothing. But when a value can underflow past zero or overflow its type, the wrapped result is the behaviour players saw, and a Python int gives a *different* bug rather than no bug — a negative troop load instead of a full one (#29), a clamped aggression score instead of a stuck one (#27). Both cases go through small local helpers (`npe/core.py`'s `_word`, `_index_dec`) with the reasoning at the call site. Check the Pascal `VAR` block for the declared type before assuming a subtraction is safe.
 
-11. **Three DATACNST tables have no source in `original/`.** `CargoSpace`, `ObjName` and `MPower` are referenced by the Pascal but declared in no file in the tree — `MPower` is read by MISC.PAS, NPEINTR.PAS and NPE00.PAS and declared by none of them. Their values in `datacnst.py` therefore cannot be checked against anything — treat them as the one place where "transcribed exactly" is a claim the repo cannot back up, and do not silently "correct" them either. `MPower`'s missing declaration also means its *range* is unknown, which is what makes #33 unresolvable rather than merely wrong.
+11. **Every DATACNST table is verified against the Pascal, automatically.** `tests/test_datacnst_source.py` parses `original/DATACNST.PAS` and compares all 30 numeric tables and 12 string/char tables against `datacnst.py`. They all match. Add a table there when you add one here — it is the only automatic check on a bulk transcription that a reviewer cannot eyeball.
+
+    This file long claimed the opposite: that `CargoSpace`, `ObjName` and `MPower` were "declared in no file in the tree" and were "the one place where 'transcribed exactly' is a claim the repo cannot back up". **That was wrong.** All three are in DATACNST.PAS — `ObjName` at :162, `MPower` at :198, `CargoSpace` at :415 — and all three transcribe correctly. See the grep warning under "Working with the Pascal source" for why they looked absent.
 
 > The code sketches in `docs/IMPLEMENTATION_PLAN.md` §1.3–1.4 are approximations written before the port and disagree with the Pascal in several places (empire numbering, `ObjectTypes` order, enum member names). Where they conflict with `original/`, the Pascal wins.
 
@@ -142,6 +144,12 @@ Player-facing coordinates are **relative to the active player's capital**, which
 Use `types.indus_range` / `types.tech_range` rather than writing members out by hand, and check the endpoints' ordinals before assuming what a range contains.
 
 ## Working with the Pascal source
+
+**Ten files in `original/` contain high-bit bytes and `grep` treats them as binary.** They are ATTCOMM.PAS, DATACNST.PAS, EIO.PAS, MAPWIND.PAS, MENU.PAS, PLAYTURN.PAS, PROLOG.PAS, PULLDOWN.PAS, TMA.PAS and WND.PAS — UI code carrying CP437 box-drawing glyphs, plus DATACNST.PAS for `BaseTypeData`/`GateTypeData`.
+
+`grep -I` skips them **silently**, and `grep -r` prints `Binary file … matches` instead of the line. So a plain search over `original/` will tell you an identifier appears nowhere when it is sitting in one of these files. **Always pass `-a`** (`grep -rna 'Ident' original/`), and be suspicious of any conclusion of the form "declared nowhere" that predates this note.
+
+This has already produced two false claims in this file, both now corrected: that three DATACNST tables had no source (they do, and they transcribe correctly), and that `DoNotSaveGame` was declared nowhere (it is PROLOG.PAS:39/392). If you find another claim of that shape, re-check it with `-a` before building on it.
 
 Highest-value reference files in `original/`:
 

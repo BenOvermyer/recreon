@@ -105,14 +105,15 @@ def play(game: GameEnvironment) -> list[str]:
     """The main turn loop, with the player's turn itself still missing.
 
     Returns whatever autosave had to say. ANACREON.PAS calls ``AutoBackup``
-    after each completed turn and *not* on the branch where the last player
-    has been destroyed -- there it calls ``DoNotSaveGame``, so a finished game
-    does not leave a backup inviting the player back into it.
+    after each completed turn, and the branch where the last player has been
+    destroyed does not reach it -- so a finished game leaves no backup
+    inviting the player back into it.
 
-    ``DoNotSaveGame`` is called at ANACREON.PAS:411 and declared in no unit in
-    ``original/``, so what it did beyond suppressing the backup cannot be
-    checked -- the same gap as the missing DATACNST tables. Skipping the
-    backup is the reading the call site supports.
+    That branch also calls ``DoNotSaveGame`` (PROLOG.PAS:392), whose whole
+    body is ``GameModified := False``. It suppresses the prologue's
+    save-before-you-quit prompt, not the backup; the two are independent, and
+    the backup is skipped here purely by where it sits in the ``IF``. There is
+    nothing to port until the prologue exists (§8.5).
     """
     warnings: list[str] = []
 
