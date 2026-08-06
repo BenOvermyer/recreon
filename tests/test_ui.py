@@ -6,7 +6,7 @@ from conftest import blank_game
 from recreon.primintr import put_object
 from recreon.types import Empire, IDNumber, ObjectTypes, WorldClass
 from recreon.ui.app import RecreonApp
-from recreon.ui.map_view import EMPTY_GLYPH, MapView, cp437
+from recreon.ui.map_view import BLANK_CHAR, MapView, cp437
 
 def test_cp437_decodes_dos_glyphs():
     # The starbase and stargate glyph tables hold raw CP437 bytes.
@@ -34,18 +34,29 @@ def test_stargate_glyphs_are_visible():
 
 
 def test_map_glyphs_reflect_sector_contents():
+    """Empty space is blank, and a known world shows its designation glyph.
+
+    The map draws `TypeStr[Typ]` -- what the world is *for* -- not `ClassStr`,
+    which is its terrain. An earlier version of this widget drew the latter.
+    """
+    from recreon.types import WorldTypes
+
     game = blank_game(size=10)
     view = MapView(game)
 
-    empty = XYCoord(2, 2)
-    assert view.glyph_at(empty) == EMPTY_GLYPH
+    # (2,2) is off the capital-relative grid rules for this fixture.
+    assert view.glyph_at(XYCoord(2, 2)) == BLANK_CHAR
 
     planet_pos = XYCoord(3, 4)
+    game.NoOfPlanets = 1
     game.Universe.Planet[1].XY = planet_pos
     game.Universe.Planet[1].Cls = WorldClass.EthCls
+    game.Universe.Planet[1].Typ = WorldTypes.CapTyp
+    game.Universe.Planet[1].KnownBy.add(Empire.Empire1)
     put_object(game, planet_pos, IDNumber(ObjectTypes.Pln, 1))
-    # ClassStr maps EthCls to 'E'.
-    assert view.glyph_at(planet_pos) == "E"
+
+    # TypeStr maps CapTyp to 'C'.
+    assert view.glyph_at(planet_pos) == "C"
 
 
 def test_cursor_clamps_to_the_galaxy_edge():
