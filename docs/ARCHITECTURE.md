@@ -398,6 +398,13 @@ folded in here.
 **Misc:**
 - `set_empire_defenses()` - Roll one of four defense distributions
 
+### intrface.py — news rendering
+`get_news_line()` turns a `NewsRecord` into the sentence the player reads.
+Each headline has a template where `*` is the location and `@` the empire named
+by `Parm1`; both are substituted last. `Parm2`/`Parm3` carry a resource, an
+industry or a second empire depending on the headline. Nine declared headline
+types have no arm in the original's CASE and are never filed by anything.
+
 ### intrface.py — scouting and probes
 `scout()`, `probe_scout()` reveal the ring of sectors around a point (both
 start at `NoDir`, so the point itself is included); `in_range_of_starbase()`

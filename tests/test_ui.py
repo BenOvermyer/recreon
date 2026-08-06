@@ -113,3 +113,40 @@ async def test_status_bar_names_what_is_under_the_cursor():
         await pilot.pause()
         assert "Sarkhon" in str(app.status_bar.content)
         assert "Pln" in str(app.status_bar.content)
+
+
+async def test_the_news_panel_shows_headlines_as_prose():
+    """The panel renders whatever is in the player's feed, not raw enum names."""
+    from recreon.galaxy import Location, XYCoord as XY
+    from recreon.news import NewsTypes, add_news
+
+    game = blank_game(size=20, empires=2)
+    game.Universe.EmpireData[Empire.Empire2].EmpireName = "Kaldor"
+    world = IDNumber(ObjectTypes.Pln, 1)
+    game.NoOfPlanets = 1
+    put_object(game, XY(3, 3), world)
+    game.Universe.Planet[1].XY = XY(3, 3)
+
+    add_news(
+        game,
+        Empire.Empire1,
+        NewsTypes.BattleL,
+        Location(XY(0, 0), world),
+        int(Empire.Empire2),
+    )
+
+    app = RecreonApp(game)
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        panel = str(app.news_panel.render())
+        assert "conquered by the empire of Kaldor" in panel
+        assert "BattleL" not in panel
+
+
+async def test_the_news_panel_says_so_when_nothing_happened():
+    game = blank_game(size=20, empires=1)
+    app = RecreonApp(game)
+
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        assert "no news" in str(app.news_panel.render())
