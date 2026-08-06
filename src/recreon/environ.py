@@ -23,6 +23,12 @@ DEFAULT_STARTING_YEAR = 4021
 #: Seconds allowed per turn, set by InitializeUniverse.
 DEFAULT_TIME_PER_TURN = 300
 
+#: What a game is called until it is saved under another name. ENVIRON.PAS
+#: declares this as a typed constant, ``CurrentGame: LineStr = 'ANACREON.SAV'``,
+#: and the autosave derives its ``.BAK`` from it -- so the name is not merely
+#: cosmetic, it decides which files a session writes.
+DEFAULT_GAME_NAME = "ANACREON.SAV"
+
 
 class GameEnvironment:
     """One running game.
@@ -73,7 +79,7 @@ class GameEnvironment:
         #: beside it. A typed constant in ENVIRON.PAS, and session state rather
         #: than saved state -- a loaded game takes the name of the file it came
         #: from, not the name it had when it was saved.
-        self.CurrentGame: str = "recreon.sav"
+        self.CurrentGame: str = DEFAULT_GAME_NAME
 
         #: Directory the save files live in. ENVIRON.PAS reads this from
         #: ANACREON.CNF along with the scenario and help paths; the config file

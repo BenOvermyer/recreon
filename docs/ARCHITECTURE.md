@@ -24,6 +24,7 @@ src/recreon/
 ├── sbase.py             # Starbase movement, self-destruct (SBASE.PAS)
 ├── orders.py            # Fleet order scripting (ORDERS.PAS)
 ├── mess.py              # Diplomatic messages (MESS.PAS)
+├── prolog.py            # Game lifecycle, prologue commands (PROLOG.PAS)
 ├── loadsave.py          # Save/load a game (LOADSAVE.PAS)
 ├── npe/                 # AI system (NPE*.PAS)
 │   ├── __init__.py
@@ -40,6 +41,7 @@ src/recreon/
 │   ├── app.py           # Main Textual application
 │   ├── map_view.py      # Galaxy map buffer, 3 columns/sector (MAPWIND.PAS)
 │   ├── newgame.py       # Scenario picker, intro, naming (NEWGAME.PAS front end)
+│   ├── prologue.py      # The menu before and between games (PROLOG.PAS)
 │   ├── menus.py         # Menu system (MENU.PAS, PULLDOWN.PAS)
 │   ├── status.py        # Status windows (STAWIND.PAS, FLTWIND.PAS, EMPWIND.PAS)
 │   ├── command.py       # Command input (DISPLAY.PAS)
@@ -352,6 +354,30 @@ plus a `MessI` headline. Worlds near a capital are how a third party reads
 someone else's diplomacy. Four original bugs live in this unit — #47, #48, #49
 and #50 — of which #50 is the one that changes play.
 
+### prolog.py
+The prologue from PROLOG.PAS: the game's lifecycle and the settings that live
+outside a game.
+
+**Functions:** `save_the_game()`, `continue_old_game()`, `quit_game()`,
+`start_a_new_game()`, `needs_saving()`, `do_not_save_game()`,
+`add_player_empire()`, `delete_player_empire()`, `change_time_limit()`, the
+three toggles, and `choose_player_options()` with its two callers
+(`players_to_move`, `deletable_empires`).
+
+`PrologueState` holds `GameLoaded` and `GameModified` — unit-level typed
+constants in the original, so scoped to the prologue here rather than added to
+`GameEnvironment`.
+
+`add_player_empire()` is the substantial one: it seats a latecomer on the first
+independent world above bio-tech with over 2000 people, gives them the highest
+technology level in the galaxy, and files a `NewPlEmp` headline with every
+empire that already knew the world. Two original bugs live here — #54 (a manual
+save destroys the autosave, because it uses the same file as scratch) and #55
+(the technology union is discarded on each new high-water mark).
+
+Not ported: the title-screen effects, DOS shell, print map, mono/colour, and
+the ANACREON.CNF configuration file.
+
 ### loadsave.py
 Saving and loading from LOADSAVE.PAS. `InitializeUniverse` is on
 `GameEnvironment`; everything else in the unit is here.
@@ -558,6 +584,12 @@ What the steps *decide* is in `newgame.py`; this draws it. The screens read the
 header and intro first via `read_scenario_intro` rather than answering from
 inside the parse, which an event loop cannot do — safe because neither draws
 from the generator.
+
+### ui/prologue.py
+The prologue menu, plus the three little windows it opens: `Attention`
+(`AttentionWindow`, acknowledgement or yes/no), `TextPrompt` (`InputString`),
+and `ChooseFrom` (`ChoosePlayer` and the save-file picker). `PrologueScreen`
+dismisses with `"begin"` or `"quit"` — the two ways `Prologue`'s loop ends.
 
 ### ui/menus.py
 Menu system from MENU.PAS, PULLDOWN.PAS.

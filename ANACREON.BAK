@@ -1,0 +1,5625 @@
+{
+ "signature": "Re:creon save file",
+ "version": 1,
+ "environment": {
+  "Year": 4022,
+  "Player": 0,
+  "EmpiresToMove": [
+   0
+  ],
+  "ScenaFilename": "",
+  "TimePerTurn": 300,
+  "AutoSave": true,
+  "AsyncTurns": false,
+  "PauseActive": true,
+  "ReEnterGame": false
+ },
+ "sector": {
+  "size": 20,
+  "rows": [
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ],
+   [
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    },
+    {
+     "Obj": {
+      "ObjTyp": 0,
+      "Index": 0
+     },
+     "Flts": [],
+     "MineScout": [],
+     "Special": 128
+    }
+   ]
+  ]
+ },
+ "planets": {},
+ "starbases": {},
+ "fleets": {},
+ "stargates": {},
+ "constr": {},
+ "messages": [],
+ "empires": {
+  "0": {
+   "InUse": true,
+   "IsAPlayer": true,
+   "EmpireName": "Empire 1",
+   "Pass": "",
+   "TimeLeft": 0,
+   "Capital": {
+    "ObjTyp": 0,
+    "Index": 0
+   },
+   "DefenseSettings": {
+    "ShellDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    },
+    "StarbaseDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    }
+   },
+   "Probe": [
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    }
+   ],
+   "Names": [],
+   "TotalRevIndex": 0,
+   "TechnologyLevel": 5,
+   "Technology": [
+    3,
+    5,
+    11,
+    12,
+    15,
+    16,
+    17,
+    18
+   ],
+   "IsAnEmpress": false,
+   "RevFactor": 0,
+   "Founding": 4021,
+   "Modifiers": []
+  },
+  "1": {
+   "InUse": false,
+   "IsAPlayer": false,
+   "EmpireName": "",
+   "Pass": "",
+   "TimeLeft": 0,
+   "Capital": {
+    "ObjTyp": 0,
+    "Index": 0
+   },
+   "DefenseSettings": {
+    "ShellDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    },
+    "StarbaseDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    }
+   },
+   "Probe": [
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    }
+   ],
+   "Names": [],
+   "TotalRevIndex": 0,
+   "TechnologyLevel": 0,
+   "Technology": [],
+   "IsAnEmpress": false,
+   "RevFactor": 0,
+   "Founding": 0,
+   "Modifiers": []
+  },
+  "2": {
+   "InUse": false,
+   "IsAPlayer": false,
+   "EmpireName": "",
+   "Pass": "",
+   "TimeLeft": 0,
+   "Capital": {
+    "ObjTyp": 0,
+    "Index": 0
+   },
+   "DefenseSettings": {
+    "ShellDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    },
+    "StarbaseDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    }
+   },
+   "Probe": [
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    }
+   ],
+   "Names": [],
+   "TotalRevIndex": 0,
+   "TechnologyLevel": 0,
+   "Technology": [],
+   "IsAnEmpress": false,
+   "RevFactor": 0,
+   "Founding": 0,
+   "Modifiers": []
+  },
+  "3": {
+   "InUse": false,
+   "IsAPlayer": false,
+   "EmpireName": "",
+   "Pass": "",
+   "TimeLeft": 0,
+   "Capital": {
+    "ObjTyp": 0,
+    "Index": 0
+   },
+   "DefenseSettings": {
+    "ShellDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    },
+    "StarbaseDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    }
+   },
+   "Probe": [
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    }
+   ],
+   "Names": [],
+   "TotalRevIndex": 0,
+   "TechnologyLevel": 0,
+   "Technology": [],
+   "IsAnEmpress": false,
+   "RevFactor": 0,
+   "Founding": 0,
+   "Modifiers": []
+  },
+  "4": {
+   "InUse": false,
+   "IsAPlayer": false,
+   "EmpireName": "",
+   "Pass": "",
+   "TimeLeft": 0,
+   "Capital": {
+    "ObjTyp": 0,
+    "Index": 0
+   },
+   "DefenseSettings": {
+    "ShellDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    },
+    "StarbaseDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    }
+   },
+   "Probe": [
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    }
+   ],
+   "Names": [],
+   "TotalRevIndex": 0,
+   "TechnologyLevel": 0,
+   "Technology": [],
+   "IsAnEmpress": false,
+   "RevFactor": 0,
+   "Founding": 0,
+   "Modifiers": []
+  },
+  "5": {
+   "InUse": false,
+   "IsAPlayer": false,
+   "EmpireName": "",
+   "Pass": "",
+   "TimeLeft": 0,
+   "Capital": {
+    "ObjTyp": 0,
+    "Index": 0
+   },
+   "DefenseSettings": {
+    "ShellDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    },
+    "StarbaseDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    }
+   },
+   "Probe": [
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    }
+   ],
+   "Names": [],
+   "TotalRevIndex": 0,
+   "TechnologyLevel": 0,
+   "Technology": [],
+   "IsAnEmpress": false,
+   "RevFactor": 0,
+   "Founding": 0,
+   "Modifiers": []
+  },
+  "6": {
+   "InUse": false,
+   "IsAPlayer": false,
+   "EmpireName": "",
+   "Pass": "",
+   "TimeLeft": 0,
+   "Capital": {
+    "ObjTyp": 0,
+    "Index": 0
+   },
+   "DefenseSettings": {
+    "ShellDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    },
+    "StarbaseDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    }
+   },
+   "Probe": [
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    }
+   ],
+   "Names": [],
+   "TotalRevIndex": 0,
+   "TechnologyLevel": 0,
+   "Technology": [],
+   "IsAnEmpress": false,
+   "RevFactor": 0,
+   "Founding": 0,
+   "Modifiers": []
+  },
+  "7": {
+   "InUse": false,
+   "IsAPlayer": false,
+   "EmpireName": "",
+   "Pass": "",
+   "TimeLeft": 0,
+   "Capital": {
+    "ObjTyp": 0,
+    "Index": 0
+   },
+   "DefenseSettings": {
+    "ShellDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    },
+    "StarbaseDefDist": {
+     "0": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "1": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "2": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "3": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     },
+     "4": {
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+     }
+    }
+   },
+   "Probe": [
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    },
+    {
+     "Dest": {
+      "x": 0,
+      "y": 0
+     },
+     "Status": 0
+    }
+   ],
+   "Names": [],
+   "TotalRevIndex": 0,
+   "TechnologyLevel": 0,
+   "Technology": [],
+   "IsAnEmpress": false,
+   "RevFactor": 0,
+   "Founding": 0,
+   "Modifiers": []
+  }
+ },
+ "news": {
+  "0": [],
+  "1": [],
+  "2": [],
+  "3": [],
+  "4": [],
+  "5": [],
+  "6": [],
+  "7": []
+ },
+ "npe": {
+  "types": {
+   "0": 0,
+   "1": 0,
+   "2": 0,
+   "3": 0,
+   "4": 0,
+   "5": 0,
+   "6": 0,
+   "7": 0
+  },
+  "data": {}
+ }
+}

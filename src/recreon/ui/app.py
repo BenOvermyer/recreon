@@ -66,7 +66,7 @@ class RecreonApp(App):
     BINDINGS = [
         Binding("q", "quit", "Quit"),
         Binding("n", "next_turn", "Next turn"),
-        Binding("g", "new_game", "New game"),
+        Binding("g", "prologue", "Menu"),
         Binding("up,k", "move(0,-1)", "Up", show=False),
         Binding("down,j", "move(0,1)", "Down", show=False),
         Binding("left,h", "move(-1,0)", "Left", show=False),
@@ -77,13 +77,24 @@ class RecreonApp(App):
         self,
         game: GameEnvironment | None = None,
         scenario_dir: str | Path | None = None,
+        save_dir: str | Path | None = None,
     ) -> None:
         super().__init__()
-        #: A blank environment stands in until the picker builds a real one,
+        from ..prolog import PrologueState
+
+        #: A blank environment stands in until a game is started or loaded,
         #: so every widget has something to render against on first mount.
         self.game = game or GameEnvironment()
         self.started = game is not None
         self.scenario_dir = Path(scenario_dir) if scenario_dir else None
+        self.save_dir = Path(save_dir) if save_dir else Path.cwd()
+
+        #: PROLOG.PAS's two flags. A game handed in on the command line counts
+        #: as loaded and unmodified -- nothing has happened to it yet.
+        self.prologue = PrologueState(game_loaded=self.started)
+        self.game.SavDirect = str(self.save_dir)
+        if self.scenario_dir:
+            self.game.SceDirect = str(self.scenario_dir)
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -105,29 +116,47 @@ class RecreonApp(App):
 
     def on_mount(self) -> None:
         self._refresh_all()
-        if not self.started and self.scenario_dir is not None:
-            self.action_new_game()
+        # ANACREON.PAS runs Prologue before anything else, every time round
+        # the outer loop. A game handed in on the command line skips it.
+        if not self.started:
+            self.action_prologue()
 
-    def action_new_game(self) -> None:
-        """Open the scenario picker. ``StartANewGame`` in the prologue menu."""
-        from .newgame import NewGameScreen
+    def action_prologue(self) -> None:
+        """Open the prologue menu. ``Prologue`` in the main program."""
+        from .prologue import PrologueScreen
 
         self.push_screen(
-            NewGameScreen(self.scenario_dir or Path.cwd()), self._game_started
+            PrologueScreen(
+                self.game,
+                self.prologue,
+                self.scenario_dir or Path.cwd(),
+                self.save_dir,
+            ),
+            self._prologue_closed,
         )
 
-    def _game_started(self, game: GameEnvironment | None) -> None:
-        """The picker dismissed. ``None`` means the player backed out.
-
-        Backing out with no game to return to leaves the app on an empty
-        galaxy rather than quitting, which is where the original's prologue
-        menu sits when you cancel out of ``StartANewGame``.
-        """
-        if game is None:
+    def _prologue_closed(self, outcome: str | None) -> None:
+        """The two ways ``Prologue``'s loop ends: Continue, or EndGame."""
+        if outcome == "quit":
+            self.exit()
             return
 
+        self.started = self.prologue.game_loaded
+        self._refresh_all()
+
+    def adopt_game(self, game: GameEnvironment) -> None:
+        """Point every widget at a newly started or loaded game.
+
+        The environment is replaced wholesale rather than mutated -- loading
+        builds a fresh one -- so the widgets holding the old reference have to
+        be re-pointed or they keep rendering the previous galaxy.
+        """
         self.game = game
         self.started = True
+        game.SavDirect = str(self.save_dir)
+        if self.scenario_dir:
+            game.SceDirect = str(self.scenario_dir)
+
         for widget in (
             self.map_view,
             self.world_panel,
@@ -150,7 +179,19 @@ class RecreonApp(App):
         self._refresh_all()
 
     def action_next_turn(self) -> None:
+        from ..loadsave import auto_backup
         from ..main import update_turn
 
+        if not self.started:
+            return
+
         update_turn(self.game)
+        self.prologue.game_modified = True
+
+        # ANACREON.PAS runs AutoBackup after every completed turn.
+        for warning in auto_backup(self.game):
+            from .prologue import Attention
+
+            self.push_screen(Attention(warning))
+
         self._refresh_all()
