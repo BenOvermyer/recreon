@@ -22,7 +22,7 @@ from recreon.main import new_game, update_turn
 from recreon.news import NewsRecord, NewsTypes, add_news
 from recreon.npe.types import NPEmpireTypes
 from recreon.orders import CommandRecord, CommandTypes, get_fleet_code
-from recreon.fleet import get_next_fleet
+from recreon.fleet import get_next_fleet, move_fleet
 from recreon.types import (
     Empire,
     IDNumber,
@@ -71,21 +71,51 @@ def test_a_scenario_survives_a_round_trip(saved, scenario_path):
     assert loaded.ScenaFilename == str(scenario_path)
 
 
+def played_out(scenario_path, turns: int = 120):
+    """A game with every save section carrying something.
+
+    Playing alone is not enough. A hundred and twenty turns reliably grows the
+    economy, the news and the AI's state, but whether any *fleet* is in the
+    air at the moment you stop is down to the roll -- frontier.scn's empires
+    launch rarely and abort quickly, so the count is 0 most turns. Waiting for
+    one would make the test a hostage to the RNG trajectory, and any change to
+    a draw anywhere in the game would move it.
+
+    So the fleet is placed deliberately, with cargo and compiled orders, and
+    the played-out galaxy supplies the rest.
+    """
+    game = new_game(scenario_path)
+    for _ in range(turns):
+        update_turn(game)
+
+    flt_id = get_next_fleet(game, game.Player)
+    fleet = game.Universe.Fleet[flt_id.Index]
+    fleet.Ships[T.fgt] = 120
+    fleet.Cargo[T.tri] = 40
+    fleet.Dest = XYCoord(6, 6)
+    fleet.NextOrder = 1
+    move_fleet(game, flt_id, XYCoord(4, 4))
+    get_fleet_code(game, flt_id).append(
+        CommandRecord(CommandTypes.DestCOM, Location(XYCoord(6, 6), IDNumber()))
+    )
+
+    return game
+
+
 def test_resaving_a_loaded_game_is_byte_identical(tmp_path, scenario_path):
     """The strongest statement the format can make about itself.
 
     If any field were dropped, coerced to a different type, or restored in a
-    different order, the second save would differ from the first. Run against
-    a galaxy that has been played for a while, so fleets, starbases, gates,
-    news and AI state are all populated rather than at their defaults.
+    different order, the second save would differ from the first.
     """
-    game = new_game(scenario_path)
-    for _ in range(120):
-        update_turn(game)
+    game = played_out(scenario_path)
 
-    # The point of playing first: a fresh scenario exercises almost nothing.
+    # Every section this is meant to cover actually has content.
     assert game.GlobalSets.SetOfActiveFleets
     assert game.GlobalSets.SetOfActiveStarbases
+    assert game.GlobalSets.SetOfActivePlanets
+    assert any(game.News.values())
+    assert any(data.Data is not None for data in game.NPEData.values())
 
     first, second = tmp_path / "a.sav", tmp_path / "b.sav"
     save_game(game, first)
@@ -448,9 +478,7 @@ def test_clean_up_universe_clears_the_fleets_out_of_their_sectors(scenario_path)
     ``Flts`` set, which is state a reused GameEnvironment would otherwise
     carry into the next game.
     """
-    game = new_game(scenario_path)
-    for _ in range(120):
-        update_turn(game)
+    game = played_out(scenario_path)
     assert game.GlobalSets.SetOfActiveFleets
 
     # Held by reference, because CleanUpSector drops the grid itself and the
