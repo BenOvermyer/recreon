@@ -965,6 +965,11 @@ def load_scenario(
     # place worlds, and the header value is only an upper bound.
     game.NoOfPlanets = 0
 
+    # ENVIRON.PAS keeps the scenario a game came from, and save/load carries
+    # it. Set after initialize_universe, which does not clear it but would be
+    # the wrong order to rely on.
+    game.ScenaFilename = str(path)
+
     # The introduction sits between the header and the first directive in the
     # same forward pass, so it has to be consumed even though nothing displays
     # it yet. Its pages are kept for the Phase 8 UI.

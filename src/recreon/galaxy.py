@@ -135,6 +135,41 @@ class Galaxy:
             for y in range(1, self.size + 1):
                 yield XYCoord(x, y)
 
+    # --- Save/load -----------------------------------------------------------
+
+    def save_sector(self) -> dict:
+        """The whole grid, for the save file. Port of ``SaveSector``.
+
+        Rows 0 and column 0 go out with everything else. They are outside the
+        playable area but they are allocated, and ``Special`` carries
+        :data:`NO_SRM_FIELD` there rather than 0, so dropping them would make
+        a reloaded galaxy differ from a fresh one at the edges.
+
+        The original writes the size twice -- once for x and once for y -- and
+        reads it back into the same variable both times, which is harmless
+        only because the grid is square. One copy is written here.
+        """
+        from .utils.serial import encode
+
+        return {
+            "size": self.size,
+            "rows": [[encode(sector) for sector in row] for row in self._sectors],
+        }
+
+    def load_sector(self, data: dict) -> None:
+        """Rebuild the grid. Port of ``LoadSector``.
+
+        Reallocates through :meth:`initialize` first, exactly as the original
+        does, so a grid of the wrong size from a previous game cannot survive
+        into this one.
+        """
+        from .utils.serial import decode
+
+        self.initialize(data["size"])
+        for x, row in enumerate(data["rows"]):
+            for y, sector in enumerate(row):
+                self._sectors[x][y] = decode(SectorRecord, sector)
+
 
 __all__ = [
     "MAX_SIZE_OF_GALAXY",

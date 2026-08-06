@@ -23,6 +23,8 @@ src/recreon/
 ├── constr.py            # Construction commands, UI only (CONSTR.PAS)
 ├── sbase.py             # Starbase movement, self-destruct (SBASE.PAS)
 ├── orders.py            # Fleet order scripting (ORDERS.PAS)
+├── mess.py              # Diplomatic messages (MESS.PAS)
+├── loadsave.py          # Save/load a game (LOADSAVE.PAS)
 ├── npe/                 # AI system (NPE*.PAS)
 │   ├── __init__.py
 │   ├── types.py         # AI type definitions (NPETYPES.PAS)
@@ -330,6 +332,57 @@ Only the first four characters of a verb are significant, so `DEST` and
 branch is commented out of `ParseLine` in v2.0, so no compiled order carries
 it. Execution lives in `fleet.execute_fleet_orders()`.
 
+### mess.py
+Diplomatic messages from MESS.PAS. The store, the delivery rules and the
+save/load sections; the compose and inbox windows stay with the rest of the UI.
+
+`MessageList` is a list on `GameEnvironment`, newest first, and a message body
+(`TextStructure` in TEXTSTRC.PAS, a linked list of lines) is a `list[str]`.
+
+**Functions:** `new_message()`, `delete_all_messages()`,
+`delete_read_messages()`, `get_messages()`, `set_message_read()`,
+`send_message()`, `intercept_message()`, `load_message_data()`,
+`save_message_data()`.
+
+Interception is the mechanic worth knowing: every empire that is *not* a
+recipient rolls once per world at `150 / distance²` percent, measured from the
+recipient's capital, and a hit files a garbled copy in the eavesdropper's inbox
+plus a `MessI` headline. Worlds near a capital are how a third party reads
+someone else's diplomacy. Four original bugs live in this unit — #47, #48, #49
+and #50 — of which #50 is the one that changes play.
+
+### loadsave.py
+Saving and loading from LOADSAVE.PAS. `InitializeUniverse` is on
+`GameEnvironment`; everything else in the unit is here.
+
+**Functions:** `save_game()`, `load_game()`, `clean_up_universe()`,
+`auto_backup()`, `backup_path()`, plus a section pair per entity type
+(`save_planets`/`load_planets`, starbases, fleets, stargates, constr, empires).
+The other sections live in the unit that owns their state, as the original does:
+`environ.save_environment()`, `galaxy.Galaxy.save_sector()`,
+`news.save_news_data()`, `mess.save_message_data()`,
+`npe.dispatch.save_npe_data()`.
+
+**The format is JSON, not the original's raw record dump.** Pascal writes
+records with `BlockWrite` straight out of memory; nothing in Python has that
+layout, and no `.SAV` or `.BAK` is shipped in `original/` to be compatible with.
+So this is its own format with its own signature and its own version line, and
+**a save from the DOS build cannot be loaded**. The version shims in the
+original (`SFVersion > 13` for `TerraformTarget`, `> 14` for a stargate's `WLF`,
+`< 12` for the old NPE `FleetData`) are unportable rather than unported — each
+reinterprets a byte layout that has no counterpart here.
+
+What *is* ported is the structure and the behaviour: sections in the original's
+order, the per-empire sets rebuilt from the records rather than saved, the world
+count recounted on load, the fleet-position repair in `LoadFleets`, and the two
+version warnings.
+
+`utils/serial.py` is the codec underneath — it walks annotations rather than
+values, so an `IntEnum` comes back as that enum and a `set[Empire]` as a set of
+`Empire`. It refuses ambiguous unions rather than inventing a discriminator; the
+one such field, `NPEDataRecord.Data`, is dispatched on the `Typ` beside it,
+exactly as `NPE.PAS`'s `LoadNPE` does.
+
 ## AI Layer (npe/)
 
 ### npe/types.py
@@ -416,7 +469,8 @@ in flight and frees them for relaunch; `probes_return()` is unreachable in v2.0.
 ### npe/dispatch.py
 AI dispatcher from NPE.PAS — `initialize_npe()`, `implement_npe()`,
 `cleanup_npe()`, dispatching on `NPEmpireTypes` to the persona modules. Also
-`load_npe()`/`save_npe()`, which wait on save/load (§8.4).
+`load_npe_data()`/`save_npe_data()`, which are the same `CASE` again: the
+persona record class is chosen from the empire's own `Typ`, `ELSE` arm and all.
 
 ### npe/common.py
 Shared persona behaviour from NPE00.PAS. Where `core.py` holds the primitives,
@@ -533,6 +587,11 @@ Integer utilities from INT.PAS.
 ### utils/sort.py
 Sorting algorithms from SORT.PAS, QSORT.PAS, LSORT.PAS.
 
+### utils/serial.py
+JSON codec for the record types, used by the save/load sections. Not a port of
+anything — the original had no need for one, since `BlockWrite` could dump a
+record straight out of memory. See `loadsave.py` above.
+
 ## Data Files
 
 ### data/names.txt
@@ -573,6 +632,13 @@ main.py
 │   ├── primintr.py
 │   ├── fleet.py
 │   └── news.py
+├── loadsave.py
+│   ├── environ.py
+│   ├── galaxy.py
+│   ├── mess.py
+│   ├── news.py
+│   ├── npe/dispatch.py
+│   └── utils/serial.py
 ├── npe/
 │   ├── core.py
 │   ├── dispatch.py

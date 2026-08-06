@@ -15,6 +15,7 @@ from pathlib import Path
 from .environ import GameEnvironment
 from .fleet import update_all_fleets
 from .intrface import scout_fleets, scout_objects, update_probes
+from .loadsave import auto_backup
 from .newgame import load_scenario
 from .news import erase_news
 from .npe.dispatch import implement_npe
@@ -100,8 +101,21 @@ def update_turn(game: GameEnvironment) -> None:
             return
 
 
-def play(game: GameEnvironment) -> None:
-    """The main turn loop, with the player's turn itself still missing."""
+def play(game: GameEnvironment) -> list[str]:
+    """The main turn loop, with the player's turn itself still missing.
+
+    Returns whatever autosave had to say. ANACREON.PAS calls ``AutoBackup``
+    after each completed turn and *not* on the branch where the last player
+    has been destroyed -- there it calls ``DoNotSaveGame``, so a finished game
+    does not leave a backup inviting the player back into it.
+
+    ``DoNotSaveGame`` is called at ANACREON.PAS:411 and declared in no unit in
+    ``original/``, so what it did beyond suppressing the backup cannot be
+    checked -- the same gap as the missing DATACNST tables. Skipping the
+    backup is the reading the call site supports.
+    """
+    warnings: list[str] = []
+
     while not game.ExitProgram:
         if no_more_players(game):
             game.ExitProgram = True
@@ -109,6 +123,9 @@ def play(game: GameEnvironment) -> None:
 
         # PlayerTakesTurn(Player) goes here -- Phase 4 onward.
         update_turn(game)
+        warnings.extend(auto_backup(game))
+
+    return warnings
 
 
 #: Shipped with the package; the only scenario that exists (see
