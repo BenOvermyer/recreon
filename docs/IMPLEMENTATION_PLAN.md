@@ -1073,8 +1073,12 @@ finally makes save/load reachable by a player.
 **CONSTR.PAS is done** — `constr.py` and `ui/construction.py`, covering the
 Build menu's three commands plus the warp-link frequency command.
 
+**MSCCOMM.PAS is done** -- `msccomm.py` and `ui/defenses.py`. Only its live
+half: `HolocaustCommand`, `ArtifactCommand` and `TransactionCommand` are inside
+the commented block and unreachable in v2.0.
+
 Still to do: the rest of the pull-downs below, which are MENU.PAS plus
-CLSCOMM, FLTCOMM, MSCCOMM and ATTCOMM.
+CLSCOMM, FLTCOMM and ATTCOMM.
 
 1. **Info** - About, DOS shell
 2. **Game** - Pause, Print, Next Turn, Quit

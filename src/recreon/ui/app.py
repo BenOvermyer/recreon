@@ -69,6 +69,8 @@ class RecreonApp(App):
         Binding("g", "prologue", "Menu"),
         Binding("b", "construction", "Build"),
         Binding("w", "warp_links", "Warp links"),
+        Binding("d", "defenses", "Defenses"),
+        Binding("x", "self_destruct", "Self-destruct", show=False),
         Binding("up,k", "move(0,-1)", "Up", show=False),
         Binding("down,j", "move(0,1)", "Down", show=False),
         Binding("left,h", "move(-1,0)", "Left", show=False),
@@ -191,6 +193,26 @@ class RecreonApp(App):
 
         self.push_screen(
             WarpLinkScreen(self.game, self.game.Player), self._after_command
+        )
+
+    def action_defenses(self) -> None:
+        """The orbital shell distribution editor (MSCCOMM.PAS)."""
+        if not self.started:
+            return
+        from .defenses import DefenseScreen
+
+        self.push_screen(
+            DefenseScreen(self.game, self.game.Player), self._after_command
+        )
+
+    def action_self_destruct(self) -> None:
+        """Scuttle a starbase or stargate (MSCCOMM.PAS)."""
+        if not self.started:
+            return
+        from .defenses import SelfDestructScreen
+
+        self.push_screen(
+            SelfDestructScreen(self.game, self.game.Player), self._after_command
         )
 
     def _after_command(self, _result=None) -> None:
