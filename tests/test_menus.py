@@ -106,6 +106,7 @@ def test_every_menu_command_either_runs_or_explains_itself():
         Command.CAddCom,
         Command.CAbortCom,
         Command.DefnsCom,
+        Command.AttackCom,
         Command.AutoAttackCom,
         Command.DesignateCom,
         Command.TerraCom,
@@ -206,16 +207,16 @@ async def test_menu_commands_open_their_screens(
 
 
 async def test_an_unported_command_says_what_it_is_waiting_on(tmp_path):
-    """Attack is ATTCOMM.PAS. Left on the menu rather than hidden, so the
-    menu stays a faithful picture of what the game offers."""
+    """Naming a place has no screen yet. Left on the menu rather than hidden,
+    so the menu stays a faithful picture of what the game offers."""
     app, _ = running(tmp_path)
     async with app.run_test() as pilot:
         await pilot.pause()
 
-        await choose(pilot, app, 6, 0)  # Ministry of War > Attack
+        await choose(pilot, app, 3, 4)  # Worlds > Name
 
         assert isinstance(app.screen, Attention)
-        assert "ATTCOMM" in app.screen.message
+        assert "not yet wired" in app.screen.message
 
 
 async def test_a_dos_only_command_says_so(tmp_path):

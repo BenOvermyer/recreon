@@ -10,9 +10,8 @@ F10, the DOS convention), and the direct keys the earlier branches bound stay
 as shortcuts.
 
 **Commands whose implementation has not landed yet report so rather than
-being hidden.** Attack, auto-attack and Launch LAMs are ATTCOMM.PAS; Trade
-technology and Liberate have no port yet. Leaving them visible keeps the menu
-a faithful picture of what the game offers, and makes the gap legible.
+being hidden.** Leaving them visible keeps the menu a faithful picture of what
+the game offers, and makes the gap legible.
 """
 
 from __future__ import annotations
@@ -29,10 +28,6 @@ from .prologue import Attention
 #: What each unimplemented command says when chosen. Named individually so the
 #: message tells the player *why*, rather than a blanket "not implemented".
 PENDING = {
-    Command.AttackCom: (
-        "Directing an attack round by round is ATTCOMM.PAS's interactive "
-        "half, not yet ported. Use auTo attack to resolve one."
-    ),
     Command.NAddCom: "Naming a place is not yet wired to a screen.",
     Command.NDelCom: "Removing a name is not yet wired to a screen.",
     Command.AboutCom: (
@@ -197,6 +192,8 @@ class MenuScreen(Screen[None]):
         # Ministry of War
         elif command is Command.LAMCom:
             self._close_then(app.action_launch_lams)
+        elif command is Command.AttackCom:
+            self._close_then(app.action_attack)
         elif command is Command.AutoAttackCom:
             self._close_then(app.action_auto_attack)
         elif command is Command.DefnsCom:
