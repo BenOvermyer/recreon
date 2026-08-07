@@ -10,9 +10,8 @@ F10, the DOS convention), and the direct keys the earlier branches bound stay
 as shortcuts.
 
 **Commands whose implementation has not landed yet report so rather than
-being hidden.** Attack, auto-attack and Launch LAMs are ATTCOMM.PAS; Trade
-technology and Liberate have no port yet. Leaving them visible keeps the menu
-a faithful picture of what the game offers, and makes the gap legible.
+being hidden.** Leaving them visible keeps the menu a faithful picture of what
+the game offers, and makes the gap legible.
 """
 
 from __future__ import annotations
@@ -29,14 +28,12 @@ from .prologue import Attention
 #: What a command says instead of opening a screen. Named individually so the
 #: message tells the player *why*, rather than a blanket "not implemented".
 #:
-#: Only `AttackCom` is genuinely unimplemented now -- ATTCOMM.PAS's
-#: round-by-round half. `AboutCom` belongs here because a message *is* its
-#: whole implementation.
+#: **Nothing on the menu is unimplemented any more.** `AboutCom` is the only
+#: entry left, and it belongs here because a message *is* its whole
+#: implementation -- not because it is waiting on a port. Keep the mechanism:
+#: the next command that lands ahead of its screen should say so here rather
+#: than being a silent no-op, which is what `test_menus.py` checks for.
 PENDING = {
-    Command.AttackCom: (
-        "Directing an attack round by round is ATTCOMM.PAS's interactive "
-        "half, not yet ported. Use auTo attack to resolve one."
-    ),
     Command.AboutCom: (
         "Re:creon -- a Python recreation of Anacreon: Reconstruction 4021 "
         "(v2.0, January 2004)."
@@ -208,6 +205,8 @@ class MenuScreen(Screen[None]):
         # Ministry of War
         elif command is Command.LAMCom:
             self._close_then(app.action_launch_lams)
+        elif command is Command.AttackCom:
+            self._close_then(app.action_attack)
         elif command is Command.AutoAttackCom:
             self._close_then(app.action_auto_attack)
         elif command is Command.DefnsCom:

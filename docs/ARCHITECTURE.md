@@ -29,7 +29,7 @@ src/recreon/
 ├── fltcomm.py           # Fleet commands (FLTCOMM.PAS)
 ├── clscomm.py           # World close-up, production forecast (CLSCOMM.PAS)
 ├── playturn.py          # Command set and the seven menus (PLAYTURN.PAS)
-├── attcomm.py           # Target selection, auto-attack (ATTCOMM.PAS)
+├── attcomm.py           # Target selection, auto-attack, the battle loop (ATTCOMM.PAS)
 ├── designcom.py         # World and empire commands (DESIGN.PAS)
 ├── names.py             # Place names, empire status report (NAMES.PAS)
 ├── loadsave.py          # Save/load a game (LOADSAVE.PAS)
@@ -54,7 +54,7 @@ src/recreon/
 │   ├── fleet.py         # Fleet list, distribution grid, orders (FLTCOMM.PAS)
 │   ├── closeup.py       # Close-up and production screens (CLSCOMM.PAS)
 │   ├── menu.py          # The in-game menu bar and its dispatch (PLAYTURN.PAS)
-│   ├── attack.py        # The auto-attack screen (ATTCOMM.PAS)
+│   ├── attack.py        # The attack screens, auto and interactive (ATTCOMM.PAS)
 │   ├── worlds.py        # Designate, terraform, ISSP, liberate, messages, LAMs
 │   ├── names.py         # Status report, remove name (NAMES.PAS)
 │   ├── menus.py         # Menu system (MENU.PAS, PULLDOWN.PAS)
@@ -249,8 +249,8 @@ Combat mechanics from ATTACK.PAS. Everything here resolves *one* round at
 The battle driver from ATTNPE.PAS: retreat check, targeting, then one round at
 every shell, repeated until somebody wins. Written for NPEs but consults no AI
 persona, so it resolves any attack headlessly. ATTCOMM.PAS is the interactive
-counterpart, where the player picks targets round by round (Phase 5.3, not yet
-ported).
+counterpart, where the player picks targets round by round; `attcomm` drives
+the same ATTACK.PAS primitives a round at a time instead of looping here.
 
 **Functions:**
 - `npe_attack()` - Fight a fleet against a target to a conclusion
@@ -426,25 +426,39 @@ Four things worth knowing:
   sectors of the launching base.
 
 ### attcomm.py
-ATTCOMM.PAS's target selection and auto-attack. The fight itself is
-`attnpe.npe_attack`, which despite its name consults no AI persona and so
-resolves a player's attack too.
+All of ATTCOMM.PAS. The automatic fight is `attnpe.npe_attack`, which despite
+its name consults no AI persona and so resolves a player's attack too; the
+interactive one is driven here.
 
 **Functions:** `attack_targets()` (`GetTarget`), `auto_attack_command()`,
-`result_message()`, `casualty_report()`.
+`attack_command()`, `raze_command()` (`TakeOverConOrGate`), `result_message()`,
+`casualty_report()`.
+
+**Classes:** `GroupSplitter` (`GetGroups`), `BattleSession` (`Engage` +
+`CleanUp`), `MoveOption`, `CaptureQuestion`, `BattleReport`.
 
 **A fleet in orbit screens the world beneath it** -- `GetTarget` offers the
 object under the fleet only after finding no enemy fleets, so a world cannot be
 attacked while an enemy fleet shares its sector.
 
-**The interactive half is not ported.** `AttackCommand` splits the fleet into
-groups and then lets the player move them between orbital shells, retarget and
-retreat each round -- `GetGroups`, `WarpIn`, `WarpOut`, `GroupTarget`,
-`GroupRetreat`, `GroupMove`, `Engage`. The Ministry of War menu says so rather
-than hiding the command.
+**The interactive half is a state machine, not a loop.** `AttackCommand`'s
+`REPEAT Menu(Comm) ... UNTIL EndBattle` blocks on the keyboard and Textual
+cannot, so `BattleSession` exposes each menu entry as a method and the UI asks
+what is legal, applies a decision, and reads `end_battle` to know when to stop.
+`GroupSplitter` is `GetGroups`; `WarpIn`, `WarpOut`, `GroupsDestroyedSFX` and
+`DrawScreen` are video-memory writes with no counterpart, and what they said
+survives as `BattleSession.report`.
 
-Original bug #65 lives here: the original builds its casualty report by reading
-the fleet record *after* the fight, without checking the fleet survived.
+**Nothing happens unless the player makes it happen.** `Engage` has no
+`AllAdvance` and no target prioritisation -- those belong to ATTNPE. Groups
+start in deep space with `Trg = NoRes`, so an untouched battle trades no fire
+at all. Closing and aiming are the decisions the screen exists for.
+
+Four original bugs live here: #65 (the auto-attack builds its casualty report by
+reading the fleet record *after* the fight, without checking the fleet
+survived), #69 and #70 (uninitialised `Result` and `Capture`), and #71 (the
+auto-attack reports a construction site or stargate destroyed without
+destroying it).
 
 ### playturn.py
 PLAYTURN.PAS's command layer -- the `Command` enum and `MENU_BAR`, the seven

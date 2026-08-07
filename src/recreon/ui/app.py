@@ -375,6 +375,14 @@ class RecreonApp(App):
 
         self._empire_screen(ReadMessagesScreen)
 
+    def action_attack(self) -> None:
+        """Direct an attack round by round (ATTCOMM.PAS)."""
+        if not self.started:
+            return
+        from .attack import AttackScreen
+
+        self.push_screen(AttackScreen(self.game, self.game.Player), self._after_command)
+
     def action_auto_attack(self) -> None:
         """Resolve an attack without directing it (ATTCOMM.PAS)."""
         if not self.started:
