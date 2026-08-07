@@ -27,6 +27,7 @@ src/recreon/
 ├── prolog.py            # Game lifecycle, prologue commands (PROLOG.PAS)
 ├── msccomm.py           # Defense settings, self-destruct (MSCCOMM.PAS)
 ├── fltcomm.py           # Fleet commands (FLTCOMM.PAS)
+├── clscomm.py           # World close-up, production forecast (CLSCOMM.PAS)
 ├── loadsave.py          # Save/load a game (LOADSAVE.PAS)
 ├── npe/                 # AI system (NPE*.PAS)
 │   ├── __init__.py
@@ -47,6 +48,7 @@ src/recreon/
 │   ├── construction.py  # Construction status, warp links (CONSTR.PAS)
 │   ├── defenses.py      # Shell distribution grid, self-destruct (MSCCOMM.PAS)
 │   ├── fleet.py         # Fleet list, distribution grid, orders (FLTCOMM.PAS)
+│   ├── closeup.py       # Close-up and production screens (CLSCOMM.PAS)
 │   ├── menus.py         # Menu system (MENU.PAS, PULLDOWN.PAS)
 │   ├── status.py        # Status windows (STAWIND.PAS, FLTWIND.PAS, EMPWIND.PAS)
 │   ├── command.py       # Command input (DISPLAY.PAS)
@@ -373,6 +375,28 @@ plus a `MessI` headline. Worlds near a capital are how a third party reads
 someone else's diplomacy. Four original bugs live in this unit — #47, #48, #49
 and #50 — of which #50 is the one that changes play.
 
+### clscomm.py
+The two read-only world screens from CLSCOMM.PAS.
+
+**Functions:** `basic_info()` (`GetBasicInfo`), `available_tip()`,
+`industry_info()` / `outpost_info()`, `production_forecast()`,
+`defense_forecast()`, and the two commands `production_com()` and
+`close_up()`.
+
+**The production forecast is a projection, and it disagrees with reality**
+(#62). `GetProdInfo` re-derives UPDATE.PAS's formula rather than calling it,
+and misses three things: the trillum reserve gate (a mined-out world forecasts
+output it cannot deliver), the floor-at-1 on raw materials, and `ThgLmt` --
+it uses `IntLmt`, three times the ceiling. Reproduced exactly; don't correct it
+against `update.py`.
+
+Two smaller details. `basic_info` appends a coordinate to the name only when
+the name has no comma in it -- the original's test for "is this already a
+coordinate?" -- so a place called "Kandii, Second" goes un-annotated. And
+`defense_forecast` sizes defences off the *manpower in cargo*, not the
+population: an outpost wants a quarter of the optimum, a command base or
+fortress four times it.
+
 ### fltcomm.py
 The nine fleet commands from FLTCOMM.PAS, over the mechanics in `fleet.py`.
 
@@ -677,6 +701,12 @@ normalises then leaves) and `SelfDestructScreen`. Reached from the map with
 The grid's Esc behaviour follows the original's `UNTIL (Ch=EscKey) AND NOT
 (Error)`: the first Esc on an illegal grid reports what is wrong, normalises,
 and stays; only a second one saves and leaves.
+
+### ui/closeup.py
+`CloseUpScreen` and `ProductionScreen`, both acting on whatever the map cursor
+is over. Reached with `z` and `i`. The production screen carries the trillum
+reserve figure beside the forecast, which is the only way a player can tell
+the trillum line is overstated (#62).
 
 ### ui/fleet.py
 `FleetScreen` (the fleet list with the nine commands on it),

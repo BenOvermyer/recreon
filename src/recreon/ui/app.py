@@ -69,6 +69,8 @@ class RecreonApp(App):
         Binding("g", "prologue", "Menu"),
         Binding("b", "construction", "Build"),
         Binding("w", "warp_links", "Warp links"),
+        Binding("z", "close_up", "Close-up"),
+        Binding("i", "production", "Production"),
         Binding("f", "fleets", "Fleets"),
         Binding("d", "defenses", "Defenses"),
         Binding("x", "self_destruct", "Self-destruct", show=False),
@@ -194,6 +196,51 @@ class RecreonApp(App):
 
         self.push_screen(
             WarpLinkScreen(self.game, self.game.Player), self._after_command
+        )
+
+    def _cursor_object(self) -> "IDNumber | None":
+        """What the map cursor is over, if it is a world or a base.
+
+        The close-up and production screens act on this, which is how the
+        original reaches them: the map hands them an `IDNumber`.
+        """
+        from ..galaxy import XYCoord
+        from ..primintr import get_object
+        from ..types import ObjectTypes
+
+        x, y = self.map_view.cursor_x, self.map_view.cursor_y
+        if not self.game.Galaxy.in_galaxy(x, y):
+            return None
+
+        obj = get_object(self.game, XYCoord(x, y))
+        if obj.ObjTyp not in (ObjectTypes.Pln, ObjectTypes.Base):
+            return None
+        return obj
+
+    def action_close_up(self) -> None:
+        """The world close-up (CLSCOMM.PAS), on whatever the cursor is over."""
+        if not self.started:
+            return
+        obj = self._cursor_object()
+        if obj is None:
+            return
+        from .closeup import CloseUpScreen
+
+        self.push_screen(
+            CloseUpScreen(self.game, self.game.Player, obj), self._after_command
+        )
+
+    def action_production(self) -> None:
+        """The production screen (CLSCOMM.PAS), on whatever the cursor is over."""
+        if not self.started:
+            return
+        obj = self._cursor_object()
+        if obj is None:
+            return
+        from .closeup import ProductionScreen
+
+        self.push_screen(
+            ProductionScreen(self.game, self.game.Player, obj), self._after_command
         )
 
     def action_fleets(self) -> None:
