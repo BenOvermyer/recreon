@@ -1079,8 +1079,11 @@ the commented block and unreachable in v2.0.
 §4.3: fleets can be deployed, transferred, refuelled, ordered and disbanded
 from the UI.
 
-Still to do: the rest of the pull-downs below, which are MENU.PAS plus CLSCOMM
-and ATTCOMM.
+**CLSCOMM.PAS is done** -- `clscomm.py` and `ui/closeup.py`, covering the
+world close-up and the production screen. That is most of §8.3's status
+windows too.
+
+Still to do: MENU.PAS's pull-downs, and ATTCOMM (§5.3).
 
 1. **Info** - About, DOS shell
 2. **Game** - Pause, Print, Next Turn, Quit
