@@ -1083,7 +1083,12 @@ from the UI.
 world close-up and the production screen. That is most of §8.3's status
 windows too.
 
-Still to do: MENU.PAS's pull-downs, and ATTCOMM (§5.3).
+**The menu bar is done** -- `playturn.py` and `ui/menu.py`. Note the menus are
+defined in PLAYTURN.PAS's `InitializeMainMenu`, not in MENU.PAS, which is the
+list widget Textual's `ListView` replaces.
+
+Still to do: ATTCOMM (§5.3), and the commands in `ui/menu.py`'s `PENDING` that
+have no screen yet.
 
 1. **Info** - About, DOS shell
 2. **Game** - Pause, Print, Next Turn, Quit

@@ -69,6 +69,7 @@ class RecreonApp(App):
         Binding("g", "prologue", "Menu"),
         Binding("b", "construction", "Build"),
         Binding("w", "warp_links", "Warp links"),
+        Binding("m,f10", "menu", "Menu"),
         Binding("z", "close_up", "Close-up"),
         Binding("i", "production", "Production"),
         Binding("f", "fleets", "Fleets"),
@@ -197,6 +198,14 @@ class RecreonApp(App):
         self.push_screen(
             WarpLinkScreen(self.game, self.game.Player), self._after_command
         )
+
+    def action_menu(self) -> None:
+        """The in-game menu bar (PLAYTURN.PAS's seven pull-downs)."""
+        if not self.started:
+            return
+        from .menu import MenuScreen
+
+        self.push_screen(MenuScreen(self.game, self.game.Player))
 
     def _cursor_object(self) -> "IDNumber | None":
         """What the map cursor is over, if it is a world or a base.
