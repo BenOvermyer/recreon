@@ -69,6 +69,7 @@ class RecreonApp(App):
         Binding("g", "prologue", "Menu"),
         Binding("b", "construction", "Build"),
         Binding("w", "warp_links", "Warp links"),
+        Binding("f", "fleets", "Fleets"),
         Binding("d", "defenses", "Defenses"),
         Binding("x", "self_destruct", "Self-destruct", show=False),
         Binding("up,k", "move(0,-1)", "Up", show=False),
@@ -193,6 +194,16 @@ class RecreonApp(App):
 
         self.push_screen(
             WarpLinkScreen(self.game, self.game.Player), self._after_command
+        )
+
+    def action_fleets(self) -> None:
+        """The fleet list and its nine commands (FLTCOMM.PAS)."""
+        if not self.started:
+            return
+        from .fleet import FleetScreen
+
+        self.push_screen(
+            FleetScreen(self.game, self.game.Player), self._after_command
         )
 
     def action_defenses(self) -> None:
