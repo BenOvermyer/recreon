@@ -30,6 +30,7 @@ src/recreon/
 ├── clscomm.py           # World close-up, production forecast (CLSCOMM.PAS)
 ├── playturn.py          # Command set and the seven menus (PLAYTURN.PAS)
 ├── attcomm.py           # Target selection, auto-attack (ATTCOMM.PAS)
+├── designcom.py         # World and empire commands (DESIGN.PAS)
 ├── loadsave.py          # Save/load a game (LOADSAVE.PAS)
 ├── npe/                 # AI system (NPE*.PAS)
 │   ├── __init__.py
@@ -53,6 +54,7 @@ src/recreon/
 │   ├── closeup.py       # Close-up and production screens (CLSCOMM.PAS)
 │   ├── menu.py          # The in-game menu bar and its dispatch (PLAYTURN.PAS)
 │   ├── attack.py        # The auto-attack screen (ATTCOMM.PAS)
+│   ├── worlds.py        # Designate, terraform, ISSP, liberate, messages, LAMs
 │   ├── menus.py         # Menu system (MENU.PAS, PULLDOWN.PAS)
 │   ├── status.py        # Status windows (STAWIND.PAS, FLTWIND.PAS, EMPWIND.PAS)
 │   ├── command.py       # Command input (DISPLAY.PAS)
@@ -378,6 +380,32 @@ recipient's capital, and a hit files a garbled copy in the eavesdropper's inbox
 plus a `MessI` headline. Worlds near a capital are how a third party reads
 someone else's diplomacy. Four original bugs live in this unit — #47, #48, #49
 and #50 — of which #50 is the one that changes play.
+
+### designcom.py
+DESIGN.PAS's command half; the mechanics are `design.py`. Seven commands:
+designate, terraform, ISSP, liberate, trade technology, send and read
+messages, launch LAMs.
+
+**Functions:** `designation_options()` / `designation_warnings()` /
+`designate_command()`, `terraform_options()` / `terraform_command()`,
+`issp_settings()` / `set_issp_settings()`, `independence_recipients()` /
+`grant_independence_command()`, `tradeable_technologies()` /
+`technology_recipients()` / `sell_technology()`, `message_recipients()` /
+`send_message_command()` / `inbox()` / `read_message()`, `lam_targets()` /
+`launch_lam()`. `ClassN` is the full world-class names, a table local to
+`TerraformCommand` and distinct from `ClassStr`'s single letters.
+
+Four things worth knowing:
+
+- **The warnings are advice.** All five of `DesignateCommand`'s proceed on
+  yes, and only the first matching one fires (`ELSE IF`).
+- **"Trade technology" is a gift** -- nothing is asked in return, and the offer
+  does not check whether the recipient already has it.
+- **You cannot gift a world to an absent empire** -- only to independence, or
+  to an empire with a scouted fleet in the world's own sector.
+- **LAMs target on `Known`, not `Scouted`** -- a fleet you know is there but
+  cannot see the composition of is still a legitimate target, within five
+  sectors of the launching base.
 
 ### attcomm.py
 ATTCOMM.PAS's target selection and auto-attack. The fight itself is
@@ -744,6 +772,12 @@ normalises then leaves) and `SelfDestructScreen`. Reached from the map with
 The grid's Esc behaviour follows the original's `UNTIL (Ch=EscKey) AND NOT
 (Error)`: the first Esc on an illegal grid reports what is wrong, normalises,
 and stays; only a second one saves and leaves.
+
+### ui/worlds.py
+`DesignateScreen`, `TerraformScreen`, `ISSPScreen`, `LiberateScreen`,
+`TradeTechnologyScreen`, `SendMessageScreen`, `ReadMessagesScreen`,
+`LaunchLAMScreen`. All but the three empire-wide ones act on the world under
+the map cursor; LAMs need a starbase there.
 
 ### ui/attack.py
 `AutoAttackScreen`: pick a fleet, pick a target, confirm, resolve, and read the

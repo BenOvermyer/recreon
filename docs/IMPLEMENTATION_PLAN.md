@@ -1091,8 +1091,11 @@ list widget Textual's `ListView` replaces.
 `GetTarget` and `AutoAttackCommand`, so a player can fight from the menu. The
 round-by-round `AttackCommand` is still to do.
 
-Still to do: ATTCOMM's interactive half (§5.3), and the commands in
-`ui/menu.py`'s `PENDING` that have no screen yet.
+**DESIGN.PAS is done** -- `designcom.py` and `ui/worlds.py` cover its seven
+commands, closing eight of the ten menu gaps.
+
+Still to do: ATTCOMM's interactive half (§5.3), NAMES.PAS's two naming
+commands, and the §8.3 status windows.
 
 1. **Info** - About, DOS shell
 2. **Game** - Pause, Print, Next Turn, Quit
