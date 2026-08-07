@@ -28,6 +28,7 @@ src/recreon/
 ├── msccomm.py           # Defense settings, self-destruct (MSCCOMM.PAS)
 ├── fltcomm.py           # Fleet commands (FLTCOMM.PAS)
 ├── clscomm.py           # World close-up, production forecast (CLSCOMM.PAS)
+├── playturn.py          # Command set and the seven menus (PLAYTURN.PAS)
 ├── loadsave.py          # Save/load a game (LOADSAVE.PAS)
 ├── npe/                 # AI system (NPE*.PAS)
 │   ├── __init__.py
@@ -49,6 +50,7 @@ src/recreon/
 │   ├── defenses.py      # Shell distribution grid, self-destruct (MSCCOMM.PAS)
 │   ├── fleet.py         # Fleet list, distribution grid, orders (FLTCOMM.PAS)
 │   ├── closeup.py       # Close-up and production screens (CLSCOMM.PAS)
+│   ├── menu.py          # The in-game menu bar and its dispatch (PLAYTURN.PAS)
 │   ├── menus.py         # Menu system (MENU.PAS, PULLDOWN.PAS)
 │   ├── status.py        # Status windows (STAWIND.PAS, FLTWIND.PAS, EMPWIND.PAS)
 │   ├── command.py       # Command input (DISPLAY.PAS)
@@ -374,6 +376,24 @@ recipient's capital, and a hit files a garbled copy in the eavesdropper's inbox
 plus a `MessI` headline. Worlds near a capital are how a third party reads
 someone else's diplomacy. Four original bugs live in this unit — #47, #48, #49
 and #50 — of which #50 is the one that changes play.
+
+### playturn.py
+PLAYTURN.PAS's command layer -- the `Command` enum and `MENU_BAR`, the seven
+pull-downs transcribed from `InitializeMainMenu` with the original's order and
+accelerator letters.
+
+Note the menus are **not** MENU.PAS: that is the scrolling-list widget, and
+PULLDOWN.PAS is the bar widget. Textual's `ListView` replaces both, so neither
+is ported.
+
+Half the unit is still outstanding and deliberately so: the typed-command
+parser (`GetCommand`) and the parameter table (`ParameterTypes` +
+`SetOfErrors` per command). The ported screens collect their own parameters,
+so nothing is blocked -- but the table is the original's one statement of what
+every command requires.
+
+`UNREACHABLE` names the three commands inside the `(* ARTIFACTS ... *)` block;
+`NOT_PORTABLE` names the DOS-only ones.
 
 ### clscomm.py
 The two read-only world screens from CLSCOMM.PAS.
@@ -701,6 +721,17 @@ normalises then leaves) and `SelfDestructScreen`. Reached from the map with
 The grid's Esc behaviour follows the original's `UNTIL (Ch=EscKey) AND NOT
 (Error)`: the first Esc on an illegal grid reports what is wrong, normalises,
 and stays; only a second one saves and leaves.
+
+### ui/menu.py
+The in-game menu bar, on `m` or F10, dispatching to every screen ported so
+far -- PLAYTURN.PAS's `CASE Comm OF` for what exists. `PENDING` names the
+commands with no screen yet and says what each is waiting on, so they stay
+visible on the menu rather than being hidden.
+
+One Textual detail worth keeping: the screen holds **one** `ListView` and
+refills it, rather than remounting per menu. Removing a focused `ListView`
+leaves focus on the removed widget, which made the bar open but its items
+never run.
 
 ### ui/closeup.py
 `CloseUpScreen` and `ProductionScreen`, both acting on whatever the map cursor
