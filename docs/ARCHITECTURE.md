@@ -29,6 +29,7 @@ src/recreon/
 ├── fltcomm.py           # Fleet commands (FLTCOMM.PAS)
 ├── clscomm.py           # World close-up, production forecast (CLSCOMM.PAS)
 ├── playturn.py          # Command set and the seven menus (PLAYTURN.PAS)
+├── attcomm.py           # Target selection, auto-attack (ATTCOMM.PAS)
 ├── loadsave.py          # Save/load a game (LOADSAVE.PAS)
 ├── npe/                 # AI system (NPE*.PAS)
 │   ├── __init__.py
@@ -51,6 +52,7 @@ src/recreon/
 │   ├── fleet.py         # Fleet list, distribution grid, orders (FLTCOMM.PAS)
 │   ├── closeup.py       # Close-up and production screens (CLSCOMM.PAS)
 │   ├── menu.py          # The in-game menu bar and its dispatch (PLAYTURN.PAS)
+│   ├── attack.py        # The auto-attack screen (ATTCOMM.PAS)
 │   ├── menus.py         # Menu system (MENU.PAS, PULLDOWN.PAS)
 │   ├── status.py        # Status windows (STAWIND.PAS, FLTWIND.PAS, EMPWIND.PAS)
 │   ├── command.py       # Command input (DISPLAY.PAS)
@@ -376,6 +378,27 @@ recipient's capital, and a hit files a garbled copy in the eavesdropper's inbox
 plus a `MessI` headline. Worlds near a capital are how a third party reads
 someone else's diplomacy. Four original bugs live in this unit — #47, #48, #49
 and #50 — of which #50 is the one that changes play.
+
+### attcomm.py
+ATTCOMM.PAS's target selection and auto-attack. The fight itself is
+`attnpe.npe_attack`, which despite its name consults no AI persona and so
+resolves a player's attack too.
+
+**Functions:** `attack_targets()` (`GetTarget`), `auto_attack_command()`,
+`result_message()`, `casualty_report()`.
+
+**A fleet in orbit screens the world beneath it** -- `GetTarget` offers the
+object under the fleet only after finding no enemy fleets, so a world cannot be
+attacked while an enemy fleet shares its sector.
+
+**The interactive half is not ported.** `AttackCommand` splits the fleet into
+groups and then lets the player move them between orbital shells, retarget and
+retreat each round -- `GetGroups`, `WarpIn`, `WarpOut`, `GroupTarget`,
+`GroupRetreat`, `GroupMove`, `Engage`. The Ministry of War menu says so rather
+than hiding the command.
+
+Original bug #65 lives here: the original builds its casualty report by reading
+the fleet record *after* the fight, without checking the fleet survived.
 
 ### playturn.py
 PLAYTURN.PAS's command layer -- the `Command` enum and `MENU_BAR`, the seven
@@ -721,6 +744,10 @@ normalises then leaves) and `SelfDestructScreen`. Reached from the map with
 The grid's Esc behaviour follows the original's `UNTIL (Ch=EscKey) AND NOT
 (Error)`: the first Esc on an illegal grid reports what is wrong, normalises,
 and stays; only a second one saves and leaves.
+
+### ui/attack.py
+`AutoAttackScreen`: pick a fleet, pick a target, confirm, resolve, and read the
+outcome with its casualty list. Reached from Ministry of War > auTo attack.
 
 ### ui/menu.py
 The in-game menu bar, on `m` or F10, dispatching to every screen ported so

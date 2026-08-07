@@ -868,13 +868,13 @@ def calculate_battle_outcome(attacker, defender) -> str:
         return "mutual_destruction"
 ```
 
-### 5.3 Combat UI
+### 5.3 Combat UI — *partly done in Phase 8*
 
-- Battle report window showing combat details
-- Attack command
-- Auto-attack toggle
-- LAM launch dialog
-- Defense settings (orbital shell distribution)
+- Attack command (auto) — `attcomm.py`, `ui/attack.py`
+- Battle report with casualty list — same
+- Defense settings (orbital shell distribution) — `msccomm.py`, `ui/defenses.py`
+- **Still to do**: the round-by-round interactive attack (`AttackCommand`) and
+  the LAM launch dialog (`LaunchLAM`).
 
 **Milestone 5**: Fleets can attack worlds, combat resolves with proper mechanics, conquest works.
 
@@ -1087,8 +1087,12 @@ windows too.
 defined in PLAYTURN.PAS's `InitializeMainMenu`, not in MENU.PAS, which is the
 list widget Textual's `ListView` replaces.
 
-Still to do: ATTCOMM (§5.3), and the commands in `ui/menu.py`'s `PENDING` that
-have no screen yet.
+**ATTCOMM.PAS is half done** -- `attcomm.py` and `ui/attack.py` cover
+`GetTarget` and `AutoAttackCommand`, so a player can fight from the menu. The
+round-by-round `AttackCommand` is still to do.
+
+Still to do: ATTCOMM's interactive half (§5.3), and the commands in
+`ui/menu.py`'s `PENDING` that have no screen yet.
 
 1. **Info** - About, DOS shell
 2. **Game** - Pause, Print, Next Turn, Quit

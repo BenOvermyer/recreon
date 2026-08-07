@@ -262,6 +262,16 @@ class RecreonApp(App):
             FleetScreen(self.game, self.game.Player), self._after_command
         )
 
+    def action_auto_attack(self) -> None:
+        """Resolve an attack without directing it (ATTCOMM.PAS)."""
+        if not self.started:
+            return
+        from .attack import AutoAttackScreen
+
+        self.push_screen(
+            AutoAttackScreen(self.game, self.game.Player), self._after_command
+        )
+
     def action_defenses(self) -> None:
         """The orbital shell distribution editor (MSCCOMM.PAS)."""
         if not self.started:
