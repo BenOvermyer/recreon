@@ -29,8 +29,10 @@ from .prologue import Attention
 #: What each unimplemented command says when chosen. Named individually so the
 #: message tells the player *why*, rather than a blanket "not implemented".
 PENDING = {
-    Command.AttackCom: "Attacking from the map is ATTCOMM.PAS, not yet ported.",
-    Command.AutoAttackCom: "Auto-attack is ATTCOMM.PAS, not yet ported.",
+    Command.AttackCom: (
+        "Directing an attack round by round is ATTCOMM.PAS's interactive "
+        "half, not yet ported. Use auTo attack to resolve one."
+    ),
     Command.LAMCom: "Launching LAMs is ATTCOMM.PAS, not yet ported.",
     Command.STechCom: "Trading technology is not yet ported.",
     Command.GrantIndepCom: "Liberating a world is not yet ported.",
@@ -186,6 +188,8 @@ class MenuScreen(Screen[None]):
         elif command in (Command.ConStaCom, Command.CAddCom, Command.CAbortCom):
             self._close_then(app.action_construction)
         # Ministry of War
+        elif command is Command.AutoAttackCom:
+            self._close_then(app.action_auto_attack)
         elif command is Command.DefnsCom:
             self._close_then(app.action_defenses)
 

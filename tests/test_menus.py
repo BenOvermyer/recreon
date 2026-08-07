@@ -106,6 +106,7 @@ def test_every_menu_command_either_runs_or_explains_itself():
         Command.CAddCom,
         Command.CAbortCom,
         Command.DefnsCom,
+        Command.AutoAttackCom,
     }
 
     for command in all_menu_commands():
