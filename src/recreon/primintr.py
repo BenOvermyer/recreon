@@ -134,6 +134,40 @@ def get_ships(game: GameEnvironment, obj: IDNumber) -> dict[T, int]:
     return ship_array()
 
 
+def get_ships_known(
+    game: GameEnvironment, player: Empire, obj: IDNumber
+) -> dict[T, int]:
+    """Ships at ``obj`` as an observer is allowed to believe them.
+
+    The filter applies to **independent worlds only**: their ships are shown
+    only where the world's own technology could have produced the type. An
+    unclaimed world with starships it could not have built does not report
+    them -- a plausibility check on scouting reports rather than a fog rule.
+
+    Owned worlds, bases and fleets report everything. ``player`` is declared
+    in the original's signature and never read, so it changes nothing here
+    either; it is kept for the call sites' sake.
+    """
+    from .datacnst import TechDev
+
+    if obj.ObjTyp not in (ObjectTypes.Pln, ObjectTypes.Base, ObjectTypes.Flt):
+        return ship_array()
+
+    entity = _entity(game, obj)
+    if entity is None:
+        return ship_array()
+
+    if obj.ObjTyp != ObjectTypes.Pln or entity.Emp != Empire.Indep:
+        return dict(entity.Ships)
+
+    plausible = TechDev[entity.Tech]
+    ships = ship_array()
+    for ship in ships:
+        if entity.Ships[ship] > 0 and ship in plausible:
+            ships[ship] = entity.Ships[ship]
+    return ships
+
+
 def get_cargo(game: GameEnvironment, obj: IDNumber) -> dict[T, int]:
     entity = _entity(game, obj)
     if obj.ObjTyp in (ObjectTypes.Pln, ObjectTypes.Base, ObjectTypes.Flt):

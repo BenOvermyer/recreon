@@ -312,6 +312,47 @@ class RecreonApp(App):
             LaunchLAMScreen(self.game, self.game.Player, obj), self._after_command
         )
 
+    def action_add_name(self) -> None:
+        """Name whatever the cursor is over, or the coordinate itself.
+
+        A name given to a *thing* follows it; one given to a bare coordinate
+        stays put. `AddName` decides which by looking at the ID.
+        """
+        if not self.started:
+            return
+        from ..galaxy import XYCoord
+        from ..names import add_name_command
+        from ..primintr import get_object
+        from ..types import empty_quadrant
+        from .prologue import Attention, TextPrompt
+
+        x, y = self.map_view.cursor_x, self.map_view.cursor_y
+        if not self.game.Galaxy.in_galaxy(x, y):
+            return
+        xy = XYCoord(x, y)
+        obj = get_object(self.game, xy)
+
+        def named(name: str | None) -> None:
+            if not name or not name.strip():
+                return
+            message = add_name_command(
+                self.game, self.game.Player, obj, xy, name.strip()
+            )
+            self._after_command()
+            self.push_screen(Attention(message))
+
+        self.push_screen(TextPrompt("Name this place:", detail=f"At {x},{y}."), named)
+
+    def action_remove_name(self) -> None:
+        from .names import RemoveNameScreen
+
+        self._empire_screen(RemoveNameScreen)
+
+    def action_status_report(self) -> None:
+        from .names import StatusReportScreen
+
+        self._empire_screen(StatusReportScreen)
+
     def _empire_screen(self, screen_class) -> None:
         if not self.started:
             return
