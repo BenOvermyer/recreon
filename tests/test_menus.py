@@ -107,6 +107,14 @@ def test_every_menu_command_either_runs_or_explains_itself():
         Command.CAbortCom,
         Command.DefnsCom,
         Command.AutoAttackCom,
+        Command.DesignateCom,
+        Command.TerraCom,
+        Command.SelfSufCom,
+        Command.GrantIndepCom,
+        Command.STechCom,
+        Command.MSendCom,
+        Command.MReadCom,
+        Command.LAMCom,
     }
 
     for command in all_menu_commands():

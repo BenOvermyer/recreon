@@ -33,16 +33,8 @@ PENDING = {
         "Directing an attack round by round is ATTCOMM.PAS's interactive "
         "half, not yet ported. Use auTo attack to resolve one."
     ),
-    Command.LAMCom: "Launching LAMs is ATTCOMM.PAS, not yet ported.",
-    Command.STechCom: "Trading technology is not yet ported.",
-    Command.GrantIndepCom: "Liberating a world is not yet ported.",
     Command.NAddCom: "Naming a place is not yet wired to a screen.",
     Command.NDelCom: "Removing a name is not yet wired to a screen.",
-    Command.DesignateCom: "Designating a world is not yet wired to a screen.",
-    Command.SelfSufCom: "ISSP settings are not yet wired to a screen.",
-    Command.TerraCom: "Terraforming is not yet wired to a screen.",
-    Command.MSendCom: "Composing a message is not yet wired to a screen.",
-    Command.MReadCom: "The inbox is not yet wired to a screen.",
     Command.AboutCom: (
         "Re:creon -- a Python recreation of Anacreon: Reconstruction 4021 "
         "(v2.0, January 2004)."
@@ -162,7 +154,22 @@ class MenuScreen(Screen[None]):
             return
 
         # Worlds
-        if command is Command.InfoCom:
+        if command is Command.DesignateCom:
+            self._close_then(app.action_designate)
+        elif command is Command.TerraCom:
+            self._close_then(app.action_terraform)
+        elif command is Command.SelfSufCom:
+            self._close_then(app.action_issp)
+        elif command is Command.GrantIndepCom:
+            self._close_then(app.action_liberate)
+        # Empire
+        elif command is Command.STechCom:
+            self._close_then(app.action_trade_technology)
+        elif command is Command.MSendCom:
+            self._close_then(app.action_send_message)
+        elif command is Command.MReadCom:
+            self._close_then(app.action_read_messages)
+        elif command is Command.InfoCom:
             self._close_then(app.action_close_up)
         elif command is Command.ProdInfoCom:
             self._close_then(app.action_production)
@@ -188,6 +195,8 @@ class MenuScreen(Screen[None]):
         elif command in (Command.ConStaCom, Command.CAddCom, Command.CAbortCom):
             self._close_then(app.action_construction)
         # Ministry of War
+        elif command is Command.LAMCom:
+            self._close_then(app.action_launch_lams)
         elif command is Command.AutoAttackCom:
             self._close_then(app.action_auto_attack)
         elif command is Command.DefnsCom:

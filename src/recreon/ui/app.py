@@ -262,6 +262,78 @@ class RecreonApp(App):
             FleetScreen(self.game, self.game.Player), self._after_command
         )
 
+    def _world_screen(self, screen_class) -> None:
+        """Open a screen that acts on the world under the map cursor."""
+        if not self.started:
+            return
+        obj = self._cursor_object()
+        if obj is None:
+            return
+        self.push_screen(
+            screen_class(self.game, self.game.Player, obj), self._after_command
+        )
+
+    def action_designate(self) -> None:
+        from .worlds import DesignateScreen
+
+        self._world_screen(DesignateScreen)
+
+    def action_terraform(self) -> None:
+        from .worlds import TerraformScreen
+
+        self._world_screen(TerraformScreen)
+
+    def action_issp(self) -> None:
+        from .worlds import ISSPScreen
+
+        self._world_screen(ISSPScreen)
+
+    def action_liberate(self) -> None:
+        from .worlds import LiberateScreen
+
+        self._world_screen(LiberateScreen)
+
+    def action_launch_lams(self) -> None:
+        """LAMs fire from a base, so the cursor must be on one."""
+        from ..types import ObjectTypes
+        from .worlds import LaunchLAMScreen
+
+        if not self.started:
+            return
+        obj = self._cursor_object()
+        if obj is None or obj.ObjTyp is not ObjectTypes.Base:
+            from .prologue import Attention
+
+            self.push_screen(
+                Attention("Put the cursor on one of your starbases first.")
+            )
+            return
+        self.push_screen(
+            LaunchLAMScreen(self.game, self.game.Player, obj), self._after_command
+        )
+
+    def _empire_screen(self, screen_class) -> None:
+        if not self.started:
+            return
+        self.push_screen(
+            screen_class(self.game, self.game.Player), self._after_command
+        )
+
+    def action_trade_technology(self) -> None:
+        from .worlds import TradeTechnologyScreen
+
+        self._empire_screen(TradeTechnologyScreen)
+
+    def action_send_message(self) -> None:
+        from .worlds import SendMessageScreen
+
+        self._empire_screen(SendMessageScreen)
+
+    def action_read_messages(self) -> None:
+        from .worlds import ReadMessagesScreen
+
+        self._empire_screen(ReadMessagesScreen)
+
     def action_auto_attack(self) -> None:
         """Resolve an attack without directing it (ATTCOMM.PAS)."""
         if not self.started:
