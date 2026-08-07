@@ -31,6 +31,7 @@ src/recreon/
 ├── playturn.py          # Command set and the seven menus (PLAYTURN.PAS)
 ├── attcomm.py           # Target selection, auto-attack, the battle loop (ATTCOMM.PAS)
 ├── designcom.py         # World and empire commands (DESIGN.PAS)
+├── names.py             # Place names, empire status report (NAMES.PAS)
 ├── loadsave.py          # Save/load a game (LOADSAVE.PAS)
 ├── npe/                 # AI system (NPE*.PAS)
 │   ├── __init__.py
@@ -55,6 +56,7 @@ src/recreon/
 │   ├── menu.py          # The in-game menu bar and its dispatch (PLAYTURN.PAS)
 │   ├── attack.py        # The attack screens, auto and interactive (ATTCOMM.PAS)
 │   ├── worlds.py        # Designate, terraform, ISSP, liberate, messages, LAMs
+│   ├── names.py         # Status report, remove name (NAMES.PAS)
 │   ├── menus.py         # Menu system (MENU.PAS, PULLDOWN.PAS)
 │   ├── status.py        # Status windows (STAWIND.PAS, FLTWIND.PAS, EMPWIND.PAS)
 │   ├── command.py       # Command input (DISPLAY.PAS)
@@ -380,6 +382,22 @@ recipient's capital, and a hit files a garbled copy in the eavesdropper's inbox
 plus a `MessI` headline. Worlds near a capital are how a third party reads
 someone else's diplomacy. Four original bugs live in this unit — #47, #48, #49
 and #50 — of which #50 is the one that changes play.
+
+### names.py
+NAMES.PAS: `add_name_command()`, `delete_name_command()`, and
+`status_report()` -- a one-page summary of everything the empire knows.
+
+**The printer is not portable; the report is.** `StatusHardcopy` sent its
+lines to `LST:`. `status_report` returns them, and `ui/names.py` shows them
+with an option to write a file.
+
+`resource_entry()` is the compact encoding, and it is two encodings: your own
+holdings in hundreds (`++` above 99), another empire's as an intelligence
+estimate -- raw materials `--` because you cannot see them at all, otherwise
+`no` / `y` plus thousands / `y+`.
+
+The report's order is decreasing interest: capital, your worlds, your bases,
+scouted foreign worlds, scouted foreign bases.
 
 ### designcom.py
 DESIGN.PAS's command half; the mechanics are `design.py`. Seven commands:
@@ -786,6 +804,11 @@ normalises then leaves) and `SelfDestructScreen`. Reached from the map with
 The grid's Esc behaviour follows the original's `UNTIL (Ch=EscKey) AND NOT
 (Error)`: the first Esc on an illegal grid reports what is wrong, normalises,
 and stays; only a second one saves and leaves.
+
+### ui/names.py
+`StatusReportScreen` (the report, with `s` to write it to a file) and
+`RemoveNameScreen`. Naming itself is a prompt on the map cursor,
+`app.action_add_name`.
 
 ### ui/worlds.py
 `DesignateScreen`, `TerraformScreen`, `ISSPScreen`, `LiberateScreen`,

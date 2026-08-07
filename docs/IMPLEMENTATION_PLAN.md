@@ -1094,8 +1094,10 @@ round-by-round `AttackCommand` is still to do.
 **DESIGN.PAS is done** -- `designcom.py` and `ui/worlds.py` cover its seven
 commands, closing eight of the ten menu gaps.
 
-Still to do: ATTCOMM's interactive half (§5.3), NAMES.PAS's two naming
-commands, and the §8.3 status windows.
+**NAMES.PAS is done** -- `names.py` and `ui/names.py`. Every menu command is
+now wired except Attack.
+
+Still to do: ATTCOMM's interactive half (§5.3) and the §8.3 status windows.
 
 1. **Info** - About, DOS shell
 2. **Game** - Pause, Print, Next Turn, Quit

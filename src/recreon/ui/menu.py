@@ -25,11 +25,15 @@ from textual.widgets import Footer, Header, Label, ListItem, ListView, Static
 from ..playturn import MENU_BAR, NOT_PORTABLE, Command, MenuBarItem
 from .prologue import Attention
 
-#: What each unimplemented command says when chosen. Named individually so the
+#: What a command says instead of opening a screen. Named individually so the
 #: message tells the player *why*, rather than a blanket "not implemented".
+#:
+#: **Nothing on the menu is unimplemented any more.** `AboutCom` is the only
+#: entry left, and it belongs here because a message *is* its whole
+#: implementation -- not because it is waiting on a port. Keep the mechanism:
+#: the next command that lands ahead of its screen should say so here rather
+#: than being a silent no-op, which is what `test_menus.py` checks for.
 PENDING = {
-    Command.NAddCom: "Naming a place is not yet wired to a screen.",
-    Command.NDelCom: "Removing a name is not yet wired to a screen.",
     Command.AboutCom: (
         "Re:creon -- a Python recreation of Anacreon: Reconstruction 4021 "
         "(v2.0, January 2004)."
@@ -125,6 +129,11 @@ class MenuScreen(Screen[None]):
         """
         app = self.app
 
+        if command is Command.HrdCopyCom:
+            # The printer has no equivalent; the report it built does.
+            self._close_then(app.action_status_report)
+            return
+
         if command in NOT_PORTABLE:
             self.app.push_screen(
                 Attention("That was a DOS feature with no equivalent here.")
@@ -149,7 +158,11 @@ class MenuScreen(Screen[None]):
             return
 
         # Worlds
-        if command is Command.DesignateCom:
+        if command is Command.NAddCom:
+            self._close_then(app.action_add_name)
+        elif command is Command.NDelCom:
+            self._close_then(app.action_remove_name)
+        elif command is Command.DesignateCom:
             self._close_then(app.action_designate)
         elif command is Command.TerraCom:
             self._close_then(app.action_terraform)

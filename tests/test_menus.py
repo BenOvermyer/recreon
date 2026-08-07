@@ -116,6 +116,9 @@ def test_every_menu_command_either_runs_or_explains_itself():
         Command.MSendCom,
         Command.MReadCom,
         Command.LAMCom,
+        Command.NAddCom,
+        Command.NDelCom,
+        Command.HrdCopyCom,
     }
 
     for command in all_menu_commands():
@@ -206,17 +209,31 @@ async def test_menu_commands_open_their_screens(
         assert isinstance(app.screen, expected)
 
 
-async def test_an_unported_command_says_what_it_is_waiting_on(tmp_path):
-    """Naming a place has no screen yet. Left on the menu rather than hidden,
-    so the menu stays a faithful picture of what the game offers."""
+async def test_a_command_whose_whole_implementation_is_a_message_says_it(tmp_path):
+    """`PENDING` is down to `AboutCom`, which is not waiting on a port -- a
+    message is all it ever was. The mechanism stays for the next command that
+    lands ahead of its screen; `test_every_menu_command_either_runs_or_explains
+    _itself` is what keeps a silent no-op from slipping in."""
     app, _ = running(tmp_path)
     async with app.run_test() as pilot:
         await pilot.pause()
 
-        await choose(pilot, app, 3, 4)  # Worlds > Name
+        await choose(pilot, app, 0, 0)  # Info > About Re:creon
 
         assert isinstance(app.screen, Attention)
-        assert "not yet wired" in app.screen.message
+        assert "Anacreon" in app.screen.message
+
+
+async def test_the_status_report_replaces_the_printer(tmp_path):
+    """`StatusHardcopy`'s printer has no equivalent; its report does."""
+    from recreon.ui.names import StatusReportScreen
+
+    app, _ = running(tmp_path)
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        await choose(pilot, app, 1, 1)  # Game > Status hardcopy
+
+        assert isinstance(app.screen, StatusReportScreen)
 
 
 async def test_a_dos_only_command_says_so(tmp_path):
