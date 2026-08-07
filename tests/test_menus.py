@@ -115,6 +115,9 @@ def test_every_menu_command_either_runs_or_explains_itself():
         Command.MSendCom,
         Command.MReadCom,
         Command.LAMCom,
+        Command.NAddCom,
+        Command.NDelCom,
+        Command.HrdCopyCom,
     }
 
     for command in all_menu_commands():
@@ -216,6 +219,18 @@ async def test_an_unported_command_says_what_it_is_waiting_on(tmp_path):
 
         assert isinstance(app.screen, Attention)
         assert "ATTCOMM" in app.screen.message
+
+
+async def test_the_status_report_replaces_the_printer(tmp_path):
+    """`StatusHardcopy`'s printer has no equivalent; its report does."""
+    from recreon.ui.names import StatusReportScreen
+
+    app, _ = running(tmp_path)
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        await choose(pilot, app, 1, 1)  # Game > Status hardcopy
+
+        assert isinstance(app.screen, StatusReportScreen)
 
 
 async def test_a_dos_only_command_says_so(tmp_path):

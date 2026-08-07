@@ -86,7 +86,9 @@ UNREACHABLE = frozenset({Command.ArtfctCom, Command.TransCom, Command.HoloCom})
 
 #: Commands that only DOS could do, or that need hardware the port has no
 #: equivalent for.
-NOT_PORTABLE = frozenset({Command.ShellCom, Command.HrdCopyCom})
+#: ``HrdCopyCom`` is *not* here: its printer is unportable but the report it
+#: builds is shown on screen instead. See :mod:`recreon.names`.
+NOT_PORTABLE = frozenset({Command.ShellCom})
 
 
 @dataclass(slots=True, frozen=True)
