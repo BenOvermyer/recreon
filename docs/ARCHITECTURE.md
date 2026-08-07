@@ -26,6 +26,7 @@ src/recreon/
 ├── mess.py              # Diplomatic messages (MESS.PAS)
 ├── prolog.py            # Game lifecycle, prologue commands (PROLOG.PAS)
 ├── msccomm.py           # Defense settings, self-destruct (MSCCOMM.PAS)
+├── fltcomm.py           # Fleet commands (FLTCOMM.PAS)
 ├── loadsave.py          # Save/load a game (LOADSAVE.PAS)
 ├── npe/                 # AI system (NPE*.PAS)
 │   ├── __init__.py
@@ -45,6 +46,7 @@ src/recreon/
 │   ├── prologue.py      # The menu before and between games (PROLOG.PAS)
 │   ├── construction.py  # Construction status, warp links (CONSTR.PAS)
 │   ├── defenses.py      # Shell distribution grid, self-destruct (MSCCOMM.PAS)
+│   ├── fleet.py         # Fleet list, distribution grid, orders (FLTCOMM.PAS)
 │   ├── menus.py         # Menu system (MENU.PAS, PULLDOWN.PAS)
 │   ├── status.py        # Status windows (STAWIND.PAS, FLTWIND.PAS, EMPWIND.PAS)
 │   ├── command.py       # Command input (DISPLAY.PAS)
@@ -371,6 +373,37 @@ plus a `MessI` headline. Worlds near a capital are how a third party reads
 someone else's diplomacy. Four original bugs live in this unit — #47, #48, #49
 and #50 — of which #50 is the one that changes play.
 
+### fltcomm.py
+The nine fleet commands from FLTCOMM.PAS, over the mechanics in `fleet.py`.
+
+**Functions:** `ground_candidates()` (`GetGround`), `player_fleets()`,
+`launch_fleet_command()`, `abort_warnings()` / `abort_fleet_command()`,
+`change_destination_command()`, `transfer_fleet_command()`,
+`max_trillum_to_use()` / `trillum_to_use()` / `refuel_fleet_command()`,
+`launch_probe_command()`, `mine_sweeper_command()`, `fleet_order_source()` /
+`fleet_orders_command()` / `fleet_cancel_orders_command()`, plus the
+distribution grid's rules: `masked_amounts()`, `distribution_error()`,
+`report_transfer_to_other_empire()`.
+
+Three details worth knowing:
+
+- **Abort's guards are warnings, not refusals.** Aborting onto another
+  empire's world hands them the ships — the only way to give ships away — and
+  aborting past 9999 of a ship type loses the excess. Both ask and proceed.
+- **Another empire's holdings read `????`** in the distribution grid. You can
+  move things across but not count what is there. Transferring *to* them files
+  a `TrnsShp` headline plus a `Trns2` line per resource, so they see what
+  arrived.
+- **Only a fleet can be overloaded.** A world has unlimited room, so the grid
+  checks the ground side only when it is another fleet — and only *your* fleet
+  errors: overload someone else's and the original quietly calls
+  `BalanceFleet` on it.
+
+Two original bugs live here: #59 (a shortened order list leaves the resume
+point past the end — undefined in Pascal, an `IndexError` here, so the port
+clamps) and #60 (mine sweeping costs 100 starships as an order and nothing as
+a command).
+
 ### msccomm.py
 MSCCOMM.PAS's live half. The unit declares five commands but three --
 `HolocaustCommand`, `ArtifactCommand`, `TransactionCommand` -- sit inside the
@@ -644,6 +677,11 @@ normalises then leaves) and `SelfDestructScreen`. Reached from the map with
 The grid's Esc behaviour follows the original's `UNTIL (Ch=EscKey) AND NOT
 (Error)`: the first Esc on an illegal grid reports what is wrong, normalises,
 and stays; only a second one saves and leaves.
+
+### ui/fleet.py
+`FleetScreen` (the fleet list with the nine commands on it),
+`DistributionScreen` (`InputNewDistribution`, shared by launch and transfer)
+and `OrdersScreen` (the order editor). Reached from the map with `f`.
 
 ### ui/menus.py
 Menu system from MENU.PAS, PULLDOWN.PAS.

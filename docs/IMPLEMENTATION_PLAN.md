@@ -791,13 +791,11 @@ def compile_orders(fleet: FleetRecord, orders: list[Order]):
     pass
 ```
 
-### 4.3 Fleet UI
+### 4.3 Fleet UI — **done in Phase 8**
 
-- Fleet status window showing ships, cargo, fuel, orders
-- Fleet deployment dialog
-- Transfer dialog (ships/cargo between fleet and ground)
-- Order editor
-- Fleet selection and destination setting
+Ported as `fltcomm.py` (FLTCOMM.PAS) and `ui/fleet.py`, alongside the other
+command units. `FleetScreen` lists ships, fuel, position and destination;
+`DistributionScreen` is the transfer grid; `OrdersScreen` is the editor.
 
 **Milestone 4**: Can deploy fleets, set destinations, transfer cargo, fleets move on map.
 
@@ -1077,8 +1075,12 @@ Build menu's three commands plus the warp-link frequency command.
 half: `HolocaustCommand`, `ArtifactCommand` and `TransactionCommand` are inside
 the commented block and unreachable in v2.0.
 
-Still to do: the rest of the pull-downs below, which are MENU.PAS plus
-CLSCOMM, FLTCOMM and ATTCOMM.
+**FLTCOMM.PAS is done** -- `fltcomm.py` and `ui/fleet.py`. This also closes
+§4.3: fleets can be deployed, transferred, refuelled, ordered and disbanded
+from the UI.
+
+Still to do: the rest of the pull-downs below, which are MENU.PAS plus CLSCOMM
+and ATTCOMM.
 
 1. **Info** - About, DOS shell
 2. **Game** - Pause, Print, Next Turn, Quit
