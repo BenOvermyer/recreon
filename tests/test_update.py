@@ -3,7 +3,7 @@
 import pytest
 from conftest import blank_game, place_world
 
-from recreon.datacnst import BasePop, OptMilitary, ThgAdj
+from recreon.datacnst import BasePop, OptMilitary, TechDev, ThgAdj
 from recreon.galaxy import XYCoord
 from recreon.news import NewsTypes
 from recreon.primintr import change_rev_index, get_issp, set_issp
@@ -696,3 +696,197 @@ def test_a_complex_hands_its_overflow_to_the_mine_over_a_full_year():
     # Whatever the complex produced on top of a full hold had to go somewhere,
     # and the mine next door is where.
     assert sum(get_cargo(game, mine).values()) > 0
+
+
+# --- Empire research ---------------------------------------------------------
+#
+# `UpdateEmpire` is the last two statements of `UpdateUniverse` and was
+# unported for a long time, so no empire advanced in technology on its own.
+
+
+def research_game(worlds=1):
+    """An empire with a capital and `worlds` university worlds beside it."""
+    game = blank_game(size=20, empires=1)
+    cap = place_world(
+        game, 1, XYCoord(5, 5), emp=Empire.Empire1, typ=WorldTypes.CapTyp, eff=100
+    )
+    game.Universe.EmpireData[Empire.Empire1].Capital = cap
+    for i in range(worlds):
+        place_world(
+            game,
+            2 + i,
+            XYCoord(6 + i, 5),
+            emp=Empire.Empire1,
+            typ=WorldTypes.RsrTyp,
+            eff=100,
+        )
+    return game, cap
+
+
+def test_an_empire_missing_a_technology_discovers_one_before_it_levels_up():
+    """Breadth before depth: an empire fills out its current tier first, and
+    only a complete tier lets the same roll advance a level."""
+    from recreon.update import new_tech_level
+
+    set_rand_seed(4021)
+    game, _ = research_game()
+    data = game.Universe.EmpireData[Empire.Empire1]
+    data.TechnologyLevel = TechLevel.WrpTchLvl
+    full = set(TechDev[TechLevel.WrpTchLvl])
+    data.Technology = set(list(full)[:-1])  # one short of the tier
+
+    for _ in range(80):
+        new_tech_level(game, Empire.Empire1)
+        if data.Technology == full:
+            break
+
+    assert data.Technology == full
+    assert data.TechnologyLevel == TechLevel.WrpTchLvl, "the level waits"
+
+
+def test_a_complete_tier_lets_the_empire_advance_a_level():
+    from recreon.update import new_tech_level
+
+    set_rand_seed(4021)
+    game, _ = research_game()
+    data = game.Universe.EmpireData[Empire.Empire1]
+    data.TechnologyLevel = TechLevel.WrpTchLvl
+    data.Technology = set(TechDev[TechLevel.WrpTchLvl])
+
+    for _ in range(80):
+        new_tech_level(game, Empire.Empire1)
+        if data.TechnologyLevel != TechLevel.WrpTchLvl:
+            break
+
+    assert data.TechnologyLevel == TechLevel.JmpTchLvl
+
+
+def test_advancing_a_level_drags_the_research_worlds_up_with_it():
+    """Every university or capital world exactly one level behind comes along,
+    which is how an empire's labs stay at the frontier without being upgraded
+    by hand."""
+    from recreon.update import new_tech_level
+
+    set_rand_seed(4021)
+    game, cap = research_game(worlds=2)
+    data = game.Universe.EmpireData[Empire.Empire1]
+    data.TechnologyLevel = TechLevel.WrpTchLvl
+    data.Technology = set(TechDev[TechLevel.WrpTchLvl])
+    for i in (1, 2, 3):
+        game.Universe.Planet[i].Tech = TechLevel.WrpTchLvl
+
+    for _ in range(80):
+        new_tech_level(game, Empire.Empire1)
+        if data.TechnologyLevel != TechLevel.WrpTchLvl:
+            break
+
+    for i in (1, 2, 3):
+        assert game.Universe.Planet[i].Tech == TechLevel.JmpTchLvl, i
+
+
+def test_an_empire_at_the_top_stops_researching():
+    """A full `GteTchLvl` set is the end of the tree; nothing rolls."""
+    from recreon.update import new_tech_level
+
+    set_rand_seed(4021)
+    game, _ = research_game()
+    data = game.Universe.EmpireData[Empire.Empire1]
+    data.TechnologyLevel = TechLevel.GteTchLvl
+    data.Technology = set(TechDev[TechLevel.GteTchLvl])
+
+    for _ in range(50):
+        new_tech_level(game, Empire.Empire1)
+
+    assert data.TechnologyLevel == TechLevel.GteTchLvl
+    assert data.Technology == set(TechDev[TechLevel.GteTchLvl])
+
+
+def test_more_labs_mean_a_better_chance():
+    """The chances sum, which is the whole mechanic -- and what makes #87's
+    overflow reachable."""
+    from recreon.update import _get_chance_for_new_tech
+
+    set_rand_seed(4021)
+    one, _ = research_game(worlds=1)
+    many, _ = research_game(worlds=5)
+
+    chance_one, _ = _get_chance_for_new_tech(one, Empire.Empire1, TechLevel.WrpTchLvl)
+    chance_many, _ = _get_chance_for_new_tech(
+        many, Empire.Empire1, TechLevel.WrpTchLvl
+    )
+
+    assert chance_many > chance_one
+
+
+def test_the_research_chance_wraps_past_a_byte():
+    """Original bug #87. `TotalChance` is an `Index` (0..100) in a byte, and
+    twenty labs at 17 each reach 340 -- so a big enough research empire wraps
+    and gets *worse* at research. Do not "fix" by widening the accumulator."""
+    from recreon.update import MAX_NO_OF_LABS, _get_chance_for_new_tech
+
+    set_rand_seed(4021)
+    game = blank_game(size=40, empires=1)
+    cap = place_world(
+        game, 1, XYCoord(5, 5), emp=Empire.Empire1, typ=WorldTypes.CapTyp, eff=100
+    )
+    game.Universe.EmpireData[Empire.Empire1].Capital = cap
+    # Ruins universities are worth 17 each at full efficiency.
+    for i in range(2, 2 + MAX_NO_OF_LABS + 2):
+        place_world(
+            game,
+            i,
+            XYCoord(5 + (i % 30), 6 + (i // 30)),
+            emp=Empire.Empire1,
+            cls=WorldClass.RnsCls,
+            typ=WorldTypes.RsrTyp,
+            eff=100,
+        )
+
+    chance, _ = _get_chance_for_new_tech(game, Empire.Empire1, TechLevel.WrpTchLvl)
+
+    # 12 (capital) + 19 x 17 = 335, which wraps to 79 rather than saturating.
+    assert chance < 100, "an unbounded sum would be far above 100"
+    assert chance == 335 % 256
+
+
+def test_update_universe_researches_and_clears_read_messages():
+    """The two calls that close `UpdateUniverse` and were missing."""
+    from recreon.mess import MessageRecord
+
+    set_rand_seed(4021)
+    game, _ = research_game(worlds=3)
+    data = game.Universe.EmpireData[Empire.Empire1]
+    data.TechnologyLevel = TechLevel.WrpTchLvl
+    data.Technology = set(list(TechDev[TechLevel.WrpTchLvl])[:-1])
+
+    read = MessageRecord()
+    read.Read = True
+    unread = MessageRecord()
+    unread.Read = False
+    game.MessageList.extend([read, unread])
+
+    before = len(data.Technology)
+    for _ in range(60):
+        update_universe(game)
+
+    assert len(data.Technology) > before or data.TechnologyLevel != TechLevel.WrpTchLvl
+    assert read not in game.MessageList, "a read message should be swept"
+    assert unread in game.MessageList, "an unread one should survive"
+
+
+def test_empire_unrest_is_a_yearly_figure_not_a_running_total():
+    """`UpdateEmpire` *replaces* TotalRevIndex with the year's accumulation.
+    Without it the value drifts unboundedly -- a 300-turn game reached -605."""
+    from recreon.primintr import change_total_rev_index, total_rev_index
+
+    set_rand_seed(4021)
+    game, _ = research_game()
+
+    change_total_rev_index(game, Empire.Empire1, 500)
+    assert total_rev_index(game, Empire.Empire1) == 500
+
+    update_universe(game)
+
+    assert total_rev_index(game, Empire.Empire1) != 500, (
+        "the year's own figure replaces whatever combat accumulated"
+    )

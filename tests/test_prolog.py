@@ -36,6 +36,7 @@ from recreon.prolog import (
     toggle_turn_sync,
 )
 from recreon.types import (
+    PLAYER_EMPIRES,
     Empire,
     ObjectTypes,
     TechLevel,
@@ -398,6 +399,13 @@ def test_the_technology_union_is_order_dependent(tmp_path, state):
     g = mature(tmp_path)
 
     early, late = Empire.Empire1, Empire.Empire7
+    # Isolate the two empires under test. Every other active empire has been
+    # researching for 200 years and would otherwise supply `gte` itself,
+    # which would mask the ordering effect rather than demonstrate it.
+    for emp in PLAYER_EMPIRES:
+        if emp not in (early, late):
+            g.Universe.EmpireData[emp].Technology = set()
+
     for emp in (early, late):
         g.Universe.EmpireData[emp].InUse = True
         g.Universe.EmpireData[emp].IsAPlayer = True

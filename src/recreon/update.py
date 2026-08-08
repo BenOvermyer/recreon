@@ -15,6 +15,7 @@ change output.
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from .datacnst import (
@@ -27,6 +28,10 @@ from .datacnst import (
     K4,
     K6,
     SUPPLIES_PER_BILLION,
+    TECH_INC_CAP,
+    TECH_INC_RNS,
+    TECH_INC_UNV,
+    TECH_INC_UNV_RNS,
     TECH_LVL_INC,
     BasePop,
     ClassIndAdj,
@@ -48,12 +53,14 @@ from .intrface import (
     next_starbase_slot,
     next_stargate_slot,
 )
+from .mess import delete_read_messages
 from .misc import move_things, tech_range, thg_lmt, total_prod
 from .news import NewsTypes, add_global_news, add_news
 from .primintr import (
     add_name,
     change_rev_index,
     delete_name,
+    empire_active,
     get_base_type,
     get_capital,
     get_cargo,
@@ -77,9 +84,11 @@ from .primintr import (
     put_trillum_reserves,
     set_class,
     set_efficiency,
+    set_empire_technology,
     set_population,
     set_status,
     set_tech,
+    set_total_rev_index,
     set_type,
     total_rev_index,
     trillum_reserves,
@@ -88,7 +97,9 @@ from .primintr import (
 from .types import (
     CARGO_TYPES,
     MAX_INDUS_INDEX,
+    MAX_NO_OF_STARBASES,
     MAX_RESOURCES,
+    PLAYER_EMPIRES,
     SHIP_TYPES,
     STARBASE_TYPES,
     STARGATE_TYPES,
@@ -1334,11 +1345,183 @@ def update_construction(game: GameEnvironment, i: int) -> None:
     )
 
 
+# --- Empire research ---------------------------------------------------------
+
+
+@dataclass(slots=True)
+class _Lab:
+    """One place an empire can make a discovery, and what it contributes."""
+
+    WorldID: IDNumber
+    Chance: int
+
+
+#: The most labs `GetChanceForNewTech` will consider. `Lab: ARRAY [1..20]`, and
+#: the guard is on the outer `IF`, so a 21st research world contributes nothing
+#: -- it is not that its chance is ignored, it is never looked at.
+MAX_NO_OF_LABS = 20
+
+
+def _get_chance_for_new_tech(
+    game: GameEnvironment, emp: Empire, emp_tech: TechLevel
+) -> tuple[int, IDNumber]:
+    """The empire's yearly research chance, and which lab gets the credit.
+
+    Port of ``GetChanceForNewTech``. Every world that could plausibly host
+    research contributes: the capital, a university world at the empire's own
+    level, any world that has already outrun the empire, and any ruins world.
+    The contributions are summed, and one lab is then drawn in proportion to
+    its share so the news can name where the discovery happened.
+
+    Two things about the sweep are worth knowing. **Starbases are checked with
+    a shorter list than planets** -- only capital and university, and the
+    university case does not consult `Cls`, so a base cannot earn the
+    ruins bonus. And **a world above the empire's level counts as a
+    university**, which is how conquering somebody more advanced accelerates
+    your own research.
+
+    **Original bug #87**: the total accumulates into an `Index` (0..100),
+    which Turbo Pascal stores in a byte. Twenty labs at 17 each reach 340, so
+    the sum can pass 100 -- making research certain -- and then wrap at 256,
+    making a large research empire *worse* at research than a small one. The
+    wrap is modelled because a Python int would give a different bug rather
+    than no bug.
+    """
+    labs: list[_Lab] = []
+
+    for i in range(1, game.NoOfPlanets + 1):
+        if i not in game.GlobalSets.SetOfPlanetsOf[emp]:
+            continue
+        if len(labs) >= MAX_NO_OF_LABS:
+            continue
+        obj = IDNumber(ObjectTypes.Pln, i)
+        typ = get_type(game, obj)
+        cls = get_class(game, obj)
+        eff = get_efficiency(game, obj)
+        tch = get_tech(game, obj)
+
+        if typ == WorldTypes.CapTyp:
+            labs.append(_Lab(obj, trunc(TECH_INC_CAP * eff / 100)))
+        elif typ == WorldTypes.RsrTyp and tch == emp_tech:
+            rate = TECH_INC_UNV_RNS if cls == WorldClass.RnsCls else TECH_INC_UNV
+            labs.append(_Lab(obj, trunc(rate * eff / 100)))
+        elif tch > emp_tech:
+            labs.append(_Lab(obj, trunc(TECH_INC_UNV * eff / 100)))
+        elif cls == WorldClass.RnsCls:
+            labs.append(_Lab(obj, trunc(TECH_INC_RNS * eff / 100)))
+
+    for i in range(1, MAX_NO_OF_STARBASES + 1):
+        if i not in game.GlobalSets.SetOfStarbasesOf[emp]:
+            continue
+        if len(labs) >= MAX_NO_OF_LABS:
+            continue
+        obj = IDNumber(ObjectTypes.Base, i)
+        typ = get_type(game, obj)
+        eff = get_efficiency(game, obj)
+        tch = get_tech(game, obj)
+
+        if typ == WorldTypes.CapTyp:
+            labs.append(_Lab(obj, trunc(TECH_INC_CAP * eff / 100)))
+        elif typ == WorldTypes.RsrTyp and tch == emp_tech:
+            labs.append(_Lab(obj, trunc(TECH_INC_UNV * eff / 100)))
+
+    total_chance = sum(lab.Chance for lab in labs) % 256  # #87
+
+    # Draw the lab in proportion to its contribution. `Rnd(1, 0)` returns 1
+    # when there are no labs at all, and the walk below then finds none, so
+    # the capital is named by the fallback.
+    roll = rnd(1, total_chance)
+    for lab in labs:
+        if roll <= lab.Chance:
+            return total_chance, lab.WorldID
+        roll -= lab.Chance
+
+    return total_chance, get_capital(game, emp)
+
+
+def _get_new_tech(
+    known: set[TechnologyTypes], possible: set[TechnologyTypes]
+) -> TechnologyTypes:
+    """One technology the empire could have but does not. ``GetNewTech``."""
+    available = sorted(possible - known)
+    return available[rnd(1, len(available)) - 1]
+
+
+def new_tech_level(game: GameEnvironment, emp: Empire) -> None:
+    """One year of research for one empire. Port of ``NewTechLevel``.
+
+    An empire does one of two things, never both. If it is missing any
+    technology of its *current* level it rolls to discover one. Only once it
+    holds the full set does the same roll instead advance it a level -- so
+    breadth is a prerequisite for depth, and the last technology of a tier is
+    what unlocks the next.
+
+    Advancing a level drags the lab and **every university or capital world
+    exactly one level behind** up with it, which is how an empire's research
+    worlds stay at the frontier without being upgraded by hand.
+
+    An empire holding everything at `GteTchLvl` has finished; nothing rolls.
+    """
+    tech, tech_set = get_empire_technology(game, emp)
+
+    if set(tech_set) == set(TechDev[TechLevel.GteTchLvl]):
+        return
+
+    chance, lab_id = _get_chance_for_new_tech(game, emp, tech)
+    if rnd(1, 100) > chance:
+        return
+
+    if set(tech_set) != set(TechDev[tech]):
+        new_tech = _get_new_tech(set(tech_set), set(TechDev[tech]))
+        set_empire_technology(game, emp, tech, set(tech_set) | {new_tech})
+        add_news(
+            game,
+            emp,
+            NewsTypes.NCapTech,
+            Location(XY=limbo(), ID=lab_id),
+            int(new_tech),
+        )
+        return
+
+    tech = TechLevel(int(tech) + 1)
+    set_empire_technology(game, emp, tech, set(tech_set))
+    set_tech(game, lab_id, tech)
+
+    for i in range(1, game.NoOfPlanets + 1):
+        if i not in game.GlobalSets.SetOfPlanetsOf[emp]:
+            continue
+        obj = IDNumber(ObjectTypes.Pln, i)
+        if get_type(game, obj) in (
+            WorldTypes.RsrTyp,
+            WorldTypes.CapTyp,
+        ) and get_tech(game, obj) == TechLevel(int(tech) - 1):
+            set_tech(game, obj, tech)
+
+    add_news(
+        game, emp, NewsTypes.NCapLvl, Location(XY=limbo(), ID=lab_id), int(tech)
+    )
+
+
+def update_empire(game: GameEnvironment, emp: Empire) -> None:
+    """One year for one empire. Port of ``UpdateEmpire``.
+
+    Two statements. `TotalRevIndex` is **replaced** by the year's accumulated
+    figure rather than added to -- so it is a per-year reading, not a running
+    total, and `change_total_rev_index`'s contributions from combat during the
+    year are discarded here. Then the empire rolls for research.
+    """
+    set_total_rev_index(game, emp, game.NewTotalRevIndex[emp])
+    new_tech_level(game, emp)
+
+
 def update_universe(game: GameEnvironment) -> None:
     """Advance the whole world by one year.
 
-    Port of UPDATE.PAS ``UpdateUniverse``. Empire research (``UpdateEmpire``)
-    is still unported, so no empire advances in technology on its own yet.
+    Port of UPDATE.PAS ``UpdateUniverse``, whose last two acts are easy to miss
+    and were unported for a long time: **every active empire researches**, and
+    read messages are cleared. Without the first, no empire ever advances in
+    technology on its own -- a 300-turn game ended with every empire at exactly
+    the level its scenario gave it.
     """
     game.NewTotalRevIndex = {emp: 0 for emp in Empire}
 
@@ -1353,3 +1536,9 @@ def update_universe(game: GameEnvironment) -> None:
     # Iterated over a copy: a site that completes drops out of the set.
     for i in sorted(game.GlobalSets.SetOfActiveConstructionSites):
         update_construction(game, i)
+
+    for emp in PLAYER_EMPIRES:
+        if empire_active(game, emp):
+            update_empire(game, emp)
+
+    delete_read_messages(game)
