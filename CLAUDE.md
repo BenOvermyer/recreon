@@ -170,12 +170,16 @@ uv sync                                     # install deps
 uv run pytest                               # full suite
 uv run pytest tests/test_datacnst.py -q     # one file
 uv run pytest -k combat_table               # one test by name
+uvx ruff check src/ tests/                   # lint (F and I only)
+uvx ruff check --fix src/ tests/             # and fix what is mechanical
 uv run recreon                              # launch the TUI
 uv run recreon --scenario path.scn --name X  # pick a scenario / empire name
 uv run recreon --no-ui                      # advance one turn headlessly
 ```
 
-Python 3.12, Textual for the TUI, pytest (with `asyncio_mode = "auto"`, for Textual's `run_test()` pilot) for tests. No linter or type checker is configured yet.
+Python 3.12, Textual for the TUI, pytest (with `asyncio_mode = "auto"`, for Textual's `run_test()` pilot) for tests. **Ruff is configured and clean**, deliberately narrow: `F` (Pyflakes) and `I` (import order) only. No type checker.
+
+The narrowness is the point. Most style rules would argue with decisions the Pascal makes for us -- `E741` would reject the original's single-letter loop variables, `N` would reject the Pascal field names porting convention 3 requires, `PLR2004` would want every transcribed balance constant named. `F` earns its place regardless: it found `get_empire_status` **defined twice** in `intrface.py`, the second silently shadowing the first.
 
 ## Documentation map
 
@@ -206,6 +210,10 @@ These are project-wide decisions already made; don't relitigate them per-file:
 11. **Every DATACNST table is verified against the Pascal, automatically.** `tests/test_datacnst_source.py` parses `original/DATACNST.PAS` and compares all 30 numeric tables and 12 string/char tables against `datacnst.py`. They all match. Add a table there when you add one here — it is the only automatic check on a bulk transcription that a reviewer cannot eyeball.
 
     This file long claimed the opposite: that `CargoSpace`, `ObjName` and `MPower` were "declared in no file in the tree" and were "the one place where 'transcribed exactly' is a claim the repo cannot back up". **That was wrong.** All three are in DATACNST.PAS — `ObjName` at :162, `MPower` at :198, `CargoSpace` at :415 — and all three transcribe correctly. See the grep warning under "Working with the Pascal source" for why they looked absent.
+
+12. **The permissiveness conventions are enforced by `tests/test_divergence.py`**, which scans `src/` rather than exercising behaviour. It asserts that **nothing calls Python's `round`** (Pascal breaks ties away from zero), that the scenario parser uses no bare `int()` on a string (`Val` errors where `int` strips whitespace and accepts `_`), and that **no module imports `random`**. These pass today; the point is that they fail loudly when the next module drifts, because this class of bug is invisible to ordinary tests — the code runs, it just gives a slightly different answer than the Pascal would.
+
+    **Nine parse sites were converted to `pascal_val` in the Phase 9 sweep**, the most consequential being `dfa.next_integer` — every numeric field of every scenario file — and `primintr.name2fleet`, which sits under `get_location` and so under every typed name in the game. `name2coord` beside it had used the strict parser all along, which is what made the inconsistency findable.
 
 > The code sketches in `docs/IMPLEMENTATION_PLAN.md` §1.3–1.4 are approximations written before the port and disagree with the Pascal in several places (empire numbering, `ObjectTypes` order, enum member names). Where they conflict with `original/`, the Pascal wins.
 

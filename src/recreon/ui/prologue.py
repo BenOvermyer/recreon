@@ -22,18 +22,28 @@ from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.screen import ModalScreen, Screen
-from textual.widgets import Button, Footer, Header, Input, Label, ListItem, ListView, Static
+from textual.widgets import (
+    Button,
+    Footer,
+    Header,
+    Input,
+    Label,
+    ListItem,
+    ListView,
+    Static,
+)
 
 from ..environ import GameEnvironment
 from ..loadsave import SaveFileError
+from ..newgame import EmpireIdentity
 from ..prolog import (
     PrologueError,
     PrologueState,
     add_player_empire,
     change_time_limit,
     continue_old_game,
-    delete_player_empire,
     deletable_empires,
+    delete_player_empire,
     menu_labels,
     needs_saving,
     quit_game,
@@ -43,7 +53,6 @@ from ..prolog import (
     toggle_pause,
     toggle_turn_sync,
 )
-from ..newgame import EmpireIdentity
 
 
 class Attention(ModalScreen[bool]):
@@ -308,7 +317,7 @@ class PrologueScreen(Screen[str | None]):
                 return
             try:
                 warnings = continue_old_game(self.game, self.state, path)
-            except SaveFileError as exc:
+            except SaveFileError:
                 self.app.push_screen(
                     Attention(f'"{path.name}" is probably not', "an Anacreon save file.")
                 )
@@ -384,8 +393,8 @@ class PrologueScreen(Screen[str | None]):
         )
 
     def _cmd_add(self) -> None:
-        from .newgame import suggest_empire_name
         from ..prolog import DWARF_AMONG_GIANTS
+        from .newgame import suggest_empire_name
 
         self.state.require_game()
 

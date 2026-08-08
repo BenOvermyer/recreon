@@ -1,8 +1,9 @@
 """Milestone 2: a game starts, has a galaxy, and advances turns."""
 
+from conftest import blank_game
+
 from recreon.environ import DEFAULT_STARTING_YEAR, GameEnvironment
 from recreon.galaxy import MAX_SIZE_OF_GALAXY, NO_SRM_FIELD, Galaxy, XYCoord
-from conftest import blank_game
 from recreon.main import update_turn
 from recreon.primintr import (
     empire_active,

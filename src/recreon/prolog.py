@@ -33,8 +33,8 @@ from .environ import DEFAULT_GAME_NAME, GameEnvironment
 from .galaxy import Location, limbo
 from .intrface import clear_known_set, destroy_empire, scout
 from .loadsave import SaveFileError, clean_up_universe, load_game, save_game
-from .news import NewsTypes, add_news
 from .newgame import EmpireIdentity
+from .news import NewsTypes, add_news
 from .primintr import (
     create_empire,
     empire_active,

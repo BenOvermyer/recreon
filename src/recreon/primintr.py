@@ -944,13 +944,20 @@ def get_coord_name(game: GameEnvironment, coord: XYCoord) -> str:
 
 
 def name2fleet(game: GameEnvironment, emp: Empire, strg: str) -> IDNumber:
-    """Parse ``Fleet12``/``Enemy12`` into a fleet ID, else EmptyQuadrant."""
+    """Parse ``Fleet12``/``Enemy12`` into a fleet ID, else EmptyQuadrant.
+
+    ``pascal_val``, matching `name2coord` beside it and the original's
+    ``Val(Copy(Strg,6,16),FltIndex,Error)``. With a bare ``int`` the port
+    accepted ``FLEET 12`` and ``FLEET1_2``, which the original rejects -- and
+    this is on the path of every typed name in the game, through
+    `get_location`.
+    """
     strg = strg.upper()
     if strg[:5] not in ("ENEMY", "FLEET") or len(strg) <= 5:
         return empty_quadrant()
 
     try:
-        flt_index = int(strg[5:21])
+        flt_index = pascal_val(strg[5:21])
     except ValueError:
         return empty_quadrant()
 

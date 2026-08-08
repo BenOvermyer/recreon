@@ -16,7 +16,6 @@ from recreon.utils.pascal import (
     trunc,
 )
 
-
 # --- Rounding and truncation -------------------------------------------------
 
 

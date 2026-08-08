@@ -1,6 +1,6 @@
 """Checks that the ported enums keep the ordinals the Pascal code relies on."""
 
-from recreon.galaxy import NO_SRM_FIELD, MAX_SIZE_OF_GALAXY
+from recreon.galaxy import MAX_SIZE_OF_GALAXY, NO_SRM_FIELD
 from recreon.types import (
     ATTACK_TYPES,
     CARGO_TYPES,

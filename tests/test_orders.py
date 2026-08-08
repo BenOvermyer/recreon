@@ -1,8 +1,8 @@
 """Compiling, storing and reading back fleet standing orders."""
 
 import pytest
-
 from conftest import blank_game, place_world
+
 from recreon.galaxy import XYCoord
 from recreon.orders import (
     BAD_COMMAND_OER,

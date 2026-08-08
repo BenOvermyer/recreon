@@ -21,12 +21,12 @@ from .datacnst import (
     AMBROSIA_ADJ,
     DRUGS_PER_BILLION,
     ISSP,
+    K4,
+    K6,
     SUPPLIES_PER_BILLION,
     ClassIndAdj,
     DefAdj,
     DefBuildRate,
-    K4,
-    K6,
     RawM,
     TechAdj2,
     TechDev,
@@ -35,7 +35,6 @@ from .datacnst import (
 from .environ import GameEnvironment
 from .intrface import get_industrial_distribution
 from .misc import thg_lmt, total_prod
-from .scena import display_background
 from .primintr import (
     get_base_type,
     get_cargo,
@@ -56,8 +55,8 @@ from .primintr import (
     object_name,
     trillum_reserves,
 )
+from .scena import display_background
 from .types import (
-    CARGO_TYPES,
     DEFNS_TYPES,
     SHIP_TYPES,
     Empire,

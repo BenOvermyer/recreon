@@ -7,6 +7,7 @@ NWSWIND, NMSWIND, HLPWIND) and the status lines INTRFACE.PAS builds for them.
 import pytest
 from conftest import blank_game, place_world
 
+from recreon.datastrc import NameRecord
 from recreon.empwind import empire_rows
 from recreon.fleet import get_next_fleet, move_fleet
 from recreon.fltwind import fleet_rows
@@ -30,7 +31,6 @@ from recreon.intrface import (
     get_military_status,
     get_world_status,
 )
-from recreon.datastrc import NameRecord
 from recreon.news import LOCAL_NEWS, NewsTypes, add_news
 from recreon.nmswind import get_name_line, name_lines, name_rows
 from recreon.nwswind import news_rows

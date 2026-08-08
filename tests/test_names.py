@@ -3,7 +3,7 @@
 import pytest
 from conftest import blank_game, place_world
 
-from recreon.galaxy import Location, XYCoord, limbo
+from recreon.galaxy import Location, XYCoord
 from recreon.names import (
     REPORT_COLUMNS,
     STATUS_HEADER,
@@ -146,7 +146,7 @@ def test_the_capital_comes_first_and_appears_once(game, home):
 
 
 def test_a_scouted_foreign_world_is_listed(game):
-    other = place_world(game, 2, XYCoord(9, 9), emp=Empire.Empire2)
+    place_world(game, 2, XYCoord(9, 9), emp=Empire.Empire2)
     lines = status_report(game, P)
     assert len(lines[4:]) == 1  # only the capital so far
 

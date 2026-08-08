@@ -1,8 +1,8 @@
 """Milestone 5: fleets attack worlds and each other, and conquest works."""
 
 import pytest
-
 from conftest import blank_game, place_world
+
 from recreon.attack import (
     MAX_NO_OF_GROUPS,
     AttackIntentionTypes,
@@ -43,8 +43,8 @@ from recreon.attack import (
 )
 from recreon.attnpe import MAX_ENGAGE_ROUNDS, npe_attack
 from recreon.battle import (
-    MilitaryPower,
     WAR_MACHINES,
+    MilitaryPower,
     calc_attack_round,
     calc_military_power,
 )

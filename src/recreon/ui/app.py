@@ -8,6 +8,7 @@ the status windows are Phase 8.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
@@ -18,6 +19,9 @@ from ..environ import GameEnvironment
 from ..primintr import empire_name, get_object
 from ..types import ObjectTypes
 from .map_view import MapView
+
+if TYPE_CHECKING:
+    from ..types import IDNumber
 from .status import EmpirePanel, NewsPanel, WorldPanel
 
 
@@ -235,7 +239,7 @@ class RecreonApp(App):
 
         self.push_screen(MenuScreen(self.game, self.game.Player))
 
-    def _cursor_object(self) -> "IDNumber | None":
+    def _cursor_object(self) -> IDNumber | None:
         """What the map cursor is over, if it is a world or a base.
 
         The close-up and production screens act on this, which is how the
@@ -351,7 +355,6 @@ class RecreonApp(App):
         from ..galaxy import XYCoord
         from ..names import add_name_command
         from ..primintr import get_object
-        from ..types import empty_quadrant
         from .prologue import Attention, TextPrompt
 
         x, y = self.map_view.cursor_x, self.map_view.cursor_y

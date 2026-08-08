@@ -13,8 +13,8 @@ from textual.widget import Widget
 from ..datacnst import ClassStr, IndusNames, TechN, ThingNames, TypeName
 from ..environ import GameEnvironment
 from ..galaxy import XYCoord
-from ..news import NewsTypes
 from ..misc import hi_lo, military_power
+from ..news import NewsTypes
 from ..primintr import (
     empire_name,
     get_object,

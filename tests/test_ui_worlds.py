@@ -5,13 +5,11 @@ import pytest
 from recreon.designcom import inbox
 from recreon.main import new_game
 from recreon.primintr import get_capital, get_coord, get_status, get_type
-from recreon.types import Empire, IndusTypes, WorldTypes
+from recreon.types import Empire, IndusTypes
 from recreon.ui.app import RecreonApp
-from recreon.ui.prologue import Attention, ChooseFrom, TextPrompt
+from recreon.ui.prologue import Attention, ChooseFrom
 from recreon.ui.worlds import (
-    DesignateScreen,
     ISSPScreen,
-    LiberateScreen,
     ReadMessagesScreen,
     SendMessageScreen,
     TerraformScreen,

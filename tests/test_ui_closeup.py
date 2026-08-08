@@ -65,7 +65,6 @@ async def test_empty_space_opens_nothing(tmp_path):
     async with app.run_test() as pilot:
         await pilot.pause()
         # Find a sector with nothing in it.
-        from recreon.galaxy import XYCoord
         from recreon.primintr import get_object
         from recreon.types import ObjectTypes
 

@@ -1,10 +1,10 @@
 """Milestone 3: worlds produce, populations grow, tech advances."""
 
 import pytest
+from conftest import blank_game, place_world
 
 from recreon.datacnst import BasePop, OptMilitary, ThgAdj
 from recreon.galaxy import XYCoord
-from conftest import blank_game, place_world
 from recreon.news import NewsTypes
 from recreon.primintr import change_rev_index, get_issp, set_issp
 from recreon.types import (
@@ -311,10 +311,9 @@ def test_independent_worlds_improve_barely():
 
 def test_tech_follows_the_capital():
     game, world = make_world()
-    planet = game.Universe.Planet[1]
 
     # A second world starts behind the capital and should catch up.
-    other = place_world(
+    place_world(
         game, 2, XYCoord(9, 9), emp=Empire.Empire1, tech=TechLevel.AtomicLvl
     )
     game.Universe.Planet[2].Tech = TechLevel.AtomicLvl

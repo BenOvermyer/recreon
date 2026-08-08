@@ -7,6 +7,7 @@ from conftest import blank_game, place_world
 
 from recreon.datastrc import NameRecord
 from recreon.environ import GameEnvironment
+from recreon.fleet import get_next_fleet, move_fleet
 from recreon.galaxy import Location, XYCoord
 from recreon.loadsave import (
     CURRENT_SF_VERSION,
@@ -22,7 +23,6 @@ from recreon.main import new_game, update_turn
 from recreon.news import NewsRecord, NewsTypes, add_news
 from recreon.npe.types import NPEmpireTypes
 from recreon.orders import CommandRecord, CommandTypes, get_fleet_code
-from recreon.fleet import get_next_fleet, move_fleet
 from recreon.types import (
     Empire,
     IDNumber,

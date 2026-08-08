@@ -1,6 +1,5 @@
 """The construction and warp-link screens."""
 
-from pathlib import Path
 
 import pytest
 

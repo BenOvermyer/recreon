@@ -86,9 +86,9 @@ from .types import (
     WorldClass,
     WorldTypes,
 )
-from .utils.dfa import TokenReader, TokenError
+from .utils.dfa import TokenError, TokenReader
 from .utils.int_utils import greater_int, rnd, rnd_var
-from .utils.pascal import pascal_round, randomize, set_rand_seed, trunc
+from .utils.pascal import pascal_round, pascal_val, randomize, set_rand_seed, trunc
 
 T = TechnologyTypes
 
@@ -470,18 +470,18 @@ class ScenarioLoader:
         original, rather than failing the load."""
         if ".." not in text:
             try:
-                value = int(text)
+                value = pascal_val(text)
             except ValueError:
                 return 0, 0
             return value, value
 
         low_text, _, high_text = text.partition("..")
         try:
-            low = int(low_text)
+            low = pascal_val(low_text)
         except ValueError:
             return 0, 0
         try:
-            return low, int(high_text)
+            return low, pascal_val(high_text)
         except ValueError:
             return 0, 0
 
@@ -508,7 +508,7 @@ class ScenarioLoader:
 
         if header == "Z:":
             try:
-                zone_number = int(token[2:])
+                zone_number = pascal_val(token[2:])
             except ValueError:
                 self.error(f'ERROR: Illegal zone coordinate "{token}"')
                 return limbo()
@@ -544,7 +544,7 @@ class ScenarioLoader:
 
         if comma != -1:
             try:
-                x, y = int(token[:comma]), int(token[comma + 1 :])
+                x, y = pascal_val(token[:comma]), pascal_val(token[comma + 1 :])
             except ValueError:
                 self.error(f'ERROR: Illegal coordinate "{token}"')
                 return limbo()
@@ -1065,7 +1065,7 @@ class ScenarioLoader:
                 f"(found {raw_version!r})"
             )
             return
-        self.header.version = int(raw_version)
+        self.header.version = pascal_val(raw_version)
 
         h = self.header
         h.title = self.reader.next_token()

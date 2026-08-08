@@ -20,10 +20,8 @@ from textual.screen import Screen
 from textual.widgets import Footer, Header, Label, ListItem, ListView, Static
 
 from ..environ import GameEnvironment
-from ..galaxy import limbo
-from ..names import STATUS_HEADER, delete_name_command, status_report
-from ..primintr import get_coord, object_name
-from ..types import Empire, IDNumber
+from ..names import delete_name_command, status_report
+from ..types import Empire
 from .prologue import Attention, TextPrompt
 
 

@@ -3,8 +3,8 @@
 from pathlib import Path
 
 import pytest
-
 from conftest import blank_game
+
 from recreon.galaxy import XYCoord, nebula_of, srm_owner_of
 from recreon.main import DEFAULT_SCENARIO
 from recreon.newgame import ScenarioError, ScenarioLoader, Zone, load_scenario

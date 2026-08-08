@@ -4,7 +4,7 @@ import pytest
 from conftest import blank_game, place_world
 
 from recreon.attack import AttackResultTypes
-from recreon.datacnst import CargoSpace, MPower, TrnAdj, init_defense_record
+from recreon.datacnst import MPower, init_defense_record
 from recreon.galaxy import XYCoord
 from recreon.misc import fleet_cargo_space, military_power
 from recreon.npe import core
@@ -701,7 +701,7 @@ def test_designation_never_returns_a_construction_variant(game, persona):
 
 def test_redesignation_leaves_the_capital_alone(game, persona):
     rcap = core.create_region_array(game, Empire.Empire1)
-    ordinary = place_world(game, 10, XYCoord(4, 4), emp=Empire.Empire1, typ=WT.IndTyp)
+    place_world(game, 10, XYCoord(4, 4), emp=Empire.Empire1, typ=WT.IndTyp)
 
     core.redesignate_empire(game, Empire.Empire1, rcap, persona)
 

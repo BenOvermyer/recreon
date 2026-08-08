@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 
+from recreon.types import Empire
 from recreon.ui.app import RecreonApp
 from recreon.ui.newgame import NewGameScreen, SuggestionsScreen
-from recreon.types import Empire
 from recreon.utils.pascal import set_rand_seed
 
 SCENARIOS = Path(__file__).parent.parent / "src" / "recreon" / "data" / "scenarios"
