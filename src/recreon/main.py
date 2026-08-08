@@ -61,15 +61,22 @@ def update_turn(game: GameEnvironment) -> None:
     incoming empire's warp fleets. ``update_all_fleets`` decides which is
     which.
 
-    The asynchronous (play-by-mail) branch is not ported; ``AsyncTurns`` is
-    always False for now.
+    **``AsyncTurns`` selects a genuinely different branch**, not a variation on
+    this one -- see :func:`update_turn_async`. The prologue offers it as
+    ``Sequential play ON/OFF``, so both have to exist for that setting to mean
+    anything.
     """
     if empire_active(game, game.Player):
         erase_news(game, game.Player)
-        update_all_fleets(game, game.Player, next_empire(game, game.Player))
-        move_player_starbases(game, next_empire(game, game.Player))
+        if not game.AsyncTurns:
+            update_all_fleets(game, game.Player, next_empire(game, game.Player))
+            move_player_starbases(game, next_empire(game, game.Player))
 
     game.EmpiresToMove.discard(game.Player)
+
+    if game.AsyncTurns:
+        update_turn_async(game)
+        return
 
     while True:
         if game.Player == Empire.Empire8:
@@ -98,6 +105,59 @@ def update_turn(game: GameEnvironment) -> None:
         if not any(empire_active(game, emp) for emp in PLAYER_EMPIRES):
             # Nothing left to rotate to; bail rather than spin forever.
             return
+
+
+def update_turn_async(game: GameEnvironment) -> None:
+    """The play-by-mail half of ``UpdateTurn`` (ANACREON.PAS:259-289).
+
+    Asynchronous play is not "the same turns in a different order". Nobody
+    rotates: each human picks themselves out of ``EmpiresToMove`` from the
+    prologue, takes one turn, and the loop returns so the save can be passed
+    on. **The year only turns once the last human has moved** -- which is what
+    this does.
+
+    Two differences from the sequential branch are deliberate and must not be
+    smoothed over:
+
+    * Fleets move ``update_all_fleets(emp, emp)``, the same empire twice, where
+      the sequential branch passes outgoing and incoming. Those arguments pick
+      *which* fleets move -- warp and gate-sitting for the incoming empire,
+      jump and HK for the outgoing -- so passing one empire twice is how a
+      single asynchronous pass moves both sets.
+    * Every NPE acts, then every *active* empire's fleets move, then the
+      universe updates. The sequential branch interleaves those per empire.
+
+    And one difference is an original bug, reproduced: **the four scouting
+    calls take the departing human rather than the AI empire whose turn it
+    is** (issue #85). The block was copy-pasted from the sequential branch,
+    where ``Player`` was the loop variable, and only the last two lines were
+    updated. The effect is that no AI empire ever rebuilds its fog of war in a
+    play-by-mail game.
+    """
+    departing = game.Player
+
+    if game.EmpiresToMove:
+        # Someone still has a turn to take. The prologue asks who.
+        game.Player = Empire.Empire1
+        return
+
+    game.reset_empires_to_move()
+
+    for emp in PLAYER_EMPIRES:
+        if empire_active(game, emp) and not empire_player(game, emp):
+            # #85: `departing`, not `emp`. Faithful, and the reason AI empires
+            # are frozen at load-time vision in asynchronous games.
+            set_up_turn(game, departing)
+            implement_npe(game, emp)
+            erase_news(game, emp)
+
+    for emp in PLAYER_EMPIRES:
+        if empire_active(game, emp):
+            update_all_fleets(game, emp, emp)
+            move_player_starbases(game, emp)
+
+    update_universe(game)
+    game.Player = Empire.Empire1
 
 
 def play(game: GameEnvironment) -> list[str]:
