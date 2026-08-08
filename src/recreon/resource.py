@@ -1,6 +1,14 @@
 """Cargo capacity and combat casualties.
 
-Port of RESOURCE.PAS.
+Port of RESOURCE.PAS. **Unreachable in v2.0**: no unit in `ANACREON.PAS`'s
+`USES` graph names RESOURCE, so the shipped executable never linked it. The
+only caller `SubtractCasualties` ever had is `BOMBER.PAS`, which is itself
+outside the build. Combat applies its losses through `RestoreCombatant`
+instead, which reads DATACNST's tables rather than this unit's.
+
+Ported anyway, because it is a complete unit with its own transcribed tables
+and "we looked at it and it is dead" is worth more than a gap.
+`tests/test_dead_code.py` pins that nothing in the port imports it.
 
 Note this unit carries its *own* cargo-size and transport-capacity tables,
 which disagree with the CargoSpace/TrnAdj tables in DATACNST.PAS that
