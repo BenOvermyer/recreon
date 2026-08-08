@@ -928,6 +928,64 @@ def supply_link(game: GameEnvironment, base_id: IDNumber, temp_cargo: dict[T, in
         put_cargo(game, mine_id, cargo)
 
 
+def surplus_link(
+    game: GameEnvironment, base_id: IDNumber, temp_cargo: dict[T, int]
+) -> None:
+    """Push a complex's surplus back out to the same mines. ``SurplusLink``.
+
+    The other half of :func:`supply_link`, and its mirror image: the same eight
+    sectors, the same test for a friendly raw-material world, and the same
+    ``che..tri`` range -- which is **che, met, sup, tri**, so supplies travel
+    with the raw materials while troops and ambrosia do not. What differs
+    between the two is the direction and the trigger. Supply
+    pulls whenever a mine holds more than 250, leaving it a working reserve;
+    surplus pushes only what the complex holds **above ``MaxResources``**, which
+    is stock it could not keep anyway -- ``PutTotalCargo`` clamps to the same
+    ceiling on the next line, so anything above it is about to be discarded.
+
+    So this is not generosity, it is salvage: the complex empties its overflow
+    into the neighbours rather than letting it evaporate, and stops as soon as
+    they are full too. `LesserInt` takes whichever is smaller, the room left in
+    the mine or the overflow left in the complex.
+
+    **This draws nothing from the generator**, unlike `SupplyLink`'s
+    ``Rnd(200,250)`` -- so wiring it in leaves the LCG stream where it was.
+    """
+    from .datacnst import DirX, DirY
+    from .galaxy import XYCoord
+    from .types import Directions
+
+    base_xy = get_coord(game, base_id)
+    emp = get_status(game, base_id)
+
+    for direction in Directions:
+        if direction == Directions.NoDir:
+            continue
+        x = base_xy.x + DirX[direction]
+        y = base_xy.y + DirY[direction]
+        if not game.Galaxy.in_galaxy(x, y):
+            continue
+
+        xy = XYCoord(x, y)
+        mine_id = game.Galaxy.sector(xy).Obj
+        if (
+            mine_id.ObjTyp != ObjectTypes.Pln
+            or get_status(game, mine_id) != emp
+            or get_type(game, mine_id) not in _SUPPLY_LINK_TYPES
+        ):
+            continue
+
+        cargo = get_cargo(game, mine_id)
+        for raw in tech_range(T.che, T.tri):
+            if temp_cargo[raw] > MAX_RESOURCES:
+                transfer = lesser_int(
+                    MAX_RESOURCES - cargo[raw], temp_cargo[raw] - MAX_RESOURCES
+                )
+                cargo[raw] += transfer
+                temp_cargo[raw] -= transfer
+        put_cargo(game, mine_id, cargo)
+
+
 # --- The world update --------------------------------------------------------
 
 
@@ -1076,10 +1134,11 @@ def _update_starbase(game: GameEnvironment, world: IDNumber) -> None:
             temp_cargo,
             other_reports,
         )
-        # UPDATE.PAS:1527 calls SurplusLink(World,TempCargo) here, between
-        # Production and PutTotalCargo -- it returns an industrial complex's
-        # surplus to nearby raw-material worlds. Unported (see #3), so a
-        # complex currently hoards what it does not consume.
+        # Between Production and PutTotalCargo, exactly as UPDATE.PAS:1527 has
+        # it: the overflow has to be pushed out *before* the clamp below throws
+        # it away, and it has to be after Production or there would be no
+        # overflow to push.
+        surplus_link(game, world, temp_cargo)
         for c in CARGO_TYPES:
             base.Cargo[c] = thg_lmt(temp_cargo[c])
 

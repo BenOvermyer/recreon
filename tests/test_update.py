@@ -8,6 +8,7 @@ from conftest import blank_game, place_world
 from recreon.news import NewsTypes
 from recreon.primintr import change_rev_index, get_issp, set_issp
 from recreon.types import (
+    MAX_RESOURCES,
     Empire,
     IDNumber,
     IndusTypes,
@@ -473,3 +474,226 @@ def test_only_industrial_complexes_have_an_economy():
     update_world(game, outpost)
 
     assert base.Ships[T.fgt] == 0, "an outpost should build nothing"
+
+
+# --- The supply links --------------------------------------------------------
+#
+# `SupplyLink` and `SurplusLink` are a pair, and only make sense together: an
+# industrial complex pulls raw materials in from the mines around it, runs its
+# economy, and pushes back whatever it could not keep. Both sweep the same eight
+# sectors under the same test for a friendly raw-material world.
+
+
+def complex_with_a_mine(mine_typ=WorldTypes.MinTyp, mine_emp=Empire.Empire1):
+    """An industrial complex at 10,10 with one mine due north of it."""
+    from recreon.intrface import create_starbase
+
+    game = blank_game(size=20, empires=2)
+    base = IDNumber(ObjectTypes.Base, 1)
+    create_starbase(game, base, Empire.Empire1, XYCoord(10, 10), T.cmp)
+    mine = place_world(game, 1, XYCoord(10, 9), emp=mine_emp, typ=mine_typ)
+    return game, base, mine
+
+
+def test_supply_link_draws_a_mine_down_to_a_working_reserve():
+    from recreon.primintr import get_cargo, put_cargo
+    from recreon.types import cargo_array
+    from recreon.update import supply_link
+
+    game, base, mine = complex_with_a_mine()
+    cargo = cargo_array()
+    cargo[T.che] = 5000
+    put_cargo(game, mine, cargo)
+    temp = {k: 0 for k in T}
+
+    supply_link(game, base, temp)
+
+    # `Rnd(200,250)` is what stays behind, so the mine keeps a working stock
+    # and the complex takes the rest.
+    assert 200 <= get_cargo(game, mine)[T.che] <= 250
+    assert temp[T.che] == 5000 - get_cargo(game, mine)[T.che]
+
+
+def test_supply_link_leaves_a_mine_that_is_barely_stocked_alone():
+    from recreon.primintr import get_cargo, put_cargo
+    from recreon.types import cargo_array
+    from recreon.update import supply_link
+
+    game, base, mine = complex_with_a_mine()
+    cargo = cargo_array()
+    cargo[T.che] = 250
+    put_cargo(game, mine, cargo)
+    temp = {k: 0 for k in T}
+
+    supply_link(game, base, temp)
+
+    assert get_cargo(game, mine)[T.che] == 250
+    assert temp[T.che] == 0
+
+
+def test_surplus_link_pushes_back_only_what_is_over_the_ceiling():
+    """`MaxResources` is what a complex can hold, and `PutTotalCargo` clamps to
+    it on the next line -- so the overflow is stock that is about to evaporate.
+    This is salvage rather than generosity."""
+    from recreon.primintr import get_cargo, put_cargo
+    from recreon.types import cargo_array
+    from recreon.update import surplus_link
+
+    game, base, mine = complex_with_a_mine()
+    cargo = cargo_array()
+    cargo[T.che] = 9000
+    put_cargo(game, mine, cargo)
+    temp = {k: 0 for k in T}
+    temp[T.che] = 12000
+
+    surplus_link(game, base, temp)
+
+    # The mine had room for 999 and the complex had 2001 to spare, so the
+    # mine's headroom is what binds.
+    assert get_cargo(game, mine)[T.che] == MAX_RESOURCES
+    assert temp[T.che] == 12000 - 999
+
+
+def test_surplus_link_is_bounded_by_the_overflow_when_that_is_smaller():
+    from recreon.primintr import get_cargo, put_cargo
+    from recreon.types import cargo_array
+    from recreon.update import surplus_link
+
+    game, base, mine = complex_with_a_mine()
+    put_cargo(game, mine, cargo_array())
+    temp = {k: 0 for k in T}
+    temp[T.che] = MAX_RESOURCES + 40
+
+    surplus_link(game, base, temp)
+
+    assert get_cargo(game, mine)[T.che] == 40
+    assert temp[T.che] == MAX_RESOURCES
+
+
+def test_surplus_link_does_nothing_below_the_ceiling():
+    from recreon.primintr import get_cargo, put_cargo
+    from recreon.types import cargo_array
+    from recreon.update import surplus_link
+
+    game, base, mine = complex_with_a_mine()
+    cargo = cargo_array()
+    cargo[T.che] = 100
+    put_cargo(game, mine, cargo)
+    temp = {k: 0 for k in T}
+    temp[T.che] = MAX_RESOURCES
+
+    surplus_link(game, base, temp)
+
+    assert get_cargo(game, mine)[T.che] == 100
+    assert temp[T.che] == MAX_RESOURCES
+
+
+def test_the_links_carry_supplies_as_well_as_raw_materials():
+    """`FOR RawI := che TO tri` is che, met, **sup**, tri -- so supplies travel
+    with the ores, while troops, ninjas and ambrosia stay put. Checking the
+    endpoints of a Pascal subrange rather than trusting its name."""
+    from recreon.primintr import get_cargo, put_cargo
+    from recreon.types import cargo_array
+    from recreon.update import surplus_link
+
+    game, base, mine = complex_with_a_mine()
+    put_cargo(game, mine, cargo_array())
+    temp = {k: 0 for k in T}
+    for thing in (T.che, T.met, T.sup, T.tri, T.men, T.nnj, T.amb):
+        temp[thing] = MAX_RESOURCES + 500
+
+    surplus_link(game, base, temp)
+
+    moved = get_cargo(game, mine)
+    for thing in (T.che, T.met, T.sup, T.tri):
+        assert moved[thing] == 500, thing
+    for thing in (T.men, T.nnj, T.amb):
+        assert moved[thing] == 0, thing
+
+
+def test_neither_link_touches_another_empires_mine():
+    from recreon.primintr import get_cargo, put_cargo
+    from recreon.types import cargo_array
+    from recreon.update import supply_link, surplus_link
+
+    game, base, mine = complex_with_a_mine(mine_emp=Empire.Empire2)
+    cargo = cargo_array()
+    cargo[T.che] = 5000
+    put_cargo(game, mine, cargo)
+
+    temp = {k: 0 for k in T}
+    supply_link(game, base, temp)
+    assert temp[T.che] == 0, "a rival's mine is not a supply line"
+
+    temp[T.che] = MAX_RESOURCES + 500
+    surplus_link(game, base, temp)
+    assert get_cargo(game, mine)[T.che] == 5000
+    assert temp[T.che] == MAX_RESOURCES + 500
+
+
+def test_neither_link_touches_a_world_that_is_not_a_mine():
+    """The filter is `[AgrTyp,CheTyp,MinTyp,RawTyp,TriTyp]` -- a research world
+    or a shipyard next door is not part of the network."""
+    from recreon.primintr import get_cargo, put_cargo
+    from recreon.types import cargo_array
+    from recreon.update import surplus_link
+
+    game, base, mine = complex_with_a_mine(mine_typ=WorldTypes.RsrTyp)
+    put_cargo(game, mine, cargo_array())
+    temp = {k: 0 for k in T}
+    temp[T.che] = MAX_RESOURCES + 500
+
+    surplus_link(game, base, temp)
+
+    assert get_cargo(game, mine)[T.che] == 0
+    assert temp[T.che] == MAX_RESOURCES + 500
+
+
+def test_surplus_link_spends_no_randomness():
+    """`SupplyLink` draws `Rnd(200,250)` per mine and this draws nothing, so
+    wiring it in leaves the generator stream where it was."""
+    from recreon.primintr import put_cargo
+    from recreon.types import cargo_array
+    from recreon.update import surplus_link
+    from recreon.utils import pascal
+
+    game, base, mine = complex_with_a_mine()
+    put_cargo(game, mine, cargo_array())
+    temp = {k: 0 for k in T}
+    temp[T.che] = MAX_RESOURCES + 500
+
+    before = pascal._rand_seed
+    surplus_link(game, base, temp)
+
+    assert pascal._rand_seed == before
+
+
+def test_a_complex_hands_its_overflow_to_the_mine_over_a_full_year():
+    """End to end through `update_world`, which is where the call actually
+    sits -- between Production and the clamp that would otherwise discard it."""
+    from recreon.primintr import get_cargo, put_cargo
+    from recreon.types import cargo_array
+    from recreon.update import update_world
+
+    game, base, mine = complex_with_a_mine()
+    put_cargo(game, mine, cargo_array())
+
+    record = game.Universe.Starbase[1]
+    record.Pop = 900
+    record.Eff = 90
+    record.Tech = TechLevel.WrpTchLvl
+    for ind in (
+        IndusTypes.CheInd,
+        IndusTypes.MinInd,
+        IndusTypes.SupInd,
+        IndusTypes.TriInd,
+    ):
+        record.Indus[ind] = 200
+    for thing in (T.che, T.met, T.sup, T.tri):
+        record.Cargo[thing] = MAX_RESOURCES
+
+    update_world(game, base)
+
+    # Whatever the complex produced on top of a full hold had to go somewhere,
+    # and the mine next door is where.
+    assert sum(get_cargo(game, mine).values()) > 0
