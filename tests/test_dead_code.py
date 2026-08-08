@@ -153,3 +153,69 @@ def test_every_dead_module_says_so_in_its_first_line():
     for module in PORTED_BUT_DEAD:
         doc = ast.get_docstring(ast.parse((SRC / f"{module}.py").read_text())) or ""
         assert "Unreachable in v2.0" in doc, module
+
+
+# --- The other half: everything in the build is accounted for ----------------
+
+#: Units in the build with no Python module, and why. Textual replaces the
+#: whole UI layer, and two units are DOS runtime with no counterpart at all.
+REPLACED_UNITS = {
+    "ANACREON": "the program itself; `main.py` is its turn loop",
+    "DOS2": "DOS runtime",
+    "EDIT": "Textual Input/TextArea",
+    "EIO": "Textual widgets",
+    "MAPWIND": "ui/map_view.py",
+    "MENU": "Textual ListView",
+    "OVERINIT": "the overlay manager -- a DOS memory artifact",
+    "PULLDOWN": "Textual ListView",
+    "STRG": "Python str",
+    "SYSTEM2": "DOS runtime",
+    "TEXTSTRC": "Python list[str]",
+    "TMA": "the logo animation, written straight to video memory",
+    "WND": "Textual Screen",
+    "WNDTYPES": "Textual Screen",
+    "DISPLAY": "display.py carries its two parsers; the rest is video",
+}
+
+#: Units whose module name differs from the unit name, per ARCHITECTURE.md.
+UNIT_ALIASES = {
+    "DFA": "utils/dfa",
+    "INT": "utils/int_utils",
+    "REAL1": "utils/real1",
+    "QSORT": "utils/sort",
+    "NPE": "npe/dispatch",
+    "NPE00": "npe/common",
+    "NPE01": "npe/pirate",
+    "NPE02": "npe/kingdom",
+    "NPE03": "npe/guardian",
+    "NPE04": "npe/berserker",
+    "NPEINTR": "npe/core",
+    "NPETYPES": "npe/types",
+}
+
+
+def test_every_unit_in_the_build_is_accounted_for():
+    """Either ported to a module, or replaced with a reason on the record.
+
+    This is the claim "the port is complete" made checkable. Porting
+    convention 1 is one module per unit, so a unit in the build with neither a
+    module nor an entry in `REPLACED_UNITS` is something that was missed.
+    """
+    modules = {
+        p.relative_to(SRC).with_suffix("").as_posix() for p in SRC.rglob("*.py")
+    }
+    available = {p.stem.upper() for p in ORIGINAL.glob("*.PAS")}
+
+    unaccounted = []
+    for unit in sorted(_reachable_units() & available):
+        name = UNIT_ALIASES.get(unit, unit.lower())
+        if name not in modules and unit not in REPLACED_UNITS:
+            unaccounted.append(unit)
+
+    assert unaccounted == []
+
+
+def test_the_replaced_units_are_really_in_the_build():
+    """A stale entry in `REPLACED_UNITS` would hide a genuinely missing unit
+    by excusing a name that no longer needs excusing."""
+    assert set(REPLACED_UNITS) <= _reachable_units()

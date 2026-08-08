@@ -1205,9 +1205,37 @@ a feature decision, not a porting task.
 
 ---
 
-## Phase 9: Testing & Validation
+## Phase 9: Testing & Validation — **done**
 
 **Duration**: Weeks 23-26
+
+What this phase actually produced, since it diverged from the sketch below.
+The sketch asks for coverage; the phase's own issue argued that a systematic
+sweep for Python-is-more-permissive divergences would be worth more than
+coverage metrics, because three of the six known instances passed every unit
+test at the time. That turned out right.
+
+- **The permissiveness sweep.** `round()` was already routed; of 53 floor
+  divisions only two can take a negative dividend and both are guarded; nine
+  parse sites that port a Pascal `Val` were converted to `pascal_val`, the
+  most consequential being `dfa.next_integer` and `primintr.name2fleet`.
+- **Ruff configured**, deliberately narrow (`F` and `I`). It found
+  `get_empire_status` **defined twice** in `intrface.py` on its first run.
+- **Table verification widened.** 17 balance tables live outside DATACNST --
+  ATTACK.PAS alone carries the whole of combat's tuning -- and none were
+  checked. All 17 match.
+- **Range invariants.** Four shipped scenarios played 150-200 turns each with
+  every record swept every turn against the ranges Turbo Pascal could hold.
+  Nothing violates them.
+- **Dead code settled** by walking `USES` from ANACREON.PAS: 15 of the 77
+  units are not in the v2.0 build at all.
+
+**And one lesson worth carrying.** The range invariants did not catch
+`UpdateEmpire` being unported, because a tech level that never *rises* never
+leaves its valid range. An invariant that bounds values cannot see a value
+that should have moved and did not. Coverage of that shape needs a different
+instrument -- which is what `tests/test_dead_code.py`'s unit-accounting test
+now provides at unit granularity.
 
 ### 9.1 Unit tests
 
