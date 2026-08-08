@@ -16,6 +16,7 @@ from recreon.attack import (
     GDMLaunch,
     GroupRecord,
     GroupStatus,
+    HoloResultTypes,
     advance_groups,
     all_groups_destroyed,
     attack_array,
@@ -34,6 +35,7 @@ from recreon.attack import (
     group_array,
     group_attack,
     holocaust_effectiveness,
+    holocaust_world,
     lam_attack,
     resolve_attack,
     restore_combatant,
@@ -60,6 +62,7 @@ from recreon.primintr import (
     get_rev_index,
     get_ships,
     get_status,
+    get_tech,
     put_cargo,
     put_defns,
     put_ships,
@@ -1070,3 +1073,96 @@ def test_pascal_div_truncates_toward_zero():
     assert -5001 // 1000 == -6
     assert pascal_div(5001, 1000) == 5
     assert pascal_div(-5000, 1000) == -5
+
+
+# --- HolocaustWorld's three kept defects --------------------------------------
+#
+# `HolocaustWorld` and `HolocaustEffectiveness` are unreachable in v2.0 -- their
+# only caller, `HolocaustCommand`, sits inside MSCCOMM.PAS's commented block --
+# but they are part of ATTACK.PAS's interface and are ported with three original
+# defects intact. Issue #6 asks for those to be confirmed as *intended*
+# faithfulness rather than oversight before 1.0, which is what these do.
+
+
+def test_a_pre_warp_world_always_capitulates():
+    """The first of the three: `WorldSurrenders` rolls `Random(1)`, which is
+    identically 0, so the comparison against a squared probability always
+    holds. Pre-warp worlds surrender by an explicit branch; the band above them
+    surrenders because of the quirk. Both are the original."""
+    from recreon.attack import _world_surrenders
+
+    set_rand_seed(4021)
+    game = blank_game(empires=1)
+    target = place_world(game, 2, XYCoord(9, 9), tech=TechLevel.PreTchLvl)
+
+    assert _world_surrenders(game, 100, target)
+
+
+def test_every_world_in_the_middle_band_capitulates_too():
+    """`Random(1)` is always 0 and the chance is never negative, so `0 <= p`
+    holds for every world between pre-warp and star-tech -- however small the
+    strike and however large the population. That is the defect: the roll
+    reads as a probability and is a certainty."""
+    from recreon.attack import _world_surrenders
+
+    set_rand_seed(4021)
+    game = blank_game(empires=1)
+    target = place_world(game, 2, XYCoord(9, 9), tech=TechLevel.WrpTchLvl, pop=9000)
+
+    # Effectiveness 1 out of 100, on a large world, halves an already tiny
+    # chance -- and it still surrenders.
+    assert _world_surrenders(game, 1, target)
+
+
+def test_a_star_tech_world_never_capitulates():
+    """The other explicit branch, and the only thing that stops the quirk from
+    applying to the whole galaxy."""
+    from recreon.attack import _world_surrenders
+
+    set_rand_seed(4021)
+    game = blank_game(empires=1)
+    target = place_world(game, 2, XYCoord(9, 9), tech=TechLevel.GteTchLvl)
+
+    assert not _world_surrenders(game, 100, target)
+
+
+def test_a_sizeable_world_always_reverts_to_pre_technology():
+    """The second of the three: `RevertTechnology` is handed `Deaths` where an
+    `Index` (0..100) belongs, so the roll is `Rnd(1,100) <= Deaths DIV 2`.
+    Deaths run to hundreds on any populated world, so the comparison is a
+    foregone conclusion and the world always goes pre-tech."""
+    set_rand_seed(4021)
+    game = blank_game(empires=1)
+    place_world(game, 1, XYCoord(2, 2), emp=Empire.Empire1)
+    target = place_world(game, 2, XYCoord(9, 9), tech=TechLevel.GteTchLvl, pop=9000)
+    flt = _fleet_at(game, Empire.Empire1, 1, XYCoord(9, 9), {T.ssp: 100})
+
+    _, _, _, deaths, reverted = holocaust_world(
+        game, Empire.Empire1, 100, target, flt
+    )
+
+    assert deaths > 200, "a populated world loses hundreds"
+    assert reverted
+    assert get_tech(game, target) == TechLevel.PreTchLvl
+
+
+def test_a_surrender_applies_an_unrolled_unrest_figure():
+    """The third: on the surrender path the original never assigns `EnemyRev`,
+    then applies it to the losing empire's total unrest anyway. Zero is the
+    only defined reading of what a Turbo Pascal stack would have held, so the
+    port applies zero -- and the point of the test is that it applies
+    *something* rather than skipping the call."""
+    set_rand_seed(4021)
+    game = blank_game(empires=1)
+    place_world(game, 1, XYCoord(2, 2), emp=Empire.Empire1)
+    target = place_world(game, 2, XYCoord(9, 9), tech=TechLevel.PreTchLvl, pop=100)
+    flt = _fleet_at(game, Empire.Empire1, 1, XYCoord(9, 9), {T.ssp: 100})
+
+    result, _, _, deaths, reverted = holocaust_world(
+        game, Empire.Empire1, 100, target, flt
+    )
+
+    assert result == HoloResultTypes.WorldSurrendersHRT
+    assert deaths == 0, "a world that gives in is not bombarded"
+    assert not reverted
+    assert get_status(game, target) == Empire.Empire1
