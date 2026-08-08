@@ -42,6 +42,7 @@ from ..fltcomm import (
 )
 from ..galaxy import XYCoord
 from ..misc import fleet_cargo_space
+from ..playturn import Command, ParameterSession, trap_command_errors
 from ..primintr import (
     absolute_x,
     absolute_y,
@@ -51,7 +52,15 @@ from ..primintr import (
     get_status,
     object_name,
 )
-from ..types import CARGO_TYPES, SHIP_TYPES, Empire, IDNumber, TechnologyTypes
+from ..types import (
+    CARGO_TYPES,
+    SHIP_TYPES,
+    Empire,
+    IDNumber,
+    TechnologyTypes,
+    cargo_array,
+    ship_array,
+)
 from .prologue import Attention, ChooseFrom, TextPrompt
 
 T = TechnologyTypes
@@ -261,6 +270,7 @@ class FleetScreen(Screen[None]):
 
     BINDINGS = [
         Binding("escape", "close", "Close"),
+        Binding("l", "deploy", "Deploy"),
         Binding("d", "destination", "Destination"),
         Binding("t", "transfer", "Transfer"),
         Binding("a", "abort", "Abort/join"),
@@ -340,6 +350,79 @@ class FleetScreen(Screen[None]):
         self._rebuild()
 
     # --- Commands -------------------------------------------------------------
+
+    def action_deploy(self) -> None:
+        """Deploy a new fleet -- the one command here that starts without one.
+
+        This is the only screen in the port driven by PLAYTURN.PAS's parameter
+        table rather than by parameters the screen picks for itself, and
+        deliberately so: ``FLaunchCom`` is the table's richest row -- three
+        parameters, the only ``IDParm2`` in the game -- and driving it from
+        :class:`~recreon.playturn.ParameterSession` is what makes the table
+        load-bearing instead of decorative. The player sees the original's own
+        questions, in its order, with its error messages.
+        """
+        refusal = trap_command_errors(self.game, self.player, Command.FLaunchCom)
+        if refusal:
+            self.app.push_screen(Attention(refusal))
+            return
+
+        session = ParameterSession(self.game, self.player, Command.FLaunchCom)
+
+        def ask(detail: str = "") -> None:
+            def answered(text: str | None) -> None:
+                # Escape gives None and an empty field gives ""; the original
+                # makes no distinction -- `InputParameter` maps Escape to '' --
+                # and either abandons the command.
+                session.answer(text or "")
+                if session.cancelled:
+                    return
+                if session.message:
+                    ask(session.message)
+                elif session.done:
+                    self._distribute(session.result)
+                else:
+                    ask()
+
+            self.app.push_screen(
+                TextPrompt(session.question(), detail=detail), answered
+            )
+
+        ask()
+
+    def _distribute(self, result) -> None:
+        """The distribution grid, with the fleet side empty. ``FillChar(FltSh,0)``."""
+        launch_pt = result.Obj2
+        ground_name = object_name(self.game, self.player, launch_pt, True)
+
+        def split(split_result) -> None:
+            if split_result is None:
+                return
+            self._report(
+                launch_fleet_command(
+                    self.game,
+                    self.player,
+                    result.NewName,
+                    launch_pt,
+                    split_result["fleet_ships"],
+                    split_result["fleet_cargo"],
+                    result.Coord,
+                )[1]
+            )
+
+        self.app.push_screen(
+            DistributionScreen(
+                self.game,
+                self.player,
+                f"{result.NewName} ready to be deployed from {ground_name}.",
+                launch_pt,
+                ship_array(),
+                cargo_array(),
+                get_ships(self.game, launch_pt),
+                get_cargo(self.game, launch_pt),
+            ),
+            split,
+        )
 
     def action_destination(self) -> None:
         flt = self.selected
