@@ -28,6 +28,7 @@ src/recreon/
 ├── msccomm.py           # Defense settings, self-destruct (MSCCOMM.PAS)
 ├── fltcomm.py           # Fleet commands (FLTCOMM.PAS)
 ├── clscomm.py           # World close-up, production forecast (CLSCOMM.PAS)
+├── scena.py             # Scenario background text (SCENA.PAS)
 ├── playturn.py          # Commands, menus, parameter table (PLAYTURN.PAS)
 ├── display.py           # The two command-line parsers (DISPLAY.PAS)
 ├── attcomm.py           # Target selection, auto-attack, the battle loop (ATTCOMM.PAS)
@@ -512,6 +513,36 @@ looking like transcription slips.
 
 `UNREACHABLE` names the three commands inside the `(* ARTIFACTS ... *)` block;
 `NOT_PORTABLE` names the DOS-only ones.
+
+### scena.py
+SCENA.PAS: the authored prose a scenario can attach to an object, and the only
+part of the scenario format that is read *during* a game rather than at load.
+
+**Functions:** `display_background()` (the entry point both callers use),
+`display_text()`, `parse_line()`, `satisfies_conditions()`,
+`build_empire_set()`, `interpret_set()`, `id_match()`, `split_line()`,
+`find_line()`, `scenario_path()`, and `load_scena_text()`.
+
+An index entry is `object conditions… textnumber`, e.g. `2:3 A:2 8`. The
+conditions are what let one index serve two screens: `E:` matches only a
+close-up, `A:` only a conquest, `O` only a close-up of a world the viewer owns,
+and all of them must hold. Empire ordinals are `Empire`'s own, so Indep is 8.
+
+Four things are behaviour rather than detail. **The first matching entry wins**
+(`EASTWEST.SCN` lists the same worlds under two different owners). **A conquest
+is evaluated before ownership changes**, since `CleanUp` runs `EnemyConquered`
+before `ResolveAttack`. **The close-up gates on `Scouted`**, not merely known.
+And **authored text spends no randomness** — `EnemyConquered`'s `Rnd(1,3)` sits
+inside its `IF NOT Message`, so a scenario that supplies text leaves the
+generator untouched.
+
+`display_background` returns the lines or `None`; the original's `x, y, Col`
+and its `WriteString` loop are video, and the callers place the text.
+
+Two original bugs: #77 (`ParseLine` loops forever on an unmatched bracket —
+**the one place in this unit the port deviates**, since a hang cannot be
+distinguished from a crash) and #78 (`LoadScenaText` closes a file it never
+opened; latent, its only caller being the dead artifact VM).
 
 ### display.py
 DISPLAY.PAS, of which only two routines survive the move: `interpret_xy()` and
