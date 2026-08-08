@@ -18,72 +18,22 @@ change game balance without failing anything else.
 from __future__ import annotations
 
 import re
-from pathlib import Path
 
 import pytest
+from pascal_source import PascalUnit, flatten
 
 from recreon import datacnst
 
-SOURCE = Path(__file__).parent.parent / "original" / "DATACNST.PAS"
+#: The extraction machinery lives in `tests/pascal_source.py` so that
+#: `test_pascal_tables.py` can use it on the units that carry their own
+#: balance tables -- ATTACK, UPDATE, NPEINTR. One implementation, proven by
+#: this file first.
+UNIT = PascalUnit("DATACNST")
+PASCAL = UNIT.text
 
-#: The Pascal is CP437; only the glyph tables use the high half.
-PASCAL = SOURCE.read_text(encoding="latin-1")
-
-
-def strip_comments(text: str) -> str:
-    text = re.sub(r"\{[^}]*\}", " ", text)
-    return re.sub(r"\(\*.*?\*\)", " ", text, flags=re.S)
-
-
-def literal(name: str) -> str:
-    """The right-hand side of one `Name: ARRAY ... = ...` declaration.
-
-    Parentheses are balanced rather than scanning for `;`, because several
-    blocks close with `);` followed by a trailing comment rather than at the
-    end of a line -- `ThgAdj` and `ConsCargoNeeded` both do, and a naive scan
-    swallows the table after them.
-    """
-    match = re.search(
-        r"^[ \t]*" + name + r"\s*:\s*(?:ARRAY|array)\b[^=]*=", PASCAL, flags=re.M
-    )
-    assert match, f"{name} is not declared in DATACNST.PAS"
-    rest = strip_comments(PASCAL[match.end() :])
-
-    if rest.lstrip().startswith("'"):
-        # A packed literal: one string, one character per key. TypeStr et al.
-        return rest[: rest.index(";")]
-
-    start = rest.index("(")
-    depth = 0
-    for i in range(start, len(rest)):
-        if rest[i] == "(":
-            depth += 1
-        elif rest[i] == ")":
-            depth -= 1
-            if depth == 0:
-                return rest[start : i + 1]
-    raise AssertionError(f"unbalanced parentheses in {name}")
-
-
-def pascal_numbers(name: str) -> list[float]:
-    return [float(n) for n in re.findall(r"-?\d+\.?\d*", literal(name))]
-
-
-def pascal_strings(name: str) -> list[str]:
-    return [s.replace("''", "'") for s in re.findall(r"'((?:[^']|'')*)'", literal(name))]
-
-
-def flatten(value) -> list[float]:
-    """Every number in a ported table, in key order."""
-    if isinstance(value, dict):
-        return [n for key in value for n in flatten(value[key])]
-    if isinstance(value, (list, tuple)):
-        return [n for item in value for n in flatten(item)]
-    if isinstance(value, bool):
-        return [float(value)]
-    if isinstance(value, (int, float)):
-        return [float(value)]
-    return []
+literal = UNIT.literal
+pascal_numbers = UNIT.numbers
+pascal_strings = UNIT.strings
 
 
 #: Every numeric table in DATACNST.PAS. Listed rather than discovered so that
