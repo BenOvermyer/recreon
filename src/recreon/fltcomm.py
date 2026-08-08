@@ -13,8 +13,6 @@ cost. Drawing all of it is :mod:`recreon.ui.fleet`.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 from .datacnst import FUEL_PER_TON
 from .environ import GameEnvironment
 from .fleet import (
@@ -28,6 +26,7 @@ from .fleet import (
 from .galaxy import Location, XYCoord, limbo
 from .intrface import balance_fleet
 from .misc import fleet_cargo_space, fuel_capacity, no_ships, same_id
+from .news import NewsTypes, add_news
 from .orders import (
     BAD_COMMAND_OER,
     BAD_DEST_OER,
@@ -48,7 +47,6 @@ from .primintr import (
     add_name,
     empire_name,
     enemy_mine,
-    get_cargo,
     get_coord,
     get_fleet_fuel,
     get_fleets,
@@ -64,9 +62,7 @@ from .primintr import (
     put_mine,
     scouted,
 )
-from .news import NewsTypes, add_news
 from .types import (
-    MAX_NO_OF_FLEETS,
     MAX_RESOURCES,
     NO_OF_PROBES_PER_EMPIRE,
     SHIP_TYPES,

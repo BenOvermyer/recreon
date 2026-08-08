@@ -76,9 +76,9 @@ from ..utils.pascal import pascal_random_real, pascal_round
 from .core import (
     MAX_NO_OF_REGIONS,
     create_region_array,
-    fleet_entry,
     deploy_battle_fleet,
     enforce_npe_data_links,
+    fleet_entry,
     implement_jump_attack_msn,
     plunder_world,
     set_empire_defenses,

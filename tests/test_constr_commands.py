@@ -25,7 +25,7 @@ from recreon.constr import (
     warp_link_freq_list,
 )
 from recreon.datacnst import ConsCargoNeeded, TechDev, YearsToBuild
-from recreon.galaxy import Location, XYCoord, limbo
+from recreon.galaxy import Location, XYCoord
 from recreon.intrface import create_stargate, next_stargate_slot
 from recreon.primintr import (
     add_name,
@@ -245,7 +245,6 @@ def test_cargo_on_a_fleet_over_the_site_counts_against_the_shortfall(game):
 
     flt = get_next_fleet(game, PLAYER)
     move_fleet(game, flt, xy)
-    cargo = {material: 0 for material in CONSTR_MATERIALS}
     put_cargo(game, flt, {**game.Universe.Fleet[flt.Index].Cargo, T.met: 1000})
 
     (row,) = constr_status_rows(game, PLAYER)

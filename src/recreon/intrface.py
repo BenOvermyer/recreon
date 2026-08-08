@@ -11,28 +11,28 @@ import math
 from typing import TYPE_CHECKING
 
 from .datacnst import (
+    AMBROSIA_ADJ,
     DEFAULT_ISSP,
-    NORMAL_ISSP,
-    ClassStr,
-    IndusNames,
-    TechStr,
-    TypeStr,
-    TechN,
-    TechnologyName,
-    ThingNames,
     ISSP,
     K4,
     K6,
+    NORMAL_ISSP,
     SAFETY_ADJ,
     SUPPLIES_PER_BILLION,
-    AMBROSIA_ADJ,
     CargoSpace,
     ClassIndAdj,
+    ClassStr,
     FltMovementRate,
+    IndusNames,
     PrincipalIndustry,
     TechAdj2,
+    TechN,
+    TechnologyName,
+    TechStr,
     ThgAdj,
+    ThingNames,
     TypeData,
+    TypeStr,
     YearsToBuild,
 )
 from .galaxy import Location, XYCoord
@@ -53,22 +53,22 @@ from .primintr import (
 )
 from .types import (
     MAX_NO_OF_CONSTR_SITES,
-    TechLevel,
     MAX_NO_OF_FLEETS,
     MAX_NO_OF_STARBASES,
     MAX_NO_OF_STARGATES,
     SHIP_TYPES,
     Empire,
-    IndusTypes,
     IDNumber,
+    IndusTypes,
     ObjectTypes,
     SpecialConditions,
+    TechLevel,
     TechnologyTypes,
-    tech_range,
     WorldTypes,
     empty_quadrant,
     indus_range,
     ship_array,
+    tech_range,
 )
 from .utils.pascal import pascal_round
 
@@ -1277,60 +1277,6 @@ def get_military_status(
     return line
 
 
-def get_empire_status(
-    game: GameEnvironment, emp: Empire
-) -> tuple[int, int, int, dict[TechnologyTypes, int]]:
-    """An empire's vital statistics. Port of ``GetEmpireStatus``.
-
-    Returns worlds held, total population, shipyard industry in tenths, and
-    every hull the empire owns anywhere.
-
-    Two things are easy to get wrong. **Starbases count as worlds** and add
-    their population to the total, but only a *compound* base contributes
-    shipyard capacity -- a command base or fortress builds nothing. And the
-    ship total sweeps fleets as well as worlds, so a fleet in transit is still
-    counted; it is a census of the empire, not of what is sitting still.
-    """
-    planets = 0
-    total_pop = 0
-    ship_ind = 0.0
-    total_ships = ship_array()
-
-    for i in range(1, game.NoOfPlanets + 1):
-        if i not in game.GlobalSets.SetOfPlanetsOf[emp]:
-            continue
-        planet = game.Universe.Planet[i]
-        planets += 1
-        total_pop += planet.Pop
-        ip = (TechAdj2[planet.Tech] / 100) * ((planet.Eff + 250) / 100) / K6
-        for ind in SHIPYARD_INDUSTRIES:
-            ship_ind += ip * (planet.Indus[ind] + K4) ** 2
-        for thing in SHIP_TYPES:
-            total_ships[thing] += planet.Ships[thing]
-
-    for i in range(1, MAX_NO_OF_STARBASES + 1):
-        if i not in game.GlobalSets.SetOfStarbasesOf[emp]:
-            continue
-        base = game.Universe.Starbase[i]
-        planets += 1
-        total_pop += base.Pop
-        for thing in SHIP_TYPES:
-            total_ships[thing] += base.Ships[thing]
-        if base.STyp == TechnologyTypes.cmp:
-            ip = (TechAdj2[base.Tech] / 100) * ((base.Eff + 250) / 100) / K6
-            for ind in SHIPYARD_INDUSTRIES:
-                ship_ind += ip * (base.Indus[ind] + K4) ** 2
-
-    active = game.GlobalSets.SetOfFleetsOf[emp] & game.GlobalSets.SetOfActiveFleets
-    for i in range(1, MAX_NO_OF_FLEETS + 1):
-        if i in active:
-            fleet = game.Universe.Fleet[i]
-            for thing in SHIP_TYPES:
-                total_ships[thing] += fleet.Ships[thing]
-
-    return planets, total_pop, pascal_round(ship_ind), total_ships
-
-
 def get_empire_status_line(
     game: GameEnvironment, emp: Empire, full: bool
 ) -> str:
@@ -1388,7 +1334,6 @@ def get_fleet_position_status(
         empire_name,
         get_coord_name,
         get_name,
-        get_status,
         object_name,
         scouted,
     )
@@ -1532,16 +1477,19 @@ def get_nearest_worlds(
 def get_empire_status(
     game: GameEnvironment, emp: Empire
 ) -> tuple[int, int, int, dict[TechnologyTypes, int]]:
-    """Vital statistics for an empire.
+    """Vital statistics for an empire. Port of ``GetEmpireStatus``.
 
     Returns ``(planets, total_pop, ship_ind, total_ships)`` -- world count,
     population in tens of millions, shipyard industry in tenths, and every
     ship the empire owns wherever it is standing.
 
-    Starbases count toward ``planets`` alongside worlds, so the "number of
-    worlds" this reports is really "number of holdings". Only a ``cmp``
-    industrial complex contributes shipyard industry; other base types are
-    counted as holdings but build nothing.
+    Two things are easy to get wrong. **Starbases count toward ``planets``**
+    alongside worlds and add their population to the total, so the "number of
+    worlds" this reports is really "number of holdings" -- but only a ``cmp``
+    industrial complex contributes shipyard industry, since a command base or
+    fortress builds nothing. And the ship total **sweeps fleets as well as
+    worlds**, so a fleet in transit is still counted: this is a census of the
+    empire, not of what is sitting still.
     """
     planets = 0
     total_pop = 0

@@ -26,7 +26,7 @@ from .primintr import (
     set_terraform_target,
     set_type,
 )
-from .types import IndusTypes, IDNumber, TechLevel, WorldClass, WorldTypes
+from .types import IDNumber, IndusTypes, TechLevel, WorldClass, WorldTypes
 from .utils.int_utils import rnd
 from .utils.pascal import pascal_random_real, pascal_round
 

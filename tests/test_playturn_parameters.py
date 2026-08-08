@@ -10,6 +10,8 @@ so that "fixing" one shows up as a failure rather than as a silent divergence.
 import pytest
 
 from recreon.display import interpret_obj, interpret_xy
+from recreon.fleet import get_next_fleet, move_fleet
+from recreon.galaxy import Location, XYCoord
 from recreon.main import new_game
 from recreon.playturn import (
     ERROR_TEXT,
@@ -19,9 +21,9 @@ from recreon.playturn import (
     UNCHECKED_ERRORS,
     Command,
     Errors,
+    Parameters,
     ParameterSession,
     ParameterTypes,
-    Parameters,
     error_message,
     trap_command_errors,
     validate_parameter,
@@ -34,8 +36,6 @@ from recreon.primintr import (
     put_defns,
     set_status,
 )
-from recreon.fleet import get_next_fleet, move_fleet
-from recreon.galaxy import Location, XYCoord
 from recreon.types import (
     NO_OF_FLEETS_PER_EMPIRE,
     Empire,

@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 
 from .datacnst import ObjName
 from .primintr import get_coord_name, get_fleet_name
-from .types import Empire, IDNumber, ObjectTypes
+from .types import Empire, ObjectTypes
 
 if TYPE_CHECKING:
     from .datastrc import NameRecord

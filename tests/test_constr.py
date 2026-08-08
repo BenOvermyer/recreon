@@ -1,6 +1,7 @@
 """Milestone 6: construction sites consume material and finish into real objects."""
 
 from conftest import blank_game, place_world
+
 from recreon.datacnst import ConsCargoNeeded, YearsToBuild
 from recreon.fleet import deploy_fleet, move_fleet
 from recreon.galaxy import XYCoord, limbo

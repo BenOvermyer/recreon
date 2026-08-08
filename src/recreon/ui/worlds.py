@@ -17,7 +17,7 @@ from textual.containers import VerticalScroll
 from textual.screen import Screen
 from textual.widgets import Footer, Header, Label, ListItem, ListView, Static, TextArea
 
-from ..datacnst import ThingNames, TypeName
+from ..datacnst import TechnologyName, ThingNames, TypeName
 from ..designcom import (
     ClassN,
     designate_command,
@@ -39,10 +39,9 @@ from ..designcom import (
     terraform_options,
     tradeable_technologies,
 )
-from ..datacnst import TechnologyName
 from ..environ import GameEnvironment
 from ..primintr import empire_name, get_defns, my_lord, object_name
-from ..types import Empire, IDNumber, IndusTypes, ObjectTypes, TechnologyTypes
+from ..types import Empire, IDNumber, IndusTypes, TechnologyTypes
 from .prologue import Attention, ChooseFrom, TextPrompt
 
 T = TechnologyTypes

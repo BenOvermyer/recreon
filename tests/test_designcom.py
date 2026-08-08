@@ -10,7 +10,6 @@ from conftest import blank_game, place_world
 from recreon.datacnst import TechDev, TerraformPotentialClasses
 from recreon.designcom import (
     ISSP_INDUSTRIES,
-    LAM_RANGE,
     UNDESIGNATABLE,
     ClassN,
     designate_command,
@@ -40,7 +39,6 @@ from recreon.primintr import (
     get_defns,
     get_issp,
     get_status,
-    get_tech,
     get_type,
     put_defns,
     put_ships,

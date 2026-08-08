@@ -24,7 +24,6 @@ from .primintr import (
     get_cargo,
     get_class,
     get_defns,
-    get_efficiency,
     get_name,
     get_population,
     get_ships_known,
@@ -35,7 +34,6 @@ from .primintr import (
     scouted,
 )
 from .types import (
-    MAX_NO_OF_STARBASES,
     DEFNS_TYPES,
     SHIP_TYPES,
     Empire,

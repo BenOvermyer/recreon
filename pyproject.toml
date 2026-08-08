@@ -19,6 +19,26 @@ recreon = "recreon.main:main"
 testpaths = ["tests"]
 asyncio_mode = "auto"
 
+[tool.ruff]
+line-length = 90
+target-version = "py312"
+
+[tool.ruff.lint]
+# `F` is Pyflakes: unused imports, undefined names, redefinitions. That last
+# one is why this is configured at all -- it found `get_empire_status` defined
+# twice in `intrface.py`, where the second silently shadowed the first.
+#
+# Deliberately narrow. This is a port, and most style rules would argue with
+# decisions the Pascal makes for us: `E741` would reject the original's
+# single-letter loop variables, `N` would reject the Pascal field names that
+# porting convention 3 requires, and `PLR2004` would want every transcribed
+# balance constant named. The point here is to catch real defects, not to
+# relitigate the porting conventions.
+select = ["F", "I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["recreon"]
+
 [build-system]
 requires = ["uv_build>=0.11.28,<0.12.0"]
 build-backend = "uv_build"

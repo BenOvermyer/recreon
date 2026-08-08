@@ -1,12 +1,14 @@
 """Milestone 2: the map renders and turns advance from the UI."""
 
 
-from recreon.galaxy import XYCoord
 from conftest import blank_game
+
+from recreon.galaxy import XYCoord
 from recreon.primintr import put_object
 from recreon.types import Empire, IDNumber, ObjectTypes, WorldClass
 from recreon.ui.app import RecreonApp
 from recreon.ui.map_view import BLANK_CHAR, MapView, cp437
+
 
 def test_cp437_decodes_dos_glyphs():
     # The starbase and stargate glyph tables hold raw CP437 bytes.
@@ -117,7 +119,8 @@ async def test_status_bar_names_what_is_under_the_cursor():
 
 async def test_the_news_panel_shows_headlines_as_prose():
     """The panel renders whatever is in the player's feed, not raw enum names."""
-    from recreon.galaxy import Location, XYCoord as XY
+    from recreon.galaxy import Location
+    from recreon.galaxy import XYCoord as XY
     from recreon.news import NewsTypes, add_news
 
     game = blank_game(size=20, empires=2)

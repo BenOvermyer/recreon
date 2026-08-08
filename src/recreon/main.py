@@ -8,10 +8,9 @@ advances are faithful; the work done inside a turn is not yet there.
 from __future__ import annotations
 
 import argparse
-
-from . import __version__
 from pathlib import Path
 
+from . import __version__
 from .environ import GameEnvironment
 from .fleet import update_all_fleets
 from .intrface import scout_fleets, scout_objects, update_probes

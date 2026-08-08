@@ -14,7 +14,6 @@ MENU.PAS and still to come.
 
 from __future__ import annotations
 
-from textual import on
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import VerticalScroll

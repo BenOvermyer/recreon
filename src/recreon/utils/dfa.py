@@ -17,6 +17,8 @@ from __future__ import annotations
 
 from enum import Enum, auto
 
+from .pascal import pascal_val
+
 #: DOS end-of-file marker. Turbo Pascal hands this back at the end of a TEXT
 #: file, and the state machine keys off it, so the port produces it too.
 EOF_CH = "\x1a"
@@ -175,9 +177,18 @@ class TokenReader:
         return "".join(token)
 
     def next_integer(self) -> int:
-        """The next token parsed as an integer."""
+        """The next token parsed as an integer.
+
+        ``pascal_val`` rather than ``int``: NEWGAME.PAS's ``NextInteger`` is
+        ``Val(Token,Temp,Error)`` with the failure caught and turned into
+        ``ERROR: Illegal number format``, and Python's ``int`` accepts three
+        things ``Val`` rejects -- surrounding whitespace, ``_`` as a digit
+        separator, and a unicode minus. This is the single highest-traffic
+        parse in the codebase: every numeric field of every scenario file
+        comes through here.
+        """
         token = self.next_token()
         try:
-            return int(token)
+            return pascal_val(token)
         except ValueError:
             raise TokenError(f'ERROR: Illegal number format "{token}"') from None

@@ -1,8 +1,8 @@
 """Milestone 4: fleets deploy, carry cargo, burn fuel, move and obey orders."""
 
 import pytest
-
 from conftest import blank_game, place_world
+
 from recreon.datacnst import FUEL_PER_TON, CargoSpace, FltMovementRate
 from recreon.fleet import (
     abort_fleet,
@@ -26,7 +26,7 @@ from recreon.fleet import (
     use_up_fuel,
 )
 from recreon.galaxy import Location, XYCoord, limbo
-from recreon.intrface import balance_fleet, create_stargate, create_starbase
+from recreon.intrface import balance_fleet, create_starbase, create_stargate
 from recreon.misc import fuel_capacity, fuel_consumption
 from recreon.news import NewsTypes
 from recreon.orders import (

@@ -22,7 +22,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from .datacnst import DirX, DirY
-from .fleet import destroy_fleet, fleet_name_destruction, get_fleet_destination, get_new_pos
+from .fleet import (
+    destroy_fleet,
+    fleet_name_destruction,
+    get_fleet_destination,
+    get_new_pos,
+)
 from .galaxy import Location, XYCoord, limbo
 from .misc import same_xy
 from .news import NewsTypes, add_news

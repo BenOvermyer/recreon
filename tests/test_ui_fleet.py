@@ -9,7 +9,7 @@ from recreon.primintr import get_capital, get_coord, get_ships, put_ships
 from recreon.types import Empire, TechnologyTypes, ship_array
 from recreon.ui.app import RecreonApp
 from recreon.ui.fleet import DistributionScreen, FleetScreen, OrdersScreen
-from recreon.ui.prologue import Attention, ChooseFrom, TextPrompt
+from recreon.ui.prologue import Attention, ChooseFrom
 from recreon.utils.pascal import set_rand_seed
 
 T = TechnologyTypes

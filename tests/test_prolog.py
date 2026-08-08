@@ -1,16 +1,15 @@
 """The prologue's commands, ported from PROLOG.PAS."""
 
-from pathlib import Path
 
 import pytest
-from conftest import blank_game, place_world
+from conftest import blank_game
 
 from recreon.environ import GameEnvironment
-from recreon.galaxy import XYCoord
 from recreon.loadsave import backup_path, load_game, save_game
 from recreon.main import new_game, update_turn
 from recreon.newgame import EmpireIdentity
 from recreon.news import NewsTypes
+from recreon.primintr import empire_active, get_status, get_tech
 from recreon.prolog import (
     DEFAULT_GAME_NAME,
     MAX_MINUTES_PER_TURN,
@@ -36,10 +35,8 @@ from recreon.prolog import (
     toggle_pause,
     toggle_turn_sync,
 )
-from recreon.primintr import empire_active, get_status, get_tech
 from recreon.types import (
     Empire,
-    IDNumber,
     ObjectTypes,
     TechLevel,
     TechnologyTypes,

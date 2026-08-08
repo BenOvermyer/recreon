@@ -34,7 +34,7 @@ from .datacnst import (
 )
 from .design import change_issp, designate_world, terraform_world
 from .environ import GameEnvironment
-from .galaxy import Location, XYCoord, limbo
+from .galaxy import Location, limbo
 from .mess import MessageRecord, get_messages, send_message, set_message_read
 from .misc import distance
 from .news import NewsTypes, add_news
@@ -58,12 +58,9 @@ from .primintr import (
     put_defns,
     scouted,
     set_empire_technology,
-    set_issp,
     set_status,
 )
 from .types import (
-    MAX_NO_OF_FLEETS,
-    MAX_NO_OF_STARBASES,
     PLAYER_EMPIRES,
     Empire,
     IDNumber,
@@ -74,7 +71,6 @@ from .types import (
     WorldClass,
     WorldTypes,
     empty_quadrant,
-    tech_range,
 )
 
 T = TechnologyTypes

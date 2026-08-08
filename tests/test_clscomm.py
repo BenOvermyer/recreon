@@ -12,7 +12,6 @@ from recreon.clscomm import (
     industry_info,
     outpost_info,
     production_com,
-    production_forecast,
 )
 from recreon.datacnst import TechDev
 from recreon.fleet import get_next_fleet, move_fleet
@@ -20,14 +19,10 @@ from recreon.galaxy import Location, XYCoord, limbo
 from recreon.intrface import create_starbase
 from recreon.primintr import (
     add_name,
-    get_cargo,
-    put_cargo,
-    put_indus,
     set_population,
     set_type,
 )
 from recreon.types import (
-    DEFNS_TYPES,
     Empire,
     IDNumber,
     IndusTypes,
@@ -35,7 +30,6 @@ from recreon.types import (
     SpecialConditions,
     TechLevel,
     TechnologyTypes,
-    WorldClass,
     WorldTypes,
 )
 from recreon.utils.pascal import set_rand_seed

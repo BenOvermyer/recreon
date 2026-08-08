@@ -31,7 +31,6 @@ from recreon.galaxy import Location, XYCoord, limbo
 from recreon.news import NewsTypes
 from recreon.orders import (
     CommandRecord,
-    CommandTypes,
     fleet_next_statement,
     get_fleet_code,
     set_fleet_next_statement,

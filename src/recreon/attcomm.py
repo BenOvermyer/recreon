@@ -52,7 +52,6 @@ from .attnpe import npe_attack
 from .datacnst import CargoSpace, ObjName, TechDev, ThingNames, TrnAdj
 from .environ import GameEnvironment
 from .misc import no_ships, thg_lmt
-from .scena import display_background
 from .primintr import (
     empire_active,
     empire_name,
@@ -70,6 +69,7 @@ from .primintr import (
     object_name,
     scouted,
 )
+from .scena import display_background
 from .types import (
     ATTACK_TYPES,
     SHIP_TYPES,

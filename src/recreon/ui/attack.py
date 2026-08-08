@@ -19,7 +19,6 @@ and what the defender still has at each shell.
 
 from __future__ import annotations
 
-from textual import on
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, VerticalScroll
@@ -28,8 +27,8 @@ from textual.widgets import Footer, Header, Label, ListItem, ListView, Static
 
 from ..attack import MAX_NO_OF_GROUPS, AttackResultTypes, GroupRecord, GroupStatus
 from ..attcomm import (
-    ATSymb,
     FIGHTS_BACK,
+    ATSymb,
     BattleSession,
     GroupSplitter,
     attack_command,
