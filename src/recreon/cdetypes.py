@@ -1,8 +1,14 @@
 """Scenario/artifact scripting types.
 
 Port of CDETYPES.PAS -- the bytecode format for the little interpreted language
-that drives artifacts and scripted scenario events. The interpreter itself
-lives in CODE.PAS and ARTIFACT.PAS and is not yet ported.
+that drives artifacts and scripted scenario events.
+
+**Unreachable in v2.0**, and the interpreter is not "not yet ported" -- it is
+*deliberately* unported. CODE.PAS, ARTIFACT.PAS and TRANSACT.PAS are all
+outside `ANACREON.PAS`'s `USES` graph, and the directives that would reach them
+are commented out of the scenario dispatch, so the shipped executable never
+linked any of it. Reviving the subsystem is a feature decision, not a porting
+task. `tests/test_dead_code.py` pins that nothing in the port imports this.
 
 ARCHITECTURE.md does not list a module for this unit; it goes here at package
 root to keep the one-module-per-unit mapping.

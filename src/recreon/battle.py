@@ -1,11 +1,12 @@
 """Simplified attack resolution.
 
-Port of BATTLE.PAS.
+Port of BATTLE.PAS. **Unreachable in v2.0**: no unit in `ANACREON.PAS`'s
+`USES` graph names BATTLE, so the shipped executable never linked it.
 
 Where :mod:`recreon.attack` fights out an engagement group by group and shell
 by shell, this reduces both sides to a single power number and settles a round
-in one step. Nothing in the shipped v2.0 source calls it -- it is a second,
-coarser combat model that was written but never wired up. It is ported because
+in one step -- a second, coarser combat model that was written but never wired
+up. It is ported because
 it is a complete unit with its own balance table, and because that table is
 the only surviving statement of relative ship worth outside ``MPower`` and
 ``CombatPower``, both of which disagree with it.
