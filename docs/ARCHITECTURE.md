@@ -183,7 +183,13 @@ Universe update logic from UPDATE.PAS.
 - `update_planet()` - Full planet update (production, industry, population, efficiency, tech, revolution)
 - `update_starbase()` - Starbase annual update
 - `update_construction()` - Construction site progress
-- `update_empire()` - Empire tech research, revolution tracking
+- `update_empire()` - Empire tech research, revolution tracking. **The last
+  two statements of `UpdateUniverse` and the easiest thing in the unit to
+  miss** -- they were unported for the whole project, and the consequence was
+  that no empire advanced in technology on its own. `new_tech_level()` is
+  breadth-before-depth: an empire fills out its current tier before the same
+  roll advances a level, and the chance sums over up to 20 "labs". Original
+  bug #87 lives in that sum.
 
 **Planet update sequence:**
 1. Update terraforming progress
