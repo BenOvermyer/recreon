@@ -89,6 +89,13 @@ class GameEnvironment:
         #: Directory the scenario picker scans for ``*.SCN``.
         self.SceDirect: str = ""
 
+        #: Directory holding ``ANACREON.HLP``. The help file does not ship with
+        #: the source, so this is normally empty and the help window shows
+        #: HLPWIND.PAS's fallback -- which is what a player without the file
+        #: saw too. PROLOG.PAS lets the player set the path; :mod:`recreon
+        #: .hlpwind` reads whatever is there.
+        self.HlpDirect: str = ""
+
         # Session flags, from the ENVIRON.PAS typed constants.
         self.AutoSave: bool = True
         self.PauseActive: bool = True

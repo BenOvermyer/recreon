@@ -30,6 +30,13 @@ src/recreon/
 ├── clscomm.py           # World close-up, production forecast (CLSCOMM.PAS)
 ├── playturn.py          # Command set and the seven menus (PLAYTURN.PAS)
 ├── attcomm.py           # Target selection, auto-attack, the battle loop (ATTCOMM.PAS)
+├── swindows.py          # F-key -> window dispatch (SWINDOWS.PAS)
+├── stawind.py           # World/military status window (STAWIND.PAS)
+├── fltwind.py           # Fleet status window (FLTWIND.PAS)
+├── empwind.py           # Empire status window (EMPWIND.PAS)
+├── nwswind.py           # News window (NWSWIND.PAS)
+├── nmswind.py           # Names window (NMSWIND.PAS)
+├── hlpwind.py           # Help window (HLPWIND.PAS)
 ├── designcom.py         # World and empire commands (DESIGN.PAS)
 ├── names.py             # Place names, empire status report (NAMES.PAS)
 ├── loadsave.py          # Save/load a game (LOADSAVE.PAS)
@@ -58,7 +65,8 @@ src/recreon/
 │   ├── worlds.py        # Designate, terraform, ISSP, liberate, messages, LAMs
 │   ├── names.py         # Status report, remove name (NAMES.PAS)
 │   ├── menus.py         # Menu system (MENU.PAS, PULLDOWN.PAS)
-│   ├── status.py        # Status windows (STAWIND.PAS, FLTWIND.PAS, EMPWIND.PAS)
+│   ├── status.py        # Docked side panels (not a port; Textual layout)
+│   ├── windows.py       # The seven F-key overlays (SWINDOWS.PAS, §8.3)
 │   ├── command.py       # Command input (DISPLAY.PAS)
 │   └── widgets/         # Custom Textual widgets
 ├── utils/               # Utility modules
@@ -855,14 +863,23 @@ Menu system from MENU.PAS, PULLDOWN.PAS.
 7. Ministry of War - Attack, Auto-attack, Launch LAMs, Defenses
 
 ### ui/status.py
-Status windows from STAWIND.PAS, FLTWIND.PAS, EMPWIND.PAS.
+The always-visible side panels: what the map cursor is over, empire totals, and
+the year's headlines. Not a port of a unit -- the original has no docked panel,
+it has overlays -- but it is what a Textual layout wants and it keeps the map
+screen informative without a keypress.
 
-**Windows:**
-- World status (planet details, production, military)
-- Fleet status (ships, cargo, fuel, orders)
-- Empire status (tech, worlds, military power)
-- News window
-- Help window
+### ui/windows.py
+The seven F-key overlays of SWINDOWS.PAS (§8.3). Read-only, every one of them,
+which is why they are all one small screen class over a list of lines.
+
+**Screens:** `HelpWindowScreen` (F1), `StatusWindowScreen` (F3/F4),
+`FleetWindowScreen` (F5/F6), `NewsWindowScreen` (F7), `EmpireWindowScreen`
+(F8), `NamesWindowScreen` (F9). F10 closes back to the map; F2 opens the menu
+bar.
+
+**F3/F4 and F5/F6 are each one window showing two stacked tables**, not two
+windows -- the tables list the same objects in the same order, which is what
+makes them readable together.
 
 ### ui/command.py
 Command input from DISPLAY.PAS.
@@ -882,7 +899,14 @@ String utilities from STRG.PAS.
 Integer utilities from INT.PAS.
 
 ### utils/sort.py
-Sorting algorithms from SORT.PAS, QSORT.PAS, LSORT.PAS.
+QSORT.PAS's `QuickSortD` and `QuickSortA`.
+
+**The sort key is the first *Word* of a record and nothing else**, so on
+little-endian x86 a record beginning with two byte-wide fields sorts by its
+**second** field. Both callers -- STAWIND and FLTWIND -- read as though the
+first field sorted first, and neither does. The algorithm is reproduced rather
+than replaced with `list.sort` because a two-byte key makes ties the common
+case, and a stable sort would place tied rows differently from the original.
 
 ### utils/serial.py
 JSON codec for the record types, used by the save/load sections. Not a port of

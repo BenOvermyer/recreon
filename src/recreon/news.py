@@ -119,6 +119,47 @@ class NewsTypes(IntEnum):
     LostF = 91
 
 
+#: Headlines about the empire's own housekeeping rather than about the galaxy.
+#:
+#: The news window's only use for this set is *ordering*: NWSWIND.PAS sweeps
+#: the feed twice, taking everything not in ``LocalNews`` first and everything
+#: in it second. So a raid, a conquest or a rebellion sorts above a world
+#: grumbling that it is short of metals, however recently each was filed. It is
+#: presentation, not filtering -- nothing is hidden, and no other unit reads it.
+LOCAL_NEWS: frozenset[NewsTypes] = frozenset(
+    {
+        NewsTypes.Lack,
+        NewsTypes.RebelW1,
+        NewsTypes.RebelW2,
+        NewsTypes.RebelW3,
+        NewsTypes.RebelW4,
+        NewsTypes.POk,
+        NewsTypes.NoFuel,
+        NewsTypes.FltDet,
+        NewsTypes.DefLack,
+        NewsTypes.IndLack,
+        NewsTypes.PCap,
+        NewsTypes.PDest,
+        NewsTypes.BseFuel,
+        NewsTypes.BseBlocked,
+        NewsTypes.FltBlocked,
+        NewsTypes.NebGate,
+        NewsTypes.SRMClear,
+        NewsTypes.NoTriRes,
+        NewsTypes.TriResWarn1,
+        NewsTypes.TriResWarn2,
+        NewsTypes.MilitRev,
+        NewsTypes.RevControl,
+        NewsTypes.OutProbe,
+        NewsTypes.OrdersSRMClear,
+        NewsTypes.OrdersNoSRMs,
+        NewsTypes.OrdersNoSSP,
+        NewsTypes.TerChaos,
+        NewsTypes.TerSuccess,
+    }
+)
+
+
 @dataclass(slots=True)
 class NewsRecord:
     Headline: NewsTypes = NewsTypes.NoNews

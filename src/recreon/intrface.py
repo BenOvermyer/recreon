@@ -12,7 +12,11 @@ from typing import TYPE_CHECKING
 
 from .datacnst import (
     DEFAULT_ISSP,
+    NORMAL_ISSP,
+    ClassStr,
     IndusNames,
+    TechStr,
+    TypeStr,
     TechN,
     TechnologyName,
     ThingNames,
@@ -60,6 +64,7 @@ from .types import (
     ObjectTypes,
     SpecialConditions,
     TechnologyTypes,
+    tech_range,
     WorldTypes,
     empty_quadrant,
     indus_range,
@@ -1112,6 +1117,376 @@ def estimated_range(game: GameEnvironment, obj: IDNumber) -> int:
     return 0
 
 
+# --- Status lines for the F-key windows --------------------------------------
+#
+# INTRFACE.PAS builds every row the §8.3 windows show. The windows themselves
+# (STAWIND, FLTWIND, EMPWIND) only choose *which* objects to list and in what
+# order; the text is all made here, which is why these live in `intrface.py`
+# rather than with the windows.
+#
+# One rule runs through all of them: **what you may read depends on whose it
+# is.** Your own worlds and fleets report exact figures; a scouted stranger's
+# report `y`/`no` per line and `--` for anything you could not possibly count;
+# an unscouted one reports `(out of range)`. That is the same three-valued fog
+# the map uses, spelled out in columns.
+
+
+def _adjust(text: str, width: int) -> str:
+    """Pascal's ``AdjustString``: pad or truncate to exactly ``width``."""
+    return text[:width].ljust(width)
+
+
+def get_import_export_str(game: GameEnvironment, obj: IDNumber) -> str:
+    """The Impt/Expt pair on the world status row.
+
+    Four industries can be over- or under-supplied -- chemicals, metals,
+    supplies and trillum -- and each shows as its own initial in one column or
+    the other, or ``-`` in both when it is at ``NormalISSP``. So ``-C--`` under
+    Impt means the world is buying chemicals.
+
+    The loop runs ``CheInd TO TriInd`` and then filters back down to those
+    four, which is the original's way of fixing the column order regardless of
+    where the industries sit in the enum.
+    """
+    #: Pascal's ``IndN``, one initial per industry; the five it never reaches
+    #: are dashes.
+    indus_initial = "BCM----ST"
+
+    imports = ""
+    exports = ""
+    for ind in indus_range(IT.CheInd, IT.TriInd):
+        if ind not in (IT.CheInd, IT.MinInd, IT.SupInd, IT.TriInd):
+            continue
+        issp = get_issp(game, obj, ind)
+        letter = indus_initial[int(ind)]
+        if issp == NORMAL_ISSP:
+            imports += "-"
+            exports += "-"
+        elif issp > NORMAL_ISSP:
+            imports += "-"
+            exports += letter
+        else:
+            imports += letter
+            exports += "-"
+
+    return f"{imports} {exports}"
+
+
+def get_world_status(
+    game: GameEnvironment, emp: Empire, world_id: IDNumber
+) -> str:
+    """One row of the F3 planetary status table. Port of ``GetWorldStatus``.
+
+    Columns: name, owner, class, type, tech, population, efficiency, ambrosia
+    addiction, import/export, revolution index, then transports and cargo.
+
+    **A population under 0.1 billion reads ``<0.1`` rather than rounding to
+    0.0**, which is the one place the game admits a world is inhabited without
+    saying by how few.
+
+    The last seven columns are the fog boundary: your own world shows counts,
+    anyone else's shows `y`/`no` for the two transport types and `--` for all
+    five cargoes. You can see hulls in orbit; you cannot audit a warehouse.
+    """
+    from .misc import hi_lo, yes_no
+    from .primintr import (
+        empire_name,
+        get_cargo,
+        get_rev_index,
+        get_ships_known,
+        object_name,
+    )
+
+    name = _adjust(object_name(game, emp, world_id), 8)
+    status = get_status(game, world_id)
+    owner = _adjust(empire_name(game, status) or "", 3)
+
+    ships = get_ships_known(game, emp, world_id)
+    cargo = get_cargo(game, world_id)
+    special = get_special(game, world_id)
+    pop = get_population(game, world_id)
+
+    line = (
+        f"{name} {owner} "
+        f"{ClassStr[get_class(game, world_id)]} "
+        f"{TypeStr[get_type(game, world_id)]} "
+        f"{TechStr[get_tech(game, world_id)]} "
+    )
+    line += (f"{pop / 100:4.1f}" if pop > 9 else "<0.1") + " "
+    line += f"{get_efficiency(game, world_id):3} "
+    line += "y " if SpecialConditions.AmbAddict in special else "- "
+    line += get_import_export_str(game, world_id) + " "
+    line += hi_lo(get_rev_index(game, world_id))
+
+    if emp == status:
+        line += f"{ships[TechnologyTypes.jtn]:5}{ships[TechnologyTypes.trn]:5}"
+        for thing in tech_range(TechnologyTypes.amb, TechnologyTypes.tri):
+            line += f"{cargo[thing]:5}"
+    else:
+        line += (
+            yes_no(ships[TechnologyTypes.jtn])
+            + yes_no(ships[TechnologyTypes.trn])
+            + "  --   --   --   --   --  "
+        )
+
+    return line
+
+
+def get_military_status(
+    game: GameEnvironment, emp: Empire, world_id: IDNumber
+) -> str:
+    """One row of the F4 military status table. Port of ``GetMilitaryStatus``.
+
+    Troops, then every ship type, then the four fixed defenses. Note the
+    defenses are read with :func:`~recreon.primintr.get_defns` for *both*
+    branches, but only printed for your own world -- a stranger's row stops
+    after the ships, which is why the table is narrower on the right for
+    everyone else.
+    """
+    from .misc import yes_no
+    from .primintr import (
+        empire_name,
+        get_cargo,
+        get_defns,
+        get_ships,
+        get_ships_known,
+        object_name,
+    )
+
+    name = _adjust(object_name(game, emp, world_id), 8)
+    status = get_status(game, world_id)
+    cargo = get_cargo(game, world_id)
+    defns = get_defns(game, world_id)
+    owner = _adjust(empire_name(game, status) or "", 3)
+
+    line = f"{name} {owner} "
+
+    if emp == status:
+        ships = get_ships(game, world_id)
+        line += f"{cargo[TechnologyTypes.men]:5}{cargo[TechnologyTypes.nnj]:5}"
+        for thing in SHIP_TYPES:
+            line += f"{ships[thing]:5}"
+        for thing in tech_range(TechnologyTypes.LAM, TechnologyTypes.ion):
+            line += f"{defns[thing]:5}"
+    else:
+        ships = get_ships_known(game, emp, world_id)
+        line += yes_no(cargo[TechnologyTypes.men]) + yes_no(cargo[TechnologyTypes.nnj])
+        for thing in SHIP_TYPES:
+            line += yes_no(ships[thing])
+
+    return line
+
+
+def get_empire_status(
+    game: GameEnvironment, emp: Empire
+) -> tuple[int, int, int, dict[TechnologyTypes, int]]:
+    """An empire's vital statistics. Port of ``GetEmpireStatus``.
+
+    Returns worlds held, total population, shipyard industry in tenths, and
+    every hull the empire owns anywhere.
+
+    Two things are easy to get wrong. **Starbases count as worlds** and add
+    their population to the total, but only a *compound* base contributes
+    shipyard capacity -- a command base or fortress builds nothing. And the
+    ship total sweeps fleets as well as worlds, so a fleet in transit is still
+    counted; it is a census of the empire, not of what is sitting still.
+    """
+    planets = 0
+    total_pop = 0
+    ship_ind = 0.0
+    total_ships = ship_array()
+
+    for i in range(1, game.NoOfPlanets + 1):
+        if i not in game.GlobalSets.SetOfPlanetsOf[emp]:
+            continue
+        planet = game.Universe.Planet[i]
+        planets += 1
+        total_pop += planet.Pop
+        ip = (TechAdj2[planet.Tech] / 100) * ((planet.Eff + 250) / 100) / K6
+        for ind in SHIPYARD_INDUSTRIES:
+            ship_ind += ip * (planet.Indus[ind] + K4) ** 2
+        for thing in SHIP_TYPES:
+            total_ships[thing] += planet.Ships[thing]
+
+    for i in range(1, MAX_NO_OF_STARBASES + 1):
+        if i not in game.GlobalSets.SetOfStarbasesOf[emp]:
+            continue
+        base = game.Universe.Starbase[i]
+        planets += 1
+        total_pop += base.Pop
+        for thing in SHIP_TYPES:
+            total_ships[thing] += base.Ships[thing]
+        if base.STyp == TechnologyTypes.cmp:
+            ip = (TechAdj2[base.Tech] / 100) * ((base.Eff + 250) / 100) / K6
+            for ind in SHIPYARD_INDUSTRIES:
+                ship_ind += ip * (base.Indus[ind] + K4) ** 2
+
+    active = game.GlobalSets.SetOfFleetsOf[emp] & game.GlobalSets.SetOfActiveFleets
+    for i in range(1, MAX_NO_OF_FLEETS + 1):
+        if i in active:
+            fleet = game.Universe.Fleet[i]
+            for thing in SHIP_TYPES:
+                total_ships[thing] += fleet.Ships[thing]
+
+    return planets, total_pop, pascal_round(ship_ind), total_ships
+
+
+def get_empire_status_line(
+    game: GameEnvironment, emp: Empire, full: bool
+) -> str:
+    """One row of the F8 empire table. Port of ``GetEmpireStatusLine``.
+
+    ``full`` is the fog: an empire whose capital you have merely *found* shows
+    its size and technology but dashes where its fleet strength would be. You
+    learn how big a rival is long before you learn what it can field.
+
+    The technology shown is the *capital's*, not the empire record's, which
+    differ while a newly taken capital is still catching up.
+    """
+    from .primintr import empire_name
+
+    capital = game.Universe.EmpireData[emp].Capital
+    line = _adjust(empire_name(game, emp) or "", 12)
+    line += " " + TechStr[get_tech(game, capital)] + " "
+
+    planets, total_pop, s_ind, total_ships = get_empire_status(game, emp)
+    line += f"{planets:3} {s_ind / 10:4.1f} {total_pop / 100:5.1f} "
+
+    if full:
+        for thing in SHIP_TYPES:
+            line += f"{total_ships[thing]:6} "
+    else:
+        line += " ----   ----   ----   ----   ----   ----   ----  "
+
+    return line
+
+
+def get_fleet_position_status(
+    game: GameEnvironment, emp: Empire, obj: IDNumber
+) -> str:
+    """The top half of the F5 fleet table. Port of ``GetFleetPositionStatus``.
+
+    Where a fleet is, where it is going, how it is doing and how far it can
+    still travel. Bases appear here too, which is why the coordinate columns
+    are built two different ways: a fleet's position goes through
+    :func:`~recreon.primintr.get_name` so a named sector reads by its name,
+    while a base's goes straight to :func:`get_coord_name`.
+
+    Three details of the enemy branch are deliberate:
+
+    * A ready enemy fleet's *destination* column repeats its position. It is
+      not going anywhere, and the original writes ``PosName`` twice rather
+      than inventing a blank.
+    * An unscouted fleet reads ``(unknown)`` for destination and
+      ``(out of range)`` for status -- you know it exists, nothing more.
+    * The range column is omitted entirely. Fuel is your business alone.
+
+    ``(orders)`` on your own fleet means it is running a compiled order list.
+    """
+    from .orders import fleet_next_statement
+    from .primintr import (
+        empire_name,
+        get_coord_name,
+        get_name,
+        get_status,
+        object_name,
+        scouted,
+    )
+    from .types import FleetStatus
+
+    #: The four ``FleetStatus`` labels, by ordinal. ``FInTrans``'s is a
+    #: placeholder -- the live path substitutes the estimated arrival year for
+    #: the ``?``.
+    #:
+    #: Note ``FInactive`` reads **"out of trillum"**. The enum member is named
+    #: for the state and the label for its only cause: a fleet goes inactive
+    #: when it cannot pay for the next jump.
+    fleet_status_name = {
+        FleetStatus.FReady: "at destination    ",
+        FleetStatus.FInTrans: "In transit (?)    ",
+        FleetStatus.FInactive: "out of trillum    ",
+        FleetStatus.FLost: "lost              ",
+    }
+
+    if obj.ObjTyp == ObjectTypes.Flt:
+        entity = game.Universe.Fleet[obj.Index]
+    else:
+        entity = game.Universe.Starbase[obj.Index]
+    location, destination = entity.XY, entity.Dest
+    flt_sta, flt_emp = entity.Status, entity.Emp
+
+    if obj.ObjTyp == ObjectTypes.Flt:
+        pos_name = get_name(game, emp, Location(XY=location, ID=empty_quadrant()))
+        des_name = get_name(game, emp, Location(XY=destination, ID=empty_quadrant()))
+    else:
+        pos_name = get_coord_name(game, location)
+        des_name = get_coord_name(game, destination)
+
+    pos_name = _adjust(pos_name, 8)
+    des_name = _adjust(des_name, 8)
+    flt_name = _adjust(object_name(game, emp, obj), 8)
+
+    if flt_emp == emp:
+        line = f"     {flt_name}   {pos_name}   {des_name}   "
+        if flt_sta == FleetStatus.FInTrans:
+            sta_name = f"In transit ({estimated_date_of_arrival(game, obj)})"
+        else:
+            sta_name = fleet_status_name[flt_sta]
+        line += _adjust(sta_name, 18) + "   "
+        line += f"{estimated_range(game, obj):3}"
+        if obj.ObjTyp == ObjectTypes.Flt and fleet_next_statement(game, obj) != 0:
+            line += "       (orders)"
+        return line
+
+    line = _adjust(empire_name(game, flt_emp) or "", 3)
+    line += f"  {flt_name}   {pos_name}   "
+    if flt_sta == FleetStatus.FReady and scouted(game, emp, obj):
+        line += f"{pos_name}   "
+    else:
+        line += "(unknown)  "
+    sta_name = (
+        fleet_status_name[flt_sta] if scouted(game, emp, obj) else "(out of range)"
+    )
+    return line + _adjust(sta_name, 18) + "      "
+
+
+def get_fleet_status_line(
+    game: GameEnvironment, emp: Empire, obj: IDNumber
+) -> str:
+    """The bottom half of the F5 fleet table. Port of ``GetFleetStatusLine``.
+
+    What is aboard: every hull, then every cargo. A stranger's fleet shows
+    `y`/`no` per hull and `--` for the whole hold; an unscouted one shows
+    nothing at all beyond its name.
+
+    Note the ownership test is against the *empire asking*, so this is the one
+    of the pair that never mentions an enemy's destination or fuel.
+    """
+    from .misc import yes_no
+    from .primintr import get_cargo, get_ships, object_name, scouted
+
+    name = _adjust(object_name(game, emp, obj), 8)
+    status = get_status(game, obj)
+    ships = get_ships(game, obj)
+    cargo = get_cargo(game, obj)
+
+    if status == emp:
+        line = name
+        for thing in SHIP_TYPES:
+            line += f"{ships[thing]:5}"
+        for thing in tech_range(TechnologyTypes.men, TechnologyTypes.tri):
+            line += f"{cargo[thing]:5}"
+        return line
+
+    if scouted(game, emp, obj):
+        line = name
+        for thing in SHIP_TYPES:
+            line += yes_no(ships[thing])
+        return line + "  --   --   --   --   --   --   -- "
+
+    return name + " (out of range)"
+
+
 def get_nearest_worlds(
     game: GameEnvironment, xy: XYCoord, n: int, set_to_consider: set[int]
 ) -> list[IDNumber]:
@@ -1258,6 +1633,14 @@ def destroy_empire(game: GameEnvironment, emp: Empire) -> None:
 
 __all__ = [
     "CARGO_PRIORITY",
+    "SHIPYARD_INDUSTRIES",
+    "get_empire_status",
+    "get_empire_status_line",
+    "get_fleet_position_status",
+    "get_fleet_status_line",
+    "get_import_export_str",
+    "get_military_status",
+    "get_world_status",
     "Gamma",
     "balance_fleet",
     "create_planet",

@@ -69,7 +69,18 @@ class RecreonApp(App):
         Binding("g", "prologue", "Menu"),
         Binding("b", "construction", "Build"),
         Binding("w", "warp_links", "Warp links"),
-        Binding("m,f10", "menu", "Menu"),
+        # The original's own help text is the authority here: "<F2> Return to
+        # Menu" and "<F10> Map Window". F10 was bound to the menu before
+        # HLPWIND.PAS was read.
+        Binding("m,f2", "menu", "Menu"),
+        Binding("f1", "window('f1')", "Help"),
+        Binding("f3", "window('f3')", "Status"),
+        Binding("f4", "window('f4')", "Status", show=False),
+        Binding("f5", "window('f5')", "Fleets"),
+        Binding("f6", "window('f6')", "Fleets", show=False),
+        Binding("f7", "window('f7')", "News"),
+        Binding("f8", "window('f8')", "Empire"),
+        Binding("f9", "window('f9')", "Names"),
         Binding("z", "close_up", "Close-up"),
         Binding("i", "production", "Production"),
         Binding("f", "fleets", "Fleets"),
@@ -198,6 +209,23 @@ class RecreonApp(App):
         self.push_screen(
             WarpLinkScreen(self.game, self.game.Player), self._after_command
         )
+
+    def action_window(self, key: str) -> None:
+        """Raise a status window. SWINDOWS.PAS's ``GetWindowCommand``.
+
+        F3/F4 and F5/F6 land on the same screen -- each of those windows shows
+        two stacked tables, and the pair of keys is habit rather than two
+        destinations.
+        """
+        if not self.started:
+            return
+        from ..swindows import window_for_key
+        from .windows import WINDOW_SCREENS
+
+        window = window_for_key(key)
+        screen = WINDOW_SCREENS.get(window) if window is not None else None
+        if screen is not None:
+            self.push_screen(screen(self.game, self.game.Player))
 
     def action_menu(self) -> None:
         """The in-game menu bar (PLAYTURN.PAS's seven pull-downs)."""
