@@ -285,3 +285,117 @@ async def test_aborting_a_fleet_onto_your_own_world_needs_no_confirmation(tmp_pa
 
         assert flt.Index not in app.game.GlobalSets.SetOfActiveFleets
         assert get_ships(app.game, home)[T.fgt] == before + 120
+
+
+# --- Deploy ------------------------------------------------------------------
+#
+# The one command driven by PLAYTURN.PAS's parameter table rather than by
+# parameters the screen picks itself, so these also exercise `ParameterSession`
+# against a real app.
+
+
+async def answer(app, pilot, text):
+    """Type one parameter into whatever prompt is up."""
+    app.screen.query_one("Input").value = text
+    await pilot.press("enter")
+    await pilot.pause()
+
+
+async def test_deploying_a_fleet_asks_the_originals_three_questions(tmp_path):
+    app = running(tmp_path, with_fleet=False)
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        screen = await open_fleets(app, pilot)
+        home = get_capital(app.game, PLAYER)
+        put_ships(app.game, home, {**ship_array(), T.fgt: 500})
+
+        screen.action_deploy()
+        await pilot.pause()
+        assert app.screen.prompt == "What name shall we use for this fleet? "
+
+        await answer(app, pilot, "Vanguard")
+        assert app.screen.prompt == "Where shall we deploy the fleet from? "
+
+        await answer(app, pilot, "0,0")
+        assert app.screen.prompt == "What shall its destination be? "
+
+        await answer(app, pilot, "2,2")
+        assert isinstance(app.screen, DistributionScreen)
+        assert "Vanguard ready to be deployed from" in app.screen.heading
+
+
+async def test_a_deployed_fleet_carries_its_name_and_its_ships(tmp_path):
+    app = running(tmp_path, with_fleet=False)
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        screen = await open_fleets(app, pilot)
+        home = get_capital(app.game, PLAYER)
+        put_ships(app.game, home, {**ship_array(), T.fgt: 500})
+
+        screen.action_deploy()
+        await pilot.pause()
+        for text in ("Vanguard", "0,0", "2,2"):
+            await answer(app, pilot, text)
+
+        grid = app.screen
+        grid.fleet_ships[T.fgt] = 300
+        grid.ground_ships[T.fgt] = 200
+        grid.action_accept()
+        await pilot.pause()
+
+        assert len(app.game.GlobalSets.SetOfActiveFleets) == 1
+        (index,) = app.game.GlobalSets.SetOfActiveFleets
+        assert app.game.Universe.Fleet[index].Ships[T.fgt] == 300
+        assert get_ships(app.game, home)[T.fgt] == 200
+
+
+async def test_a_bad_answer_re_asks_with_the_originals_message(tmp_path):
+    app = running(tmp_path, with_fleet=False)
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        screen = await open_fleets(app, pilot)
+
+        screen.action_deploy()
+        await pilot.pause()
+        await answer(app, pilot, "Muchtoolonganame")
+
+        assert app.screen.prompt == "What name shall we use for this fleet? "
+        assert "restrict yourself to 8 characters" in app.screen.detail
+
+
+async def test_escaping_a_prompt_abandons_the_whole_command(tmp_path):
+    """The original sets `Comm := NullCom` and jumps clear of the loop -- the
+    answers already given go with it, and there is no going back one step."""
+    app = running(tmp_path, with_fleet=False)
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        screen = await open_fleets(app, pilot)
+
+        screen.action_deploy()
+        await pilot.pause()
+        await answer(app, pilot, "Vanguard")
+        await pilot.press("escape")
+        await pilot.pause()
+
+        assert isinstance(app.screen, FleetScreen)
+        assert not app.game.GlobalSets.SetOfActiveFleets
+
+
+async def test_deploying_is_refused_once_thirty_fleets_are_in_space(tmp_path):
+    """`TrapCommandErrors`, which fires before the first question is asked."""
+    from recreon.types import NO_OF_FLEETS_PER_EMPIRE
+
+    app = running(tmp_path, with_fleet=False)
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        screen = await open_fleets(app, pilot)
+
+        full = set(range(1, NO_OF_FLEETS_PER_EMPIRE + 1))
+        app.game.GlobalSets.SetOfFleetsOf[PLAYER] |= full
+        app.game.GlobalSets.SetOfActiveFleets |= full
+
+        screen.action_deploy()
+        await pilot.pause()
+
+        assert isinstance(app.screen, Attention)
+        assert "too many fleets in space already" in app.screen.message

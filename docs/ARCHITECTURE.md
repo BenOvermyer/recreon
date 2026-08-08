@@ -28,7 +28,8 @@ src/recreon/
 ├── msccomm.py           # Defense settings, self-destruct (MSCCOMM.PAS)
 ├── fltcomm.py           # Fleet commands (FLTCOMM.PAS)
 ├── clscomm.py           # World close-up, production forecast (CLSCOMM.PAS)
-├── playturn.py          # Command set and the seven menus (PLAYTURN.PAS)
+├── playturn.py          # Commands, menus, parameter table (PLAYTURN.PAS)
+├── display.py           # The two command-line parsers (DISPLAY.PAS)
 ├── attcomm.py           # Target selection, auto-attack, the battle loop (ATTCOMM.PAS)
 ├── swindows.py          # F-key -> window dispatch (SWINDOWS.PAS)
 ├── stawind.py           # World/military status window (STAWIND.PAS)
@@ -477,14 +478,57 @@ Note the menus are **not** MENU.PAS: that is the scrolling-list widget, and
 PULLDOWN.PAS is the bar widget. Textual's `ListView` replaces both, so neither
 is ported.
 
-Half the unit is still outstanding and deliberately so: the typed-command
-parser (`GetCommand`) and the parameter table (`ParameterTypes` +
-`SetOfErrors` per command). The ported screens collect their own parameters,
-so nothing is blocked -- but the table is the original's one statement of what
-every command requires.
+**There is no typed-command parser to port.** `GetCommand` reads one keystroke
+and dispatches through the menu bar; `SplitCommandLine` is in DEADCODE.PAS and
+no `CommandData` array exists in the tree. Only the vestigial
+`CommandDataRecord` type and `NoOfCommands = 25` survive, with no table behind
+them.
+
+**The parameter table** is `PARAMETER_DATA`: 40 rows, one per command, each up
+to 3 `Parameter` records carrying a `ParameterTypes`, an index into the 27
+`QUESTIONS`, and a set of the 45 `Errors`. The original's rows are a fixed
+three slots plus a `NoOfParm`; every row pads identically, so the port stores
+only the live parameters and lets `len()` be the count. An import-time guard
+rejects a missing row, as `datacnst._table` does.
+
+**Functions:** `interpret_parameter()` and `check_for_errors()` (the two halves
+of validating one answer, joined by `validate_parameter()`), `error_message()`
+(`WriteError`), `trap_command_errors()`, and `ParameterSession` -- `GetParameters`
+inverted into a state machine, since Textual cannot block in a
+`REPEAT ... UNTIL Error=NoError`.
+
+Two things are behaviour rather than detail. **The order of the checks in
+`_check_object` matters**: the first failure wins, so designating your capital
+reports `CapDes` even though `NotAWorld` is listed earlier. And **only the
+prompting path is reachable** -- the branch that validates a parameter supplied
+up front could only be entered from the parser that was removed.
+
+Two original bugs live here: #74 (`FFuelCom` declares a `NoTri` check that has
+no implementation) and #75 (`NOT Obj.Index IN SetOfActiveFleets` parses as
+`(NOT Obj.Index) IN ...`, so the `NotKnown` guard against a stood-down fleet is
+always false). `UNCHECKED_ERRORS` and `SILENT_ERRORS` name the codes with no
+check and no message respectively, so both omissions are greppable rather than
+looking like transcription slips.
 
 `UNREACHABLE` names the three commands inside the `(* ARTIFACTS ... *)` block;
 `NOT_PORTABLE` names the DOS-only ones.
+
+### display.py
+DISPLAY.PAS, of which only two routines survive the move: `interpret_xy()` and
+`interpret_obj()`, which turn a string the player typed into a coordinate or an
+object. Everything else in the unit is video -- `DrawScreen`, `WriteCommLine`,
+`WriteErrorMessage`, `GetInputString`, `GetIDMenuChoice` -- and Textual replaces
+it.
+
+Both parsers **write their own message and return a bare boolean**, so the port
+returns the message rather than an error code. That division is load-bearing:
+`InterpretParameter` maps a failed `InterpretObj` to `NoObj`, which has no line
+in `WriteError`'s case, so the text the player reads comes from here and
+`playturn.error_message` returns `""`.
+
+`MAIN_HELP_LINE` is transcribed as evidence rather than for use: with
+HLPWIND.PAS's fallback page it is the second independent statement in the
+source of what the function keys do, and the two agree that F10 is the map.
 
 ### clscomm.py
 The two read-only world screens from CLSCOMM.PAS.
@@ -849,6 +893,14 @@ the trillum line is overstated (#62).
 `FleetScreen` (the fleet list with the nine commands on it),
 `DistributionScreen` (`InputNewDistribution`, shared by launch and transfer)
 and `OrdersScreen` (the order editor). Reached from the map with `f`.
+
+**Deploy (`l`) is the odd one out**, and the only screen in the port driven by
+PLAYTURN.PAS's parameter table rather than by parameters it picks itself. It
+runs `trap_command_errors` first (the 30-fleet cap, the original's only case),
+then a `ParameterSession` over `FLaunchCom`'s three parameters -- the table's
+richest row, and the only `IDParm2` in the game -- then the distribution grid
+with the fleet side empty, then `launch_fleet_command`. The player sees the
+original's own questions, in its order, with its error messages.
 
 ### ui/menus.py
 Menu system from MENU.PAS, PULLDOWN.PAS.
