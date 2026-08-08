@@ -52,6 +52,7 @@ from .attnpe import npe_attack
 from .datacnst import CargoSpace, ObjName, TechDev, ThingNames, TrnAdj
 from .environ import GameEnvironment
 from .misc import no_ships, thg_lmt
+from .scena import display_background
 from .primintr import (
     empire_active,
     empire_name,
@@ -821,17 +822,28 @@ def _enemy_conquered(
 ) -> list[str]:
     """The victory speech. Port of ``EnemyConquered``'s message half.
 
-    Taking a *capital* always gets the formal declaration; anything else draws
-    one of three.
+    **A scenario's own words come first.** ``DisplayBackground`` is asked for
+    an ``A:`` entry covering this world, and anything it finds replaces the
+    speech entirely -- seven of the thirteen shipped scenarios carry such an
+    index, so in those this is the usual outcome rather than the exception.
 
-    **Scenario background text is not ported.** The original first calls
-    ``SCENA.PAS``'s ``DisplayBackground`` with ``Conquer := True``, and a
-    scenario that supplies a ``WORLDBACKGROUNDINDEX`` entry for this world
-    replaces the whole speech with authored text -- seven of the thirteen
-    shipped scenarios do. That subsystem belongs to SCENA.PAS and is unported;
-    the close-up screen skips it in the same way. Until it lands, every
-    conquest gets the generic wording.
+    Two details of that call are load-bearing. It is made with ``DummyEmp``,
+    which is ``Indep`` and not the conquering player, so any ``[N…]`` in the
+    authored text renders the world's name as an outsider would see it. And
+    **it happens before `ResolveAttack`**, so the world still belongs to the
+    defender -- which is what lets `JAKARTA.SCN` write ``A:8`` and mean
+    "when an independent world is taken".
+
+    Failing that: taking a *capital* always gets the formal declaration, and
+    anything else draws one of three. The draw sits inside the original's
+    ``IF NOT Message``, so **a scenario that supplies text also spends no
+    randomness** -- neither the `Rnd(1,3)` nor the `MyLord` calls beneath it.
+    Keeping that shape keeps the generator in step.
     """
+    background = display_background(game, Empire.Indep, target, conquer=True)
+    if background:
+        return background
+
     emp_n = empire_name(game, player)
     declaration = (
         f"In the name of Her Imperial Majesty, Lady of {emp_n}, I hereby declare"

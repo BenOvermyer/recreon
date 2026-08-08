@@ -35,6 +35,7 @@ from .datacnst import (
 from .environ import GameEnvironment
 from .intrface import get_industrial_distribution
 from .misc import thg_lmt, total_prod
+from .scena import display_background
 from .primintr import (
     get_base_type,
     get_cargo,
@@ -422,6 +423,9 @@ class CloseUpReport:
     defenses: dict[T, int]
     #: Fleets in the same sector, as (id, name, owner) -- scouted ones only.
     fleets: list[tuple[IDNumber, str, Empire]] = field(default_factory=list)
+    #: The scenario's own words about this world, if it has any. Empty for a
+    #: world the player has not scouted, and for a scenario with no index.
+    background: list[str] = field(default_factory=list)
 
 
 def close_up(game: GameEnvironment, player: Empire, obj: IDNumber) -> CloseUpReport:
@@ -429,6 +433,11 @@ def close_up(game: GameEnvironment, player: Empire, obj: IDNumber) -> CloseUpRep
 
     Lists the fleets sharing the sector alongside the world itself, which is
     how a player sees a siege forming.
+
+    **The scenario's background text is gated on having scouted the world**,
+    not merely on knowing it is there -- `CloseUpCommand`'s call is inside an
+    ``IF Scouted(Player,Obj)``. Authored prose says what a world *is*, which is
+    the same thing the status windows withhold until you have looked.
     """
     from .primintr import get_fleets, get_status, scouted
 
@@ -445,6 +454,11 @@ def close_up(game: GameEnvironment, player: Empire, obj: IDNumber) -> CloseUpRep
             continue
         report.fleets.append(
             (flt, object_name(game, player, flt), get_status(game, flt))
+        )
+
+    if scouted(game, player, obj):
+        report.background = (
+            display_background(game, player, obj, conquer=False) or []
         )
 
     return report

@@ -38,6 +38,7 @@ class CloseUpScreen(Screen[None]):
     #heading { height: auto; padding: 1 2; text-style: bold; }
     #body { height: 1fr; padding: 0 2; }
     .section { padding: 1 0 0 0; text-style: bold; }
+    .prose { padding: 1 0 0 0; color: $text-muted; }
     """
 
     def __init__(
@@ -99,6 +100,12 @@ class CloseUpScreen(Screen[None]):
                     )
                 ),
             )
+
+        # The scenario's own words about this world, where it has any. Last,
+        # as `CloseUpCommand` puts them: the numbers are what a player came
+        # for, and the prose is what they stay for.
+        if self.report.background:
+            body.mount(Static("\n".join(self.report.background), classes="prose"))
 
     def action_close(self) -> None:
         self.dismiss(None)

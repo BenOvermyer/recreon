@@ -1087,17 +1087,28 @@ windows too.
 defined in PLAYTURN.PAS's `InitializeMainMenu`, not in MENU.PAS, which is the
 list widget Textual's `ListView` replaces.
 
-**ATTCOMM.PAS is half done** -- `attcomm.py` and `ui/attack.py` cover
-`GetTarget` and `AutoAttackCommand`, so a player can fight from the menu. The
-round-by-round `AttackCommand` is still to do.
+**ATTCOMM.PAS is done** -- `attcomm.py` and `ui/attack.py` cover `GetTarget`,
+`AutoAttackCommand` and the round-by-round `AttackCommand`, closing §5.3.
 
 **DESIGN.PAS is done** -- `designcom.py` and `ui/worlds.py` cover its seven
 commands, closing eight of the ten menu gaps.
 
-**NAMES.PAS is done** -- `names.py` and `ui/names.py`. Every menu command is
-now wired except Attack.
+**NAMES.PAS is done** -- `names.py` and `ui/names.py`.
 
-Still to do: ATTCOMM's interactive half (§5.3) and the §8.3 status windows.
+**PLAYTURN.PAS is done** -- the command enum, the menus, and the parameter
+table with its validation (`PARAMETER_DATA`, `ParameterSession`,
+`trap_command_errors`). There was never a typed-command parser: `GetCommand`
+reads one keystroke and dispatches through the bar, and `SplitCommandLine` is
+in DEADCODE.PAS. DISPLAY.PAS's two string parsers came along as `display.py`.
+
+**SCENA.PAS is done** -- `scena.py`, the scenario background text that the
+close-up and the conquest message both consult. Seven of the thirteen shipped
+scenarios carry a `WORLDBACKGROUNDINDEX`, so this is the difference between
+a conquest reading the author's words and reading the generic speech.
+
+**Every menu command is wired, and every one reaches a working screen.**
+Wiring the parameter table found the last gap: Deploy had a menu entry and no
+action behind it, so a fleet could not be launched from the UI at all.
 
 1. **Info** - About, DOS shell
 2. **Game** - Pause, Print, Next Turn, Quit
@@ -1107,12 +1118,20 @@ Still to do: ATTCOMM's interactive half (§5.3) and the §8.3 status windows.
 6. **Build** - Site status, New construction, Abort
 7. **Ministry of War** - Attack, Auto-attack, Launch LAMs, Defenses
 
-### 8.3 Status windows
+### 8.3 Status windows — **done**
 
-- News window showing recent events
-- Help window with command reference
-- Military status summary
-- Production info for worlds
+SWINDOWS.PAS's seven F-key overlays, one module each: `swindows.py` dispatches,
+`stawind.py`, `fltwind.py`, `empwind.py`, `nwswind.py`, `nmswind.py` and
+`hlpwind.py` decide what each lists, and `ui/windows.py` puts them on screen.
+The rows come from five INTRFACE.PAS builders that had no caller until then.
+
+Two things worth carrying forward. `QuickSortD` compares only the first Word of
+a record, so on little-endian x86 the *second* byte-wide field is the major
+key — both call sites read as though the first sorted first and neither does.
+And `ANACREON.HLP` never shipped, so the help window's live path is the
+original's fallback key list; the 15-topic index is transcribed as the only
+surviving description of the manual, and a reader for the real format is there
+should a copy turn up.
 
 ### 8.4 Save/Load system — **done**
 
