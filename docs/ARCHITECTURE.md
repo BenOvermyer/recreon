@@ -200,6 +200,20 @@ Universe update logic from UPDATE.PAS.
 12. Update revolution
 13. Handle hostile life events
 
+**The supply links are a pair, and only make sense together.** An industrial
+complex runs `supply_link()` before its economy and `surplus_link()` after,
+over the same eight adjacent sectors and the same test for a friendly
+raw-material world (`AgrTyp`, `CheTyp`, `MinTyp`, `RawTyp`, `TriTyp`). Supply
+*pulls*, draining any mine above 250 down to a `Rnd(200,250)` working reserve.
+Surplus *pushes*, but only what the complex holds above `MaxResources` — and
+since `PutTotalCargo` clamps to that ceiling on the very next line, the
+overflow is stock about to be discarded. So it is salvage rather than
+generosity, and it stops as soon as the neighbours are full too.
+
+Both sweep `che..tri`, which is **che, met, sup, tri** — supplies travel with
+the ores, troops and ambrosia do not. Only `supply_link` draws from the
+generator.
+
 ### fleet.py
 Fleet management from FLEET.PAS.
 
