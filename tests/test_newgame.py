@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import pytest
-from conftest import blank_game
+from conftest import blank_game, load_scenario_placed
 
 from recreon.galaxy import XYCoord, nebula_of, srm_owner_of
 from recreon.main import DEFAULT_SCENARIO
@@ -409,11 +409,6 @@ BROKEN_SCENARIOS = {"AWAKEN", "PRINCES"}
 
 ORIGINAL_SCENARIOS = sorted(p.stem for p in SCENARIO_DIR.glob("*.SCN"))
 
-#: How many unseeded rolls a scenario gets to place its worlds before the load
-#: is called a genuine failure. GAUNTLET is the tight one at roughly 8% per
-#: roll, so three attempts leaves a ~1-in-2000 flake.
-RANDOMIZE_ATTEMPTS = 3
-
 FOUR_PLAYERS = {
     Empire.Empire1: "A",
     Empire.Empire2: "B",
@@ -434,24 +429,11 @@ def test_shipped_scenarios_load(name):
     # This test cannot be seeded. Every shipped scenario carries Seed 0, so
     # `ScenarioLoader.run` calls Randomize itself and discards whatever seed
     # was set beforehand -- an earlier `set_rand_seed` here was dead code, and
-    # left the test rolling a fresh galaxy every run.
-    #
-    # That matters because placement can legitimately fail: GetRandomXY gives
-    # up after 101 tries, and GAUNTLET packs 172 worlds tightly enough to trip
-    # it on a few per cent of rolls (see the test below). So retry rather than
-    # pin -- an unlucky roll is not a regression, but failing every attempt is.
-    for attempt in range(RANDOMIZE_ATTEMPTS):
-        try:
-            game = load_scenario(SCENARIO_DIR / f"{name}.SCN", FOUR_PLAYERS)
-            break
-        except ScenarioError as exc:
-            if "No room for random world" not in str(exc):
-                raise
-            if attempt == RANDOMIZE_ATTEMPTS - 1:
-                raise AssertionError(
-                    f"{name} failed to place its worlds on "
-                    f"{RANDOMIZE_ATTEMPTS} consecutive rolls: {exc}"
-                ) from exc
+    # left the test rolling a fresh galaxy every run. `load_scenario_placed`
+    # is what absorbs the unlucky roll that follows from that; see its
+    # docstring, and `test_a_crowded_zone_can_genuinely_fail_to_place_a_world`
+    # below for the behaviour it is retrying past.
+    game = load_scenario_placed(SCENARIO_DIR / f"{name}.SCN", FOUR_PLAYERS)
 
     assert game.Galaxy.size > 0
     assert game.NoOfPlanets > 0
@@ -502,6 +484,14 @@ def test_princes_has_a_stray_token_in_its_starbase_block():
         load_scenario(SCENARIO_DIR / "PRINCES.SCN", FOUR_PLAYERS)
 
 
+def test_the_retry_helper_does_not_mask_a_real_scenario_error():
+    """`load_scenario_placed` retries a galaxy that would not pack, and only
+    that. A malformed file has to surface its own error on the first attempt,
+    or a genuine parser regression would read as three unlucky rolls."""
+    with pytest.raises(ScenarioError, match='Unknown command "3500"'):
+        load_scenario_placed(SCENARIO_DIR / "PRINCES.SCN", FOUR_PLAYERS)
+
+
 # --- The scenarios the game itself ships -------------------------------------
 #
 # The 13 above, imported under new titles and filenames, plus frontier.scn.
@@ -526,22 +516,12 @@ def test_bundled_scenarios_load(name):
     """Unlike `test_shipped_scenarios_load` there is no exempt set: a player
     picking any entry out of the game's own directory gets a game.
 
-    Same retry as that test, for the same reason -- longrun.scn is GAUNTLET,
-    which packs its worlds tightly enough that placement legitimately fails on
-    a few per cent of unseeded rolls.
+    Same retry as that test, for the same reason -- longrun.scn is GAUNTLET
+    and longsleep.scn is AWAKEN filled to the brim, and both pack their worlds
+    tightly enough that placement legitimately fails on a few per cent of
+    unseeded rolls.
     """
-    for attempt in range(RANDOMIZE_ATTEMPTS):
-        try:
-            game = load_scenario(BUNDLED_DIR / name, FOUR_PLAYERS)
-            break
-        except ScenarioError as exc:
-            if "No room for random world" not in str(exc):
-                raise
-            if attempt == RANDOMIZE_ATTEMPTS - 1:
-                raise AssertionError(
-                    f"{name} failed to place its worlds on "
-                    f"{RANDOMIZE_ATTEMPTS} consecutive rolls: {exc}"
-                ) from exc
+    game = load_scenario_placed(BUNDLED_DIR / name, FOUR_PLAYERS)
 
     assert game.Galaxy.size > 0
     assert game.NoOfPlanets > 0
