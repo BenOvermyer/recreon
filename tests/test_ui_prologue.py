@@ -9,7 +9,13 @@ from recreon.loadsave import save_game
 from recreon.main import new_game, update_turn
 from recreon.ui.app import RecreonApp
 from recreon.ui.newgame import NewGameScreen
-from recreon.ui.prologue import Attention, ChooseFrom, PrologueScreen, TextPrompt
+from recreon.ui.prologue import (
+    LOGO,
+    Attention,
+    ChooseFrom,
+    PrologueScreen,
+    TextPrompt,
+)
 from recreon.utils.pascal import set_rand_seed
 
 SCENARIOS = Path(__file__).parent.parent / "src" / "recreon" / "data" / "scenarios"
@@ -61,6 +67,36 @@ async def test_the_app_opens_on_the_prologue(tmp_path):
         await pilot.pause()
         assert isinstance(app.screen, PrologueScreen)
         assert not app.prologue.game_loaded
+
+
+async def test_the_logo_is_laid_out_without_wrapping(tmp_path):
+    """Block art survives only if the widget is exactly the size of the art.
+
+    A wrap or an ellipsis shears the letters apart, and nothing else in the
+    suite would notice -- the screen still works, it just looks broken. So
+    pin the rendered size against the art's own dimensions.
+    """
+    lines = LOGO.splitlines()
+    art = (max(len(line) for line in lines), len(lines))
+
+    app = app_for(tmp_path)
+    async with app.run_test(size=(100, 30)) as pilot:
+        await pilot.pause()
+        logo = app.screen.get_widget_by_id("logo")
+
+        assert (logo.size.width, logo.size.height) == art
+        # Centred as a block rather than left against the edge.
+        assert logo.region.x > 0
+
+
+async def test_the_logo_fits_an_eighty_column_terminal(tmp_path):
+    """The width the DOS build assumed, and the floor this UI is drawn for."""
+    assert max(len(line) for line in LOGO.splitlines()) <= 80
+
+    app = app_for(tmp_path)
+    async with app.run_test(size=(80, 30)) as pilot:
+        await pilot.pause()
+        assert app.screen.get_widget_by_id("logo").size.height == len(LOGO.splitlines())
 
 
 async def test_a_game_on_the_command_line_skips_the_prologue(tmp_path):

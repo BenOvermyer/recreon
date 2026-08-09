@@ -4,9 +4,10 @@ The Textual half of PROLOG.PAS. What the commands *do* is in
 :mod:`recreon.prolog`; this is the menu bar and the little windows it opens.
 
 The original is a pull-down bar (MENU.PAS, PULLDOWN.PAS) over a starfield with
-the Anacreon logo zooming in. The starfield and the logo are direct
-video-memory work with no Python equivalent; the menu is a list here, keyed by
-the same letters the original underlines, so muscle memory carries over.
+the Anacreon logo zooming in. The starfield and the zoom are direct
+video-memory work with no Python equivalent, so the logo is a static banner
+here; the menu is a list, keyed by the same letters the original underlines,
+so muscle memory carries over.
 
 Four commands are dropped rather than drawn: DOS shell, print map (writes to
 ``LST:``), mono/colour, and the configuration file. See
@@ -20,7 +21,7 @@ from pathlib import Path
 from textual import on
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import Horizontal, Vertical, VerticalScroll
+from textual.containers import Center, Horizontal, Vertical, VerticalScroll
 from textual.screen import ModalScreen, Screen
 from textual.widgets import (
     Button,
@@ -53,6 +54,18 @@ from ..prolog import (
     toggle_pause,
     toggle_turn_sync,
 )
+
+#: The title-screen banner, standing in for the logo the original zooms in over
+#: its starfield. 79 columns wide, so it fits an 80-column terminal -- the
+#: width the DOS build assumed, and the minimum this UI is drawn for.
+LOGO = """\
+░█████████
+░██     ░██
+░██     ░██  ░███████       ░███████  ░██░████  ░███████   ░███████  ░████████
+░█████████  ░██    ░██ ░██ ░██    ░██ ░███     ░██    ░██ ░██    ░██ ░██    ░██
+░██   ░██   ░█████████     ░██        ░██      ░█████████ ░██    ░██ ░██    ░██
+░██    ░██  ░██            ░██    ░██ ░██      ░██        ░██    ░██ ░██    ░██
+░██     ░██  ░███████  ░██  ░███████  ░██       ░███████   ░███████  ░██    ░██"""
 
 
 class Attention(ModalScreen[bool]):
@@ -183,7 +196,16 @@ class PrologueScreen(Screen[str | None]):
 
     CSS = """
     PrologueScreen { layout: vertical; align: center middle; }
-    #title { height: auto; padding: 1 2; text-align: center; }
+    /* `width: auto` sizes the widget to the art and the Center around it
+       places that block. Centring the text instead would centre each line
+       independently and shear the letters apart, since the rows are of
+       different lengths. The screen's own `align: center` cannot do the job:
+       #title and #status are full width, so the block it aligns is already
+       as wide as the screen. */
+    #banner { height: auto; padding: 1 0 0 0; }
+    #logo { height: auto; width: auto; color: $accent; text-wrap: nowrap; }
+    #title { height: auto; padding: 0 2 1 2; text-align: center;
+             color: $text-muted; }
     #menu { width: 52; height: auto; max-height: 22; border: solid $panel;
             padding: 0 1; }
     #status { height: auto; padding: 1 2; color: $text-muted; }
@@ -204,7 +226,8 @@ class PrologueScreen(Screen[str | None]):
 
     def compose(self) -> ComposeResult:
         yield Header()
-        yield Static("A N A C R E O N\nReconstruction 4021", id="title")
+        yield Center(Static(LOGO, id="logo", markup=False), id="banner")
+        yield Static("Reconstruction 4021", id="title")
         yield VerticalScroll(id="menu")
         yield Static(id="status")
         yield Footer()
