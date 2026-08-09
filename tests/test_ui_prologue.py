@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+from textual.widgets import ListView
 
 from recreon.loadsave import save_game
 from recreon.main import new_game, update_turn
@@ -23,8 +24,19 @@ def app_for(tmp_path, game=None):
     return RecreonApp(game, scenario_dir=SCENARIOS, save_dir=tmp_path)
 
 
-async def finish_new_game(pilot, screen, players: int = 1):
-    """Drive the picker that the prologue's 'New game' command pushed."""
+async def finish_new_game(pilot, screen, players: int = 1, scenario="frontier.scn"):
+    """Drive the picker that the prologue's 'New game' command pushed.
+
+    Selects by name rather than taking whichever sorts first: most of the
+    bundled scenarios set a minimum player count above 1, and frontier.scn is
+    the one that accepts a single player.
+    """
+    listing = screen.query_one(ListView)
+    listing.index = next(
+        i for i, entry in enumerate(screen.entries) if entry.path.name == scenario
+    )
+    await pilot.pause()
+
     await pilot.press("enter")
     await pilot.pause()
     while screen.step == "intro":

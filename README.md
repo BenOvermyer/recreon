@@ -34,16 +34,37 @@ uv run recreon --version
 
 ### Scenarios
 
-The picker scans `src/recreon/data/scenarios/` by default, which ships `frontier.scn` — that is also the scenario `--no-ui` uses when none is given.
+Fourteen scenarios ship with the game, in `src/recreon/data/scenarios/`, and the picker lists them all:
 
-The 13 scenarios the original shipped are in `original/scenarios/`, and you can play them:
+| Scenario | Difficulty | Players | Length |
+| --- | --- | --- | --- |
+| First Light: 4021 | Beginner | 1-3 | 50+ years |
+| Corsairs of Meridian | Beginner | 1-2 | 50+ years |
+| The Outer Reach | Beginner | 1-4 | 50+ years |
+| Two Crowns | Intermediate | 1-2 | 5-10 years |
+| The Four Heirs | Intermediate | 2-4 | 20-30 years |
+| Triad | Intermediate | 2-3 | 50+ years |
+| Vhalsecc | Intermediate | 1-4 | 100+ years |
+| The Reckoning | Intermediate | 2-4 | 100+ years |
+| The Long Sleep | Intermediate | 2-4 | 100+ years |
+| The Thousand Suns | Intermediate | 3-8 | 100+ years |
+| The Boundary Stones | Advanced | 2-4 | 100+ years |
+| The Kalgan Frontier | Advanced | 1-4 | 50-200 years |
+| The Long Run | Advanced | 1 | 100+ years |
+| The Veil | Expert | 1-4 | 100+ years |
+
+**First Light: 4021** is the one to start with, and **The Kalgan Frontier** is the default `--no-ui` uses.
+
+Thirteen of these are the scenarios the original shipped, imported under new titles; the galaxies are byte-identical to the originals, and only the titles were changed. `src/recreon/data/scenarios/README.md` maps each one back to the file it came from, and documents the two that needed repairing to load at all. `The Kalgan Frontier` is new content rather than a port.
+
+The unmodified originals are still in `original/scenarios/` under their own names, and can be played directly — two of them will not load, faithfully:
 
 ```bash
 uv run recreon --scenario-dir original/scenarios
 uv run recreon --scenario original/scenarios/INTRO.SCN
 ```
 
-Three of them do not load cleanly, and that is faithful to the DOS build rather than a bug here. `AWAKEN.SCN` asks for more worlds than the game can hold and `PRINCES.SCN` has a malformed starbase block, so neither will ever load; `GAUNTLET.SCN` packs its worlds so tightly that placement fails on an unlucky roll, so it loads roughly nine times in ten — try again if it refuses.
+One caveat on the bundled set: **The Long Run** and **The Long Sleep** pack their worlds tightly enough that placement legitimately fails on a small fraction of new games, reporting `No room for random world in zone`. The DOS build failed on the same rolls. Start a new game and it will place.
 
 ## Playing
 
