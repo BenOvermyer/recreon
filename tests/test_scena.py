@@ -9,6 +9,7 @@ about a file the original's authors wrote.
 from pathlib import Path
 
 import pytest
+from conftest import load_scenario_placed
 
 from recreon.clscomm import close_up
 from recreon.environ import GameEnvironment
@@ -325,8 +326,14 @@ def test_every_loadable_scenario_with_an_index_yields_some_text(name):
     """A sweep over each scenario's worlds under three different owners. The
     point is that the parser agrees with files it did not write -- `AWAKEN.SCN`
     and `PRINCES.SCN` also have indexes but are defective as shipped and do not
-    load, and `Nebula.SCN` is covered separately below."""
-    game = load_scenario(SHIPPED / name, {Empire.Empire1: "A", Empire.Empire2: "B"})
+    load, and `Nebula.SCN` is covered separately below.
+
+    Loaded through `load_scenario_placed` because GAUNTLET is in the list: it
+    packs 172 worlds tightly enough to fail placement on roughly 8% of rolls,
+    and no seed set here survives the scenario's own `Randomize`."""
+    game = load_scenario_placed(
+        SHIPPED / name, {Empire.Empire1: "A", Empire.Empire2: "B"}
+    )
 
     found = 0
     for i in range(1, min(game.NoOfPlanets, 50) + 1):

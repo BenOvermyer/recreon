@@ -87,3 +87,41 @@ def scenario_path():
     from recreon.main import DEFAULT_SCENARIO
 
     return DEFAULT_SCENARIO
+
+
+#: How many rolls a scenario gets to place its worlds before the load is called
+#: a genuine failure. GAUNTLET is the tight one, failing about 8% of the time,
+#: so three attempts leaves a ~1-in-2000 flake.
+RANDOMIZE_ATTEMPTS = 3
+
+
+def load_scenario_placed(path, players, attempts: int = RANDOMIZE_ATTEMPTS):
+    """``load_scenario``, retried past a galaxy that would not pack.
+
+    Placement can fail legitimately and at random: ``GetRandomXY`` gives up
+    after 101 tries rather than looping, and a densely packed scenario trips
+    it on a few per cent of rolls -- GAUNTLET at roughly 8%, and the imported
+    AWAKEN, which fills the planet array to the brim, at roughly 7%. The DOS
+    build failed on the same rolls, so this is faithful rather than a defect.
+
+    A test cannot seed its way out of it either. Every shipped scenario
+    carries ``Seed 0``, so ``ScenarioLoader.run`` calls ``Randomize`` itself
+    and discards whatever seed was set beforehand.
+
+    So retry rather than pin: an unlucky roll is not a regression, but failing
+    every attempt is. Only the crowding error is retried -- any other
+    ``ScenarioError`` propagates on the first go.
+    """
+    from recreon.newgame import ScenarioError, load_scenario
+
+    for attempt in range(attempts):
+        try:
+            return load_scenario(path, players)
+        except ScenarioError as exc:
+            if "No room for random world" not in str(exc):
+                raise
+            if attempt == attempts - 1:
+                raise AssertionError(
+                    f"{getattr(path, 'name', path)} failed to place its worlds "
+                    f"on {attempts} consecutive rolls: {exc}"
+                ) from exc
