@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+from textual.widgets import ListView
 
 from recreon.types import Empire
 from recreon.ui.app import RecreonApp
@@ -29,10 +30,26 @@ async def open_picker(app, pilot, directory=SCENARIOS):
     return screen
 
 
-async def walk_to_naming(pilot, screen, players: int | None = None):
-    """Pick the first scenario, page past the intro, answer the count."""
+async def choose_scenario(pilot, screen, scenario="frontier.scn"):
+    """Select a scenario by name rather than taking whichever sorts first.
+
+    The directory holds the fourteen bundled scenarios, and most of them set a
+    minimum player count above 1. frontier.scn accepts 1-4, so it is the one
+    that lets a test choose the count it wants to exercise.
+    """
+    listing = screen.query_one(ListView)
+    listing.index = next(
+        i for i, entry in enumerate(screen.entries) if entry.path.name == scenario
+    )
+    await pilot.pause()
+
     await pilot.press("enter")
     await pilot.pause()
+
+
+async def walk_to_naming(pilot, screen, players: int | None = None, scenario="frontier.scn"):
+    """Pick a scenario, page past the intro, answer the count."""
+    await choose_scenario(pilot, screen, scenario)
 
     while screen.step == "intro":
         await pilot.press("enter")
@@ -67,8 +84,7 @@ async def test_picking_a_scenario_shows_its_introduction():
     async with app.run_test() as pilot:
         screen = await open_picker(app, pilot)
 
-        await pilot.press("enter")
-        await pilot.pause()
+        await choose_scenario(pilot, screen)
 
         assert screen.step == "intro"
         assert screen.header.title == "The Kalgan Frontier"
@@ -136,8 +152,7 @@ async def test_a_bad_player_count_is_rejected_without_advancing():
     async with app.run_test() as pilot:
         screen = await open_picker(app, pilot)
 
-        await pilot.press("enter")
-        await pilot.pause()
+        await choose_scenario(pilot, screen)
         while screen.step == "intro":
             await pilot.press("enter")
             await pilot.pause()
@@ -157,8 +172,7 @@ async def test_a_non_numeric_player_count_is_rejected():
     async with app.run_test() as pilot:
         screen = await open_picker(app, pilot)
 
-        await pilot.press("enter")
-        await pilot.pause()
+        await choose_scenario(pilot, screen)
         while screen.step == "intro":
             await pilot.press("enter")
             await pilot.pause()
@@ -194,8 +208,7 @@ async def test_escape_during_the_intro_goes_back_to_the_list():
     async with app.run_test() as pilot:
         screen = await open_picker(app, pilot)
 
-        await pilot.press("enter")
-        await pilot.pause()
+        await choose_scenario(pilot, screen)
         assert screen.step == "intro"
 
         await pilot.press("escape")

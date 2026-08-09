@@ -502,6 +502,85 @@ def test_princes_has_a_stray_token_in_its_starbase_block():
         load_scenario(SCENARIO_DIR / "PRINCES.SCN", FOUR_PLAYERS)
 
 
+# --- The scenarios the game itself ships -------------------------------------
+#
+# The 13 above, imported under new titles and filenames, plus frontier.scn.
+# Every galaxy is byte-identical to its original except in the two files that
+# could not load; those carry the smallest fix that makes them playable, and
+# the two tests below are what pin the fix rather than the defect.
+
+BUNDLED_DIR = DEFAULT_SCENARIO.parent
+
+BUNDLED_SCENARIOS = sorted(p.name for p in BUNDLED_DIR.glob("*.scn"))
+
+
+def test_every_original_scenario_was_imported():
+    """13 imported plus frontier.scn. Guards the parametrised test below
+    against silently becoming a no-op, and catches an import that was dropped
+    on the way in."""
+    assert len(BUNDLED_SCENARIOS) == len(ORIGINAL_SCENARIOS) + 1
+
+
+@pytest.mark.parametrize("name", BUNDLED_SCENARIOS)
+def test_bundled_scenarios_load(name):
+    """Unlike `test_shipped_scenarios_load` there is no exempt set: a player
+    picking any entry out of the game's own directory gets a game.
+
+    Same retry as that test, for the same reason -- longrun.scn is GAUNTLET,
+    which packs its worlds tightly enough that placement legitimately fails on
+    a few per cent of unseeded rolls.
+    """
+    for attempt in range(RANDOMIZE_ATTEMPTS):
+        try:
+            game = load_scenario(BUNDLED_DIR / name, FOUR_PLAYERS)
+            break
+        except ScenarioError as exc:
+            if "No room for random world" not in str(exc):
+                raise
+            if attempt == RANDOMIZE_ATTEMPTS - 1:
+                raise AssertionError(
+                    f"{name} failed to place its worlds on "
+                    f"{RANDOMIZE_ATTEMPTS} consecutive rolls: {exc}"
+                ) from exc
+
+    assert game.Galaxy.size > 0
+    assert game.NoOfPlanets > 0
+
+
+def test_the_imported_awaken_fits_inside_the_planet_limit():
+    """AWAKEN asked for 212 worlds against MaxNoOfPlanets = 200. Twelve came
+    off the central pool -- the largest group, and the only one outside the
+    four-way symmetry the scenario is built around.
+
+    It now lands on exactly 200, so this pins the fix in both directions: a
+    further trim would waste worlds the author placed, and putting any back
+    would overflow again.
+
+    Filling the array to the brim leaves it as tightly packed as GAUNTLET, so
+    a seed here can still fail placement outright -- roughly 1 in 15. That is
+    the scenario's own density rather than anything the trim introduced, and
+    it is a load failure, never a quiet 199."""
+    counts = set()
+    for seed in range(1, 16):
+        set_rand_seed(seed)
+        try:
+            counts.add(load_scenario(BUNDLED_DIR / "longsleep.scn", FOUR_PLAYERS).NoOfPlanets)
+        except ScenarioError as exc:
+            assert "No room for random world" in str(exc)
+
+    assert counts == {200}, counts
+
+
+def test_the_imported_princes_parses_its_starbase_block():
+    """Dropping the stray `0 ; (reserved)` leaves the six fields every other
+    scenario's CreateStarbase has, so the block no longer runs long and the
+    trailing cargo amount is no longer read as a directive."""
+    set_rand_seed(1)
+    game = load_scenario(BUNDLED_DIR / "fourheirs.scn", FOUR_PLAYERS)
+
+    assert len(game.GlobalSets.SetOfActiveStarbases) == 1
+
+
 # --- The introduction pass ---------------------------------------------------
 
 
