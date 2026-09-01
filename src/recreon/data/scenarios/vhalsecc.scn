@@ -15,49 +15,48 @@ ANACREON 12
 BEGINTEXT
                               
 
-                              ***** Arronax *****
+                              ***** Vhalsecc *****
 
-               Just after the collapse of the second great empire,  
-       mankind lived in a divided but still intact society.  Lacking
-       the catastrophic disarray of the first fall, many worlds remained
-       self-sufficient and conservative.  Any world that seemed to step
-       out of line was swiftly punished by its neighbors.  But human 
-       nature soon required men once again to look to the stars and 
-       dream of expansion.  Some worlds set up huge industries devoted 
-       to shipbuilding so they could again roam the galaxy."  
+               The Second Empire did not collapse so much as it
+       calcified. Worlds that had grown dependent on Imperial
+       infrastructure found themselves stranded, forced to maintain
+       what they could with dwindling resources. Innovation became
+       dangerous. Expansion became threatening. And the province of
+       Vhalsecc -- vast, wealthy, and ruled by twin magistrates who
+       could not agree on anything except their own supremacy --
+       became the enforcer of stagnation.
 
 NEWPAGE                
                               
-                              ***** Arronax *****   
+                              ***** Vhalsecc *****   
 
-               "However, one province had somehow escaped the tide of 
-       the fall and was able to keep its integrity.  It grew accustomed
-       to supremacy and extremely discouraged others from attempting 
-       to become powerful.  Arronax, a divided kingdom, was ruled by rival
-       twin magistrates which sometimes clashed, but they were both violent-
-       ly opposed to others "poaching" in their territory, which they felt 
-       to be the entire galaxy."  
+               "Vhalsecc held itself apart from the decay. Its worlds
+       remained productive, its fleets remained strong, and its
+       magistrates remained vigilant. Any attempt by neighboring systems
+       to rebuild was met with swift punishment. Vhalsecc would not
+       tolerate rivals. The galaxy, in Vhalsecc's view, belonged to
+       Vhalsecc -- and would remain so until the stars themselves
+       burned out."
                                         
                                         - History of the Galaxy
                                           Zex Narphil, Counselor
         
 NEWPAGE
                               
-                              ***** Arronax *****    
+                              ***** Vhalsecc *****    
 
-               You are controlling an empire that is desperate for 
-       expansion.  Your two planets are overflowing with ships and 
-       pilgrims who want to try their luck at a new frontier.  They
-       grow increasingly restless and your throne is in danger.  You 
-       must overthrow the Arronaxan empires and once again establish 
-       harmony in the galaxy.
+               Your empire is small, crowded, and restless. Your people
+       look to the stars and see opportunity. Your throne looks to the
+       stars and sees danger. Vhalsecc watches, and Vhalsecc does not
+       forgive.
 
-               You must be cautious.  Not all emperors have such noble 
-       motives as do you.  Many are once again learning the skills of 
-       piracy, and of building conquering machines; colossal structures
-       which fill an entire sector.  Your mission will not be easy, but
-       you must succeed in order to advance.  Already your planet is being
-       probed by Arronax...
+               But you cannot hold your people back forever. Expand,
+       or be consumed by your own unrest. Build your fleet, break the
+       Vhalseccan grip, and forge something new from the wreckage of
+       the old order.
+
+               They are already watching you. Make sure they have
+       reason to be afraid.
 
 NEWPAGE
 
@@ -72,19 +71,19 @@ WorldBackgroundIndex
 2:3 E:1          1 ; Player 2 Capital
 2:5 E:2          1 ; Player 3 Capital
 2:6 E:3          1 ; Player 4 Capital
-2:8 E:4          2 ; Arronax 1 (empire 5)
-2:12 E:5         2 ; Arronax 2 (empire 6)
+2:8 E:4          2 ; Vhalsecc 1 (empire 5)
+2:12 E:5         2 ; Vhalsecc 2 (empire 6)
 2:16 E:6         3 ; Empire 7, the pirates
 2:17 E:7         4 ; Empire 8, the berzerker empire
 3:1 E:7          5 ; Rogue Starbase
 EndIndex
 
 TEXT 1
-Only by defeating Arronax will you be able to expand your empire.
+Only by defeating Vhalsecc will you be able to expand your empire.
 ENDTEXT
 
 TEXT 2
-One of the Arronaxan capitals, this is one of your primary targets
+One of the Vhalseccan capitals, this is one of your primary targets
 ENDTEXT
 
 TEXT 3
@@ -116,8 +115,8 @@ DefineZone 2 15,18 20,23 ; player 1
 DefineZone 3 10,25 15,30 ; player 2
 DefineZone 4 32,10 37,15   ; player 3
 DefineZone 5 18,33 23,38 ; player 4
-DefineZone 6 1,1 20,10   ; Arronax 1 (empire 5)
-DefineZone 7 25,35 45,45 ; Arronax 2 (empire 6)
+DefineZone 6 1,1 20,10   ; Vhalsecc 1 (empire 5)
+DefineZone 7 25,35 45,45 ; Vhalsecc 2 (empire 6)
 DefineZone 8 8,37 13,42   ; pirates (empire 7)
 DefineZone 9 32,30 36,35 ; berzerker (empire 8)
 
@@ -170,7 +169,7 @@ CreateNPEmpire 3
 
 CreateNPEmpire 4
 3 
-Arronax
+Vhalsecc
 1 8 2
 10	; str
 13	; nnj
@@ -179,7 +178,7 @@ CENTRAL
 
 CreateNPEmpire 5
 3 
-Arronax
+Vhalsecc
 1 8 2 10 13 1 CENTRAL
 
 CreateNPEmpire 6
@@ -277,13 +276,13 @@ CreateWorld 8 Z:5
 2000 0 0 2000 4000 1500 1099
 
 ; --- Non-player worlds ---
-; Arronax 1
+; Vhalsecc 1
 
 CreateWorld 9 Z:6
 20	; Volcanic
 8	; Starship
 4	; Capital
-4	; Empire 5 (Arronax 1)
+4	; Empire 5 (Vhalsecc 1)
 4000 95 100
 2000 1000 5000 2000
 6000 2000 4000 3000 1000 500 3000
@@ -293,7 +292,7 @@ CreateWorld 10 Z:6
 11	; Gas Giant
 7	; Bio-tech
 2	; base planet
-4	; Arronax 1
+4	; Vhalsecc 1
 1500 70 40
 0 600 2500 1000
 2000 500 1200 800 250 0 900
@@ -303,7 +302,7 @@ CreateWorld 11 Z:6
 17	; Poisonous
 5	; warp
 5	; chemical
-4	; Arronax 1
+4	; Vhalsecc 1
 700 70 40
 0 200 1500 600
 500 0 500 300 0 0 500
@@ -313,19 +312,19 @@ CreateWorld 12 Z:6
 20	; volcanic
 5	; warp
 12	; raw material
-4	; Arronax 1
+4	; Vhalsecc 1
 700 70 40
 0 200 1500 600
 500 0 500 300 0 0 500
 1000 0 0 6000 5000 800 3000
 
-; Arronax 2
+; Vhalsecc 2
 
 CreateWorld 13 Z:7
 20	; volcanic
 8	; starship
 4	; Capital
-5	; Empire 6 (Arronax 2)
+5	; Empire 6 (Vhalsecc 2)
 4000 95 100
 2000 1000 5000 2000
 6000 2000 4000 3000 1000 500 3000
@@ -335,7 +334,7 @@ CreateWorld 14 Z:7
 11	; gas giant
 7	; bio-tech
 2	; Base planet
-5	; Arronax 2
+5	; Vhalsecc 2
 1500 70 40
 0 600 2500 1000
 2000 500 1200 800 250 0 900
@@ -345,7 +344,7 @@ CreateWorld 15 Z:7
 17	; Poisonous
 5	; warp
 5	; Chemical
-5	; Arronax 2
+5	; Vhalsecc 2
 700 70 40
 0 200 1500 600
 500 0 500 300 0 0 500
@@ -355,7 +354,7 @@ CreateWorld 16 Z:7
 20	; volcanic
 5	; warp
 12	; raw materials
-5	; Arronax 2
+5	; Vhalsecc 2
 700 70 40
 0 200 1500 600
 500 0 500 300 0 0 500
