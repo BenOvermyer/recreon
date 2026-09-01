@@ -1187,7 +1187,7 @@ class ScenarioLoader:
             except TokenError as exc:
                 self.error(str(exc))
                 return
-            except (ValueError, KeyError) as exc:
+            except (ValueError, KeyError, IndexError) as exc:
                 self.error(f"ERROR: {directive}: {exc}")
                 return
 

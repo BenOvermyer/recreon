@@ -434,7 +434,7 @@ def load_game(game: GameEnvironment, filename: str | Path) -> list[str]:
         load_empire_data(game, document["empires"])
         load_news_data(game, document["news"])
         load_npe_data(game, document["npe"])
-    except (KeyError, TypeError, ValueError) as exc:
+    except (KeyError, TypeError, ValueError, AttributeError, IndexError) as exc:
         raise SaveFileError(f"{path} is damaged: {exc}") from exc
 
     return warnings
