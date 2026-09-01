@@ -217,12 +217,12 @@ async def test_escape_during_the_intro_goes_back_to_the_list():
 
 
 async def test_an_empty_directory_says_so(tmp_path):
-    """AttentionWindow('There are no Anacreon scenario', 'files in "…"')."""
+    """AttentionWindow('There are no Re:creon scenario', 'files in "…"')."""
     app = RecreonApp(None, scenario_dir=tmp_path)
     async with app.run_test() as pilot:
         screen = await open_picker(app, pilot, tmp_path)
         prompt = str(screen.query_one("#prompt").content)
-        assert "no Anacreon scenario files" in prompt
+        assert "no Re:creon scenario files" in prompt
 
 
 async def test_backing_out_of_the_picker_leaves_the_app_running():

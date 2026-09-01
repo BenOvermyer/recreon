@@ -342,7 +342,7 @@ class PrologueScreen(Screen[str | None]):
                 warnings = continue_old_game(self.game, self.state, path)
             except SaveFileError:
                 self.app.push_screen(
-                    Attention(f'"{path.name}" is probably not', "an Anacreon save file.")
+                    Attention(f'"{path.name}" is probably not', "a Re:creon save file.")
                 )
                 return
             self.app.adopt_game(self.game)

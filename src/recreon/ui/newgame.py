@@ -162,9 +162,9 @@ class NewGameScreen(Screen[GameEnvironment | None]):
         body.remove_children()
 
         if not self.entries:
-            # AttentionWindow('There are no Anacreon scenario', 'files in "…"')
+            # AttentionWindow('There are no Re:creon scenario', 'files in "…"')
             self.query_one("#prompt", Static).update(
-                f'There are no Anacreon scenario files in "{self.directory}".'
+                f'There are no Re:creon scenario files in "{self.directory}".'
             )
             self.query_one("#hint", Static).update("Esc: back")
             return
