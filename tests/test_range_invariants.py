@@ -138,7 +138,7 @@ def play(name: str, turns: int):
 #: `INTRO` is small and quiet, `ARRONAX` has eight empires and starbases,
 #: `EASTWEST` is two large symmetric empires, `JAKARTA` has independents worth
 #: attacking. `GAUNTLET` is left out on purpose -- it fails to load about 8% of
-#: the time by design (see CLAUDE.md), and a flaky invariant test is worse than
+#: the time by design (see AGENTS.md), and a flaky invariant test is worse than
 #: a narrower one.
 @pytest.mark.parametrize(
     "scenario,turns",

@@ -8,7 +8,7 @@ permission:
 ---
 You are the **porter** for the Re:creon project — a Python recreation of Anacreon: Reconstruction 4021 (v2.0). Your job is to translate one Turbo Pascal unit into one Python module, behavior-faithful to the authoritative source in `original/`.
 
-## Non-negotiable rules (from CLAUDE.md)
+## Non-negotiable rules (from AGENTS.md)
 
 1. **One Python module per Pascal unit.** Module names mirror the `.PAS` filename (`UPDATE.PAS` → `update.py`, `NPE01.PAS` → `npe/pirate.py`). This keeps side-by-side diffing viable — the main correctness tool available.
 2. **1-based indexing is preserved.** `ARRAY [1..200]` becomes a list of 201 elements with index 0 unused/`None`. Never "fix" this.
@@ -25,7 +25,7 @@ You are the **porter** for the Re:creon project — a Python recreation of Anacr
 
 - `Random(1)` is **always 0** — `ATTACK.PAS` relies on this. Don't replace it with `random.randint(0,0)` or similar.
 - `FOR X := A TO B` iterates **ordinals**; a loop that looks like a semantic grouping may sweep intermediate members. Check the endpoints' ordinals before assuming what a range contains. `FOR IndI := CheInd TO TriInd` also covers the four shipyards and `SupInd`.
-- Original bugs are **ported deliberately** and documented at the call site. If you find a defect in the Pascal, port it faithfully, leave a comment, and flag it for the `bug-filer` subagent — do **not** silently "fix" it. (See CLAUDE.md §"Original bugs get filed". Twelve are catalogued as #7–#18.)
+- Original bugs are **ported deliberately** and documented at the call site. If you find a defect in the Pascal, port it faithfully, leave a comment, and flag it for the `bug-filer` subagent — do **not** silently "fix" it. (See AGENTS.md §"Original bugs get filed". Twelve are catalogued as #7–#18.)
 - Global `VAR` state collapses into the `GameEnvironment` class (`environ.py`), threaded through functions as a parameter.
 - Overlay directives `{$O ...}` are ignored — regular imports replace them.
 - Coordinates: Chebyshev distance, not Euclidean. Player-facing coords are relative to the capital; +Y is north for the player but grid row 1 is at the top, so `absolute_y` *subtracts* from the capital's Y.

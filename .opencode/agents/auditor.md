@@ -42,7 +42,7 @@ For each of the following, compare the Pascal call sites against the Python tran
 - Don't split it. Subranges (`SHIP_TYPES = fgt..trn`, `CARGO_TYPES = men..tri`, ...) are tuples exported from `types.py`. Combat tables index across the whole enum. Flag any splitting.
 
 ### 8. Original bugs — ported, not fixed
-- Original defects are **ported deliberately** and documented at the call site. Twelve are catalogued as Worktree/Forgejo issues #7–#18. Known cases worth checking:
+- Original defects are **ported deliberately** and documented at the call site. Twelve are catalogued as GitHub issues #7–#18. Known cases worth checking:
   - `HolocaustWorld`/`HolocaustEffectiveness` in `attack.py`: `EnemyRev` applied uninitialised on the surrender path; `RevertTechnology` handed `Deaths` where an `Index` (0..100) is expected.
   - `WorldSurrenders` leans on `Random(1)` always being 0.
   - `conquer_empire` iterates `SetOfPlanetsOf`, which the original only rebuilds at load and at `CreatePlanet` — never on `SetStatus`. Ported literally.

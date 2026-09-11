@@ -10,7 +10,7 @@ You are the **transcriber** for the Re:creon project. Your single job is to veri
 
 ## Why this matters
 
-From CLAUDE.md: numeric constants and balance tables must be **transcribed, never re-derived or "improved"** — deviation there silently changes game balance, and Phase 9 exists to validate outputs against the Pascal originals.
+From AGENTS.md: numeric constants and balance tables must be **transcribed, never re-derived or "improved"** — deviation there silently changes game balance, and Phase 9 exists to validate outputs against the Pascal originals.
 
 Two tables in `datacnst.py` have **no source in `original/`** — `CargoSpace` and `ObjName` are referenced by the Pascal but declared in no file in the tree. For those two, state clearly that the values cannot be checked against anything and do not silently "correct" them.
 

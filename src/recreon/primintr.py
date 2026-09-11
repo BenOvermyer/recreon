@@ -623,7 +623,7 @@ def my_lord(game: GameEnvironment, emp: Empire) -> str:
     diverge from the Pascal's for no gain. But it does mean the port's stream
     can only match the original's if the UI makes the same calls in the same
     order, which it cannot -- one more reason a DOS-era galaxy is not
-    reproducible here (see CLAUDE.md on the LCG).
+    reproducible here (see AGENTS.md on the LCG).
     """
     if game.Universe.EmpireData[emp].IsAnEmpress:
         return MY_LORD_EMPRESS[rnd(1, len(MY_LORD_EMPRESS)) - 1]

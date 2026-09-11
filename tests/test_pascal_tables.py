@@ -7,7 +7,7 @@ incomplete: **several units declare their own balance tables**, and those were
 transcribed by hand with nothing checking them.
 
 The six combat adjustments in ATTACK.PAS are the ones that matter most --
-CLAUDE.md already had to correct itself once about where they live, having
+AGENTS.md already had to correct itself once about where they live, having
 claimed `CombatTechAdj` was in DATACNST. A slip in any of them changes every
 battle in the game and fails nothing else.
 

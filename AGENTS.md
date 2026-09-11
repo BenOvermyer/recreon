@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to OpenCode and ChatGPT Codex when working with code in this repository. It is the shared agent-instruction file for both tools; keep it as `AGENTS.md`.
 
 ## What this repo is
 
@@ -175,7 +175,7 @@ Modules for later phases are not stubbed out — an absent file means unported. 
 
 ## Original bugs get filed, not just commented
 
-**Every defect found in the original Pascal gets a Worktree issue on `ben.overmyer/recreon`, labelled `original-bug`** — in addition to being documented at the call site and reproduced faithfully. File it when you find it, not in a batch at the end.
+**Every defect found in the original Pascal gets a GitHub issue on `BenOvermyer/recreon`, labelled `original-bug`** — in addition to being documented at the call site and reproduced faithfully. File it when you find it, not in a batch at the end.
 
 The port stays faithful; the issue records the problem for the post-port improvement phase, when the goal shifts from reproducing the game to improving it. An issue should say what the original does, why it is wrong, what the port does now, and what fixing it would change about gameplay. Where a defect might be deliberate balance rather than a mistake — the fortress catapult in #16 is the type case — say so and leave the judgement open rather than asserting it is a bug.
 

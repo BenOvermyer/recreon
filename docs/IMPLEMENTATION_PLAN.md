@@ -494,7 +494,7 @@ def subtract_casualties(fleet: FleetRecord, losses: dict):
 **Source files**: NEWGAME.PAS (2042 lines), DFA.PAS (170 lines)
 
 > Numbered 3.5 rather than inserted as a new Phase 4 so the existing phase
-> numbers, and the references to them in CLAUDE.md and the commit history,
+> numbers, and the references to them in AGENTS.md and the commit history,
 > stay valid.
 
 Originally unscheduled. Without it nothing populates a galaxy, so every phase

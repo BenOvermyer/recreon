@@ -2,7 +2,7 @@
 description: Port a Pascal unit to a faithful Python module
 agent: porter
 ---
-Port the Turbo Pascal unit `$1` to its Python counterpart under `src/recreon/`, following the project's porting conventions (CLAUDE.md §"Porting conventions").
+Port the Turbo Pascal unit `$1` to its Python counterpart under `src/recreon/`, following the project's porting conventions (AGENTS.md §"Porting conventions").
 
 Steps:
 1. Read the Pascal unit in `original/` end to end.

@@ -116,4 +116,4 @@ uv run pytest tests/test_fleet.py -q
 uvx ruff check src/ tests/       # lint
 ```
 
-`CLAUDE.md` covers the porting conventions and the known original bugs that are reproduced deliberately; `docs/` carries the architecture and the implementation plan.
+`AGENTS.md` covers the porting conventions and the known original bugs that are reproduced deliberately; `docs/` carries the architecture and the implementation plan.

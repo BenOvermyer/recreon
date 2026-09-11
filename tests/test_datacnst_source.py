@@ -1,6 +1,6 @@
 """Check every DATACNST table against the Pascal it was transcribed from.
 
-CLAUDE.md's rule is that the balance tables are transcribed exactly and never
+AGENTS.md's rule is that the balance tables are transcribed exactly and never
 re-derived, and `_table` already catches a row or key miscount at import time.
 Nothing checked the *values* -- and for three tables this file long claimed
 nothing could, on the belief that `CargoSpace`, `ObjName` and `MPower` were

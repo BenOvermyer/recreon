@@ -130,7 +130,7 @@ class Command(IntEnum):
 
 
 #: Commands inside the `(* ARTIFACTS ... *)` block -- declared, menued and
-#: dispatched nowhere in v2.0. See CLAUDE.md on the dead artifact subsystem.
+#: dispatched nowhere in v2.0. See AGENTS.md on the dead artifact subsystem.
 UNREACHABLE = frozenset({Command.ArtfctCom, Command.TransCom, Command.HoloCom})
 
 #: Commands that only DOS could do, or that need hardware the port has no
