@@ -193,6 +193,8 @@ uvx ruff check --fix src/ tests/             # and fix what is mechanical
 uv run recreon                              # launch the TUI
 uv run recreon --scenario path.scn --name X  # pick a scenario / empire name
 uv run recreon --no-ui                      # advance one turn headlessly
+uv run python docs/manual/build.py          # rebuild the player manual (PDF + HTML)
+uv run python docs/manual/build.py --check  # verify the manual's generated appendix is current
 ```
 
 Python 3.12, Textual for the TUI, pytest (with `asyncio_mode = "auto"`, for Textual's `run_test()` pilot) for tests. **Ruff is configured and clean**, deliberately narrow: `F` (Pyflakes) and `I` (import order) only. No type checker.
@@ -207,6 +209,7 @@ Read these before writing code; they carry the full design and are more specific
 - `docs/IMPLEMENTATION_PLAN.md` — 10 phases (1–9, plus 3.5) with milestones and code sketches. Phases are ordered by dependency: data structures → galaxy/game loop → economy → scenario generation → fleets → combat → construction → AI → UI → validation.
 - `docs/TRANSLATION_NOTES.md` — Pascal→Python idiom table and gotchas (`DIV` → `//`, 1-based `FOR..TO` inclusive ranges, records → dataclasses, pointers → references, overlays → plain imports).
 - `docs/INITIAL_DESIGN.md` — game mechanics summary and success criteria.
+- `docs/manual/` — the player manual: `chapters/` (one Markdown file per chapter), `build.py` (renders the generated appendix from the game tables and runs pandoc), `template.typ` (the PDF's typst styling), `logo.svg`, and the two built artifacts. The appendix is the single source of truth for every number it prints: the file under `generated/` is written by the build, never by hand, and `tests/test_manual.py` fails if it disagrees with `datacnst`/`attack`. The PDF's per-chapter line-art icons are keyed by the chapter's **exact H1 text** (`chapter-icons` in `template.typ`) -- rename a title without updating the map and the chapter simply loses its icon.
 
 ## Porting conventions
 

@@ -1,0 +1,4118 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.10.2" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="The Re:creon project" />
+  <meta name="dcterms.date" content="2026-09-11" />
+  <title>Re:creon Player&#39;s Manual</title>
+  <style>
+
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+  <style type="text/css">
+:root {
+--ink: #172033;
+--muted: #5a6478;
+--faint: #8a93a6;
+--line: #d5dae3;
+--paper: #fcfcfa;
+--deep: #0b1124;
+--deep2: #141d3a;
+--cyan: #0e7f8c;
+--cyan-bright: #6fd7e6;
+--amber: #b06f1f;
+--amber-bright: #d9994e;
+--cream: #e8e6df;
+}
+html {
+font-size: 16px;
+}
+body {
+margin: 0 auto;
+max-width: 46rem;
+padding: 0 1.5rem 4rem;
+background: var(--paper);
+color: var(--ink);
+font-family: "Libertinus Serif", "Noto Serif", Georgia, serif;
+line-height: 1.65;
+}
+
+header#title-block-header {
+display: block;
+margin: 0 -1.5rem 3rem;
+padding: 3.5rem 1.5rem 3rem;
+background:
+radial-gradient(circle at 82% 118%, var(--deep2) 0 12rem, transparent 12.05rem),
+var(--deep);
+color: var(--cream);
+text-align: center;
+}
+header#title-block-header .title {
+margin: 1rem auto .4rem;
+font-family: "JetBrains Mono", "Fira Mono", monospace;
+font-size: 2rem;
+font-weight: 700;
+letter-spacing: .18em;
+color: var(--cream);
+}
+header#title-block-header .title::before {
+content: "";
+display: block;
+width: 5.5rem;
+height: 5.5rem;
+margin: 0 auto 1.2rem;
+background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIiB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCI+CiAgPCEtLSBSZTpjcmVvbiBlbWJsZW06IGhleGFnb25hbCBiYWRnZSwgcmluZ2VkIHBsYW5ldCwgc2F0ZWxsaXRlLCBzcGFya2xlcy4KICAgICAgIFNvbGlkIGZpbGxzIGFuZCBzdHJva2VzIG9ubHkgKG5vIGdyYWRpZW50cywgdGV4dCwgZmlsdGVycywgbWFza3Mgb3IgY2xpcHMpCiAgICAgICBzbyB0aGUgdHlwc3QgU1ZHIHJlbmRlcmVyIHVzZWQgYnkgdGhlIG1hbnVhbCBidWlsZCBkcmF3cyBpdCBleGFjdGx5LiAtLT4KICA8IS0tIG91dGVyIGhleGFnb24gLS0+CiAgPHBvbHlnb24gcG9pbnRzPSIxMjAuMCw4LjAgMjE3LjAsNjQuMCAyMTcuMCwxNzYuMCAxMjAuMCwyMzIuMCAyMy4wLDE3Ni4wIDIzLjAsNjQuMCIKICAgICAgICAgICBmaWxsPSJub25lIiBzdHJva2U9IiM1NmMxY2YiIHN0cm9rZS13aWR0aD0iNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDwhLS0gaW5uZXIgaGFpcmxpbmUgaGV4YWdvbiAtLT4KICA8cG9seWdvbiBwb2ludHM9IjEyMC4wLDIwLjAgMjA2LjYsNzAuMCAyMDYuNiwxNzAuMCAxMjAuMCwyMjAuMCAzMy40LDE3MC4wIDMzLjQsNzAuMCIKICAgICAgICAgICBmaWxsPSJub25lIiBzdHJva2U9IiNkOTk5NGUiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBvcGFjaXR5PSIwLjg1Ii8+CiAgPCEtLSBiYWNrIGhhbGYgb2YgdGhlIHJpbmcgKGRyYXduIGJlZm9yZSB0aGUgcGxhbmV0LCBzbyB0aGUgcGxhbmV0IG9jY2x1ZGVzIGl0KSAtLT4KICA8cG9seWxpbmUgcG9pbnRzPSIxOTguOCw4OS40IDE5Ni4yLDg1LjkgMTkwLjYsODMuNCAxODIuMyw4Mi4wIDE3MS42LDgxLjcgMTU5LjAsODIuNyAxNDQuOCw4NC43IDEyOS43LDg3LjggMTE0LjIsOTEuOCA5OC45LDk2LjYgODQuNSwxMDIuMCA3MS40LDEwNy44IDYwLjIsMTEzLjcgNTEuMiwxMTkuNiA0NS4wLDEyNS4yIDQxLjYsMTMwLjIgNDEuMiwxMzQuNiIKICAgICAgICAgICAgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZDk5OTRlIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgb3BhY2l0eT0iMC45Ii8+CiAgPCEtLSBwbGFuZXQgLS0+CiAgPGNpcmNsZSBjeD0iMTIwIiBjeT0iMTA2IiByPSI0NiIgZmlsbD0iIzE2MjIzZiIgc3Ryb2tlPSIjNTZjMWNmIiBzdHJva2Utd2lkdGg9IjIuNSIvPgogIDwhLS0gZnJvbnQgaGFsZiBvZiB0aGUgcmluZywgY3Jvc3NpbmcgdGhlIGRpc2MgLS0+CiAgPHBvbHlsaW5lIHBvaW50cz0iMTk4LjgsODkuNCAxOTguNCw5My44IDE5NS4wLDk4LjggMTg4LjgsMTA0LjQgMTc5LjgsMTEwLjMgMTY4LjYsMTE2LjIgMTU1LjUsMTIyLjAgMTQxLjEsMTI3LjQgMTI1LjgsMTMyLjIgMTEwLjMsMTM2LjIgOTUuMiwxMzkuMyA4MS4wLDE0MS4zIDY4LjQsMTQyLjMgNTcuNywxNDIuMCA0OS40LDE0MC42IDQzLjgsMTM4LjEgNDEuMiwxMzQuNiIKICAgICAgICAgICAgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZDk5OTRlIiBzdHJva2Utd2lkdGg9IjQuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPCEtLSBzYXRlbGxpdGUgcmlkaW5nIHRoZSByaW5nIC0tPgogIDxjaXJjbGUgY3g9IjE5My4yIiBjeT0iODQuMyIgcj0iNi41IiBmaWxsPSIjZDk5OTRlIiBzdHJva2U9IiMxNjIyM2YiIHN0cm9rZS13aWR0aD0iMiIvPgogIDwhLS0gc3BhcmtsZXMgLS0+CiAgPHBhdGggZD0iTSAxNzIsMzMgTCAxNzQsNDAgTCAxODEsNDIgTCAxNzQsNDQgTCAxNzIsNTEgTCAxNzAsNDQgTCAxNjMsNDIgTCAxNzAsNDAgWiIgZmlsbD0iIzlmZGNlYSIvPgogIDxwYXRoIGQ9Ik0gNTgsNjYuNiBMIDU5LjIsNzAuOCBMIDYzLjQsNzIgTCA1OS4yLDczLjIgTCA1OCw3Ny40IEwgNTYuOCw3My4yIEwgNTIuNiw3MiBMIDU2LjgsNzAuOCBaIiBmaWxsPSIjZDk5OTRlIi8+CiAgPHBhdGggZD0iTSAxNTAsMTg1LjEgTCAxNTEsMTg4LjUgTCAxNTQuNCwxODkuNSBMIDE1MSwxOTAuNSBMIDE1MCwxOTMuOSBMIDE0OSwxOTAuNSBMIDE0NS42LDE4OS41IEwgMTQ5LDE4OC41IFoiIGZpbGw9IiM5ZmRjZWEiLz4KPC9zdmc+Cg==) center / contain no-repeat;
+}
+header#title-block-header .subtitle {
+margin: 0;
+font-family: "Libertinus Serif", "Noto Serif", Georgia, serif;
+font-style: italic;
+font-size: 1.15rem;
+color: var(--cyan-bright);
+}
+header#title-block-header .date,
+header#title-block-header .version {
+margin-top: 1.6rem;
+font-family: "JetBrains Mono", "Fira Mono", monospace;
+font-size: .65rem;
+letter-spacing: .22em;
+text-transform: uppercase;
+color: var(--cream);
+}
+
+nav#TOC {
+margin: 0 0 3rem;
+padding: 1.25rem 1.5rem;
+border: 1px solid var(--line);
+border-top: 4px solid var(--amber);
+background: #fff;
+font-family: "Fira Sans", "DejaVu Sans", sans-serif;
+font-size: .9rem;
+}
+nav#TOC > ul { list-style: none; margin: 0; padding: 0; }
+nav#TOC ul ul { list-style: none; margin: .15rem 0 .6rem; padding-left: 1.6rem; color: var(--faint); }
+nav#TOC a { color: var(--ink); text-decoration: none; }
+nav#TOC a:hover { color: var(--cyan); }
+
+h1 {
+margin: 3.5rem 0 1.2rem;
+padding-bottom: .5rem;
+font-family: "JetBrains Mono", "Fira Mono", monospace;
+font-size: 1.7rem;
+font-weight: 700;
+letter-spacing: .02em;
+border-bottom: 3px double var(--amber);
+break-before: page;
+}
+h1:first-of-type { break-before: auto; }
+h2 {
+margin: 2.4rem 0 .8rem;
+padding-left: .6rem;
+font-family: "Fira Sans", "DejaVu Sans", sans-serif;
+font-size: 1.25rem;
+color: var(--cyan);
+border-left: 4px solid var(--amber);
+}
+h3 {
+margin: 1.8rem 0 .5rem;
+font-family: "Fira Sans", "DejaVu Sans", sans-serif;
+font-size: 1.05rem;
+color: var(--deep2);
+}
+h4 {
+margin: 1.4rem 0 .4rem;
+font-family: "Fira Sans", "DejaVu Sans", sans-serif;
+font-size: .95rem;
+font-variant: small-caps;
+color: var(--muted);
+}
+
+blockquote {
+margin: .8rem 0 1.4rem;
+padding: .1rem 0 .1rem 1.1rem;
+border-left: 2px solid var(--amber);
+font-style: italic;
+color: var(--muted);
+}
+a { color: var(--cyan); }
+kbd, code {
+font-family: "JetBrains Mono", "Fira Mono", monospace;
+font-size: .82em;
+background: #eceef3;
+color: var(--deep2);
+padding: .1em .35em;
+border-radius: 3px;
+}
+pre {
+background: #f0f2f6;
+border: 1px solid var(--line);
+border-radius: 4px;
+padding: .9rem 1rem;
+overflow-x: auto;
+}
+pre code { background: none; padding: 0; }
+hr {
+margin: 2.5rem auto;
+width: 50%;
+border: none;
+border-top: 1.5px solid var(--amber);
+}
+
+table {
+margin: 1.2rem 0;
+border-collapse: collapse;
+width: 100%;
+font-family: "Fira Sans", "DejaVu Sans", sans-serif;
+font-size: .82rem;
+}
+thead th {
+background: var(--deep2);
+color: var(--cream);
+font-weight: 600;
+padding: .45rem .6rem;
+text-align: left;
+}
+tbody td, tbody th {
+padding: .35rem .6rem;
+border-bottom: 1px solid var(--line);
+text-align: left;
+vertical-align: top;
+}
+tbody tr:nth-child(even) { background: #f3f4f0; }
+caption {
+font-family: "JetBrains Mono", "Fira Mono", monospace;
+font-size: .75rem;
+color: var(--muted);
+text-align: left;
+margin-bottom: .3rem;
+}
+
+dt {
+font-family: "Fira Sans", "DejaVu Sans", sans-serif;
+font-weight: 600;
+color: var(--deep2);
+margin-top: .9rem;
+}
+dd { margin: .1rem 0 .4rem 1.4rem; }
+
+@media print {
+body { max-width: none; padding: 0; }
+nav#TOC { break-after: page; }
+}
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Re:creon Player&#39;s Manual</h1>
+<p class="subtitle">Anacreon: Reconstruction 4021</p>
+<p class="author">The Re:creon project</p>
+<p class="date">2026-09-11</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#about-this-manual" id="toc-about-this-manual">About This
+Manual</a>
+<ul>
+<li><a href="#what-kind-of-game-this-is" id="toc-what-kind-of-game-this-is">What kind of game this is</a></li>
+<li><a href="#conventions-used-here" id="toc-conventions-used-here">Conventions used here</a></li>
+<li><a href="#where-the-name-comes-from" id="toc-where-the-name-comes-from">Where the name comes from</a></li>
+</ul></li>
+<li><a href="#getting-started" id="toc-getting-started">Getting
+Started</a>
+<ul>
+<li><a href="#installing-and-running" id="toc-installing-and-running">Installing and running</a></li>
+<li><a href="#the-prologue" id="toc-the-prologue">The prologue</a></li>
+<li><a href="#the-main-screen" id="toc-the-main-screen">The main
+screen</a></li>
+<li><a href="#what-you-can-see-the-fog-of-war" id="toc-what-you-can-see-the-fog-of-war">What you can see: the fog of
+war</a></li>
+<li><a href="#a-first-turn" id="toc-a-first-turn">A first turn</a></li>
+</ul></li>
+<li><a href="#worlds-and-their-economies" id="toc-worlds-and-their-economies">Worlds and Their Economies</a>
+<ul>
+<li><a href="#the-anatomy-of-a-world" id="toc-the-anatomy-of-a-world">The anatomy of a world</a></li>
+<li><a href="#production-where-everything-comes-from" id="toc-production-where-everything-comes-from">Production: where
+everything comes from</a></li>
+<li><a href="#feeding-everyone" id="toc-feeding-everyone">Feeding
+everyone</a></li>
+<li><a href="#ambrosia" id="toc-ambrosia">Ambrosia</a></li>
+<li><a href="#special-worlds" id="toc-special-worlds">Special
+worlds</a></li>
+<li><a href="#terraforming" id="toc-terraforming">Terraforming</a></li>
+<li><a href="#designing-for-the-long-run" id="toc-designing-for-the-long-run">Designing for the long run</a></li>
+</ul></li>
+<li><a href="#technology-and-research" id="toc-technology-and-research">Technology and Research</a>
+<ul>
+<li><a href="#eleven-levels" id="toc-eleven-levels">Eleven
+levels</a></li>
+<li><a href="#how-research-actually-happens" id="toc-how-research-actually-happens">How research actually
+happens</a></li>
+<li><a href="#independent-worlds" id="toc-independent-worlds">Independent worlds</a></li>
+<li><a href="#trading-technology" id="toc-trading-technology">Trading
+technology</a></li>
+<li><a href="#what-tech-gates" id="toc-what-tech-gates">What tech
+gates</a></li>
+</ul></li>
+<li><a href="#construction" id="toc-construction">Construction</a>
+<ul>
+<li><a href="#bases" id="toc-bases">Bases</a></li>
+<li><a href="#gates-links-and-disrupters" id="toc-gates-links-and-disrupters">Gates, links and disrupters</a></li>
+<li><a href="#fortresses-gates-and-the-two-rules-that-surprise-people" id="toc-fortresses-gates-and-the-two-rules-that-surprise-people">Fortresses,
+gates and the two rules that surprise people</a></li>
+</ul></li>
+<li><a href="#fleets-and-movement" id="toc-fleets-and-movement">Fleets
+and Movement</a>
+<ul>
+<li><a href="#what-a-fleet-is" id="toc-what-a-fleet-is">What a fleet
+is</a></li>
+<li><a href="#fuel-the-trillum-treadmill" id="toc-fuel-the-trillum-treadmill">Fuel: the trillum treadmill</a></li>
+<li><a href="#cargo-and-loading" id="toc-cargo-and-loading">Cargo and
+loading</a></li>
+<li><a href="#standing-orders" id="toc-standing-orders">Standing
+orders</a></li>
+<li><a href="#probes" id="toc-probes">Probes</a></li>
+<li><a href="#hazards-of-the-deep" id="toc-hazards-of-the-deep">Hazards
+of the deep</a></li>
+</ul></li>
+<li><a href="#combat-and-conflict" id="toc-combat-and-conflict">Combat
+and Conflict</a>
+<ul>
+<li><a href="#who-can-be-fought" id="toc-who-can-be-fought">Who can be
+fought</a></li>
+<li><a href="#the-five-shells" id="toc-the-five-shells">The five
+shells</a></li>
+<li><a href="#the-arithmetic" id="toc-the-arithmetic">The
+arithmetic</a></li>
+<li><a href="#closing-the-interactive-battle" id="toc-closing-the-interactive-battle">Closing: the interactive
+battle</a></li>
+<li><a href="#after-the-shooting" id="toc-after-the-shooting">After the
+shooting</a></li>
+<li><a href="#the-tools-you-use-to-say-no" id="toc-the-tools-you-use-to-say-no">The tools you use to say
+no</a></li>
+</ul></li>
+<li><a href="#command-reference" id="toc-command-reference">Command
+Reference</a>
+<ul>
+<li><a href="#function-keys" id="toc-function-keys">Function
+keys</a></li>
+<li><a href="#direct-keys-on-the-map" id="toc-direct-keys-on-the-map">Direct keys on the map</a></li>
+<li><a href="#the-menu-bar" id="toc-the-menu-bar">The menu bar</a></li>
+<li><a href="#interactive-combat-keys" id="toc-interactive-combat-keys">Interactive combat keys</a></li>
+<li><a href="#construction-and-defense-screens" id="toc-construction-and-defense-screens">Construction and defense
+screens</a></li>
+<li><a href="#fleet-roster-keys" id="toc-fleet-roster-keys">Fleet roster
+keys</a></li>
+</ul></li>
+<li><a href="#scenarios" id="toc-scenarios">Scenarios</a>
+<ul>
+<li><a href="#the-fourteen-you-ship-with" id="toc-the-fourteen-you-ship-with">The fourteen you ship with</a></li>
+<li><a href="#what-the-introductions-are-and-where-the-prose-comes-from" id="toc-what-the-introductions-are-and-where-the-prose-comes-from">What
+the introductions are, and where the prose comes from</a></li>
+<li><a href="#why-two-scenarios-sometimes-refuse-to-load" id="toc-why-two-scenarios-sometimes-refuse-to-load">Why two scenarios
+sometimes refuse to load</a></li>
+<li><a href="#how-a-new-game-is-assembled" id="toc-how-a-new-game-is-assembled">How a new game is
+assembled</a></li>
+<li><a href="#writing-your-own" id="toc-writing-your-own">Writing your
+own</a></li>
+</ul></li>
+<li><a href="#glossary" id="toc-glossary">Glossary</a></li>
+<li><a href="#reference-tables" id="toc-reference-tables">Reference
+Tables</a>
+<ul>
+<li><a href="#technology-levels" id="toc-technology-levels">Technology
+Levels</a></li>
+<li><a href="#industries-and-output" id="toc-industries-and-output">Industries and Output</a></li>
+<li><a href="#ships" id="toc-ships">Ships</a></li>
+<li><a href="#cargo-and-defenses" id="toc-cargo-and-defenses">Cargo and
+Defenses</a></li>
+<li><a href="#construction-1" id="toc-construction-1">Construction</a></li>
+<li><a href="#raw-material-costs" id="toc-raw-material-costs">Raw-Material Costs</a></li>
+<li><a href="#combat" id="toc-combat">Combat</a></li>
+<li><a href="#world-classes" id="toc-world-classes">World
+Classes</a></li>
+<li><a href="#world-designations" id="toc-world-designations">World
+Designations</a></li>
+<li><a href="#fleets-and-movement-1" id="toc-fleets-and-movement-1">Fleets and Movement</a></li>
+<li><a href="#game-limits" id="toc-game-limits">Game Limits</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="about-this-manual">About This Manual</h1>
+<blockquote>
+<p><em>The empire is not a battle. It is a budget that occasionally
+fights.</em> – Imperial Staff primer, author unknown</p>
+</blockquote>
+<p>Re:creon is a faithful recreation, in Python, of <strong>Anacreon:
+Reconstruction 4021</strong> – a turn-based 4X space strategy game first
+published in 1990 and released as Turbo Pascal source code in 2004.
+Every number, table and rule in the game you are about to play was
+transcribed from that source rather than reimagined, which makes the
+original’s quirks as much a part of this game as its good ideas.</p>
+<p>This manual replaces the printed booklet that came in Anacreon’s box.
+The original shipped no tutorial and its in-game help was a stub; the
+paper manual was the only way to learn the game. This version covers the
+same ground as that manual’s index – combat, construction, defenses,
+fleet orders, materials, ships, technology, world classes – and adds
+what the old one took for granted: how to actually install and start the
+game, and how this recreation’s screens work.</p>
+<h2 id="what-kind-of-game-this-is">What kind of game this is</h2>
+<p>You run an empire. Time moves one <strong>year per turn</strong>, and
+a turn is divided into orders you give – to worlds, fleets,
+construction, diplomacy – and a year of consequences you watch unfold in
+the news window. Each of up to eight empires is run by a player or by
+one of several computer personalities; in the default mode you play one
+empire and the others act after you.</p>
+<p>The levers are the classic 4X ones, but filtered through a 1990
+design sensibility that rewards reading tables:</p>
+<ul>
+<li><strong>Explore.</strong> Your sensors see only what your fleets and
+worlds have scouted. Starbases slowly map their neighborhoods; probes
+fly ahead of you.</li>
+<li><strong>Expand.</strong> Worlds are claimed, designated for a job,
+and built up with industry and construction.</li>
+<li><strong>Exploit.</strong> Every ship, base and gate has a
+raw-material bill – chemicals, metal, supplies and trillum – paid out of
+a planetary economy that can starve, riot or get addicted to
+ambrosia.</li>
+<li><strong>Exterminate.</strong> Combat is resolved shell by shell,
+from deep space down to the ground, with a published table of what
+destroys what.</li>
+</ul>
+<h2 id="conventions-used-here">Conventions used here</h2>
+<ul>
+<li>Key names appear as <code>F3</code>, <code>Enter</code>,
+<code>Esc</code>. Combinations are written out
+(<code>Ctrl+C</code>).</li>
+<li>Menu choices are written <code>Menu ▸ Item</code>, e.g. <em>Game ▸
+Next turn</em>. Each menu item also has a one-letter accelerator shown
+in its label; the letter is not always the first one (the original chose
+<code>caNcel orders</code> and <code>auTo attack</code>).</li>
+<li>Coordinates are always <strong>relative to your capital</strong>,
+which reads as <code>0,0</code>. North is +Y. Sector means the same
+thing as star system here: one cell of the square grid the map
+shows.</li>
+<li>Chapter 8 lists every command, key and status window in one place;
+the reference appendix (last chapter) reproduces the game’s actual data
+tables, so a number quoted here and a number the simulation uses are
+never two different numbers.</li>
+</ul>
+<h2 id="where-the-name-comes-from">Where the name comes from</h2>
+<p><em>Anacreon</em> was itself named after the ancient Greek poet.
+<em>Reconstruction 4021</em> was the subtitle of the 2004 release – the
+year, in the game’s own fiction, that the old empire fell apart and the
+reconstruction began. Re:creon keeps both halves: it is the original
+game, reconstructed once more.</p>
+<p>The rest of this manual assumes you have never played the original.
+If you have: nothing here will surprise you, and that is the point.</p>
+<h1 id="getting-started">Getting Started</h1>
+<blockquote>
+<p><em>The first order of government is the map. The second is the
+budget. The third, unfortunately, is also the budget.</em> – First
+manual of the Reconstruction fleet</p>
+</blockquote>
+<h2 id="installing-and-running">Installing and running</h2>
+<p>Re:creon needs Python 3.12 or later and <a href="https://docs.astral.sh/uv/">uv</a> to manage dependencies. From a
+clone of the repository:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> sync            <span class="co"># install dependencies (first time only)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run recreon     <span class="co"># launch the game</span></span></code></pre></div>
+<p>The game opens full-screen in your terminal – a Textual interface
+that replaces the original’s DOS screens one for one. Any terminal of at
+least 80x24 works; a truecolor terminal looks best.</p>
+<p>Useful command-line options:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--scenario FILE.SCN</code></td>
+<td>Skip the scenario picker and start this game</td>
+</tr>
+<tr>
+<td><code>--scenario-dir DIR</code></td>
+<td>Where the picker looks for scenarios</td>
+</tr>
+<tr>
+<td><code>--name NAME</code></td>
+<td>Name your empire instead of choosing interactively</td>
+</tr>
+<tr>
+<td><code>--save-dir DIR</code></td>
+<td>Where saved games are written and read</td>
+</tr>
+<tr>
+<td><code>--no-ui</code></td>
+<td>Advance exactly one turn headlessly and print the result</td>
+</tr>
+<tr>
+<td><code>--version</code></td>
+<td>Print the version and exit</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-prologue">The prologue</h2>
+<p>What you see first is the <strong>prologue</strong>: the menu that
+lives outside any game. Its rows, in order:</p>
+<ul>
+<li><strong>Begin…</strong> – enter the game that is loaded, if
+any.</li>
+<li><strong>New game</strong> – pick a scenario, page through its
+introduction, choose how many empires are run by humans, and name them.
+Computer empires get their names from the original’s 59-name table; you
+can accept a random name or type your own.</li>
+<li><strong>Load game</strong> / <strong>Save game</strong> – saved
+games are JSON files in the save directory. (The original’s save format
+is a raw dump of in-memory records; nothing in it could survive the
+translation to Python, so the saves here are readable, versioned files
+instead. A DOS-era save game cannot be loaded.)</li>
+<li><strong>Quit</strong> – leaves the program, asking first if the game
+has changed since the last save.</li>
+<li><strong>Time limit</strong> – seconds of thinking time added to each
+player’s turn per year, for anyone who wants a clock.</li>
+<li><strong>New player empire</strong> / <strong>Delete player
+empire</strong> – adjust how many empires humans run.</li>
+<li><strong>Auto backup</strong> – whether the game autosaves after
+every turn. It is ON by default, and the autosave is how the original
+worked too: a turn that has ended is a turn that is already saved.</li>
+<li><strong>Pause</strong> – whether a year’s news can pause for
+reading.</li>
+<li><strong>Sequential play</strong> – ON rotates through empires in a
+fixed order (Empire 1 through 8, then the year turns). OFF is the
+play-by-mail mode: each human takes their turn from the prologue, hands
+the save file on, and the year only turns when the last human has moved.
+For a solo game against the computer, leave it ON.</li>
+</ul>
+<h2 id="the-main-screen">The main screen</h2>
+<p>Once a game starts you are looking at the <strong>strategic
+map</strong>: a square grid of sectors, each a star system. Worlds,
+bases, gates, fleets and phenomena are single-character glyphs on a grid
+– exactly as the original drew them, because the original fit the whole
+game into 80x25.</p>
+<ul>
+<li>The cursor is your point of attention. Move it with the arrow keys
+or <code>h</code> <code>j</code> <code>k</code> <code>l</code>.</li>
+<li>Coordinates read <strong>relative to your capital</strong>, which
+sits at <code>0,0</code>; +Y is north. Another empire’s capital has its
+own <code>0,0</code> from its own point of view, never yours.</li>
+<li>The menu bar carries the seven command menus – <em>Info, Game,
+Empire, Worlds, Fleet, Build, Ministry of War</em> – documented in full
+in chapter 8. Press <code>m</code> or <code>F2</code> to reach it.</li>
+<li>Direct keys skip the menu for the most-used screens: <code>f</code>
+fleets, <code>b</code> construction, <code>w</code> warp links,
+<code>d</code> defenses, <code>x</code> self-destruct, <code>z</code>
+close-up of the cursor’s object, <code>i</code> production report for
+it.</li>
+<li>The <code>F</code> keys raise the status windows:
+<code>F3</code>/<code>F4</code> world and military status,
+<code>F5</code>/<code>F6</code> fleets, <code>F7</code> news,
+<code>F8</code> empires, <code>F9</code> names and records,
+<code>F10</code> the map. <code>F1</code> is help.</li>
+<li><code>n</code> ends your turn and runs the year.</li>
+</ul>
+<h2 id="what-you-can-see-the-fog-of-war">What you can see: the fog of
+war</h2>
+<p>Knowledge comes in three grades, and they matter everywhere:</p>
+<ol type="1">
+<li><strong>Unknown</strong> – you have no idea the object exists.</li>
+<li><strong>Known</strong> – you know something is there; not what it
+is. The map shows known objects.</li>
+<li><strong>Scouted</strong> – you can see its contents. Detail panels,
+the status tables, and targeting all require scouting, not merely
+knowing.</li>
+</ol>
+<p>Each turn, what your empire <em>observed</em> is recomputed from
+scratch: fleets scout their own sector and report, and every world
+scouts what it can see around itself. An empire that withdraws its
+fleets genuinely loses sight of what it was watching. Objects far from
+anything you own stay unknown until a <strong>starbase scan</strong>
+turns up one – and a base’s scan is a coin flip per object per year, so
+a new base maps its neighborhood over several years.
+<strong>Probes</strong> (<em>Fleet ▸ Probe</em>, up to ten per empire)
+fly ahead and carry word of what they find.</p>
+<h2 id="a-first-turn">A first turn</h2>
+<p>When a scenario starts, do this:</p>
+<ol type="1">
+<li>Press <code>z</code> on your capital’s sector and read the close-up:
+class, population, technology, defenses, what is under
+construction.</li>
+<li>Press <code>i</code> for the production report and see what your
+worlds are making. Ships are not built at sites – a world with shipyards
+turns raw materials into hulls every year on its own. Sites
+(<code>b</code>) build the eight big structures: SRM fields, bases,
+fortresses, complexes, outposts, gates, links and disrupters.</li>
+<li>Press <code>f</code> to see your starting fleets; select one, and
+give it a destination with <em>Fleet ▸ Change destination</em>. Explore
+something near your borders, not far from home: standard fleets cross
+one sector per year, and fuel is finite.</li>
+<li>Press <code>n</code>, and read next year’s news with
+<code>F7</code>.</li>
+</ol>
+<p>That loop – inspect, order, advance, read – is the whole game. The
+following chapters go into what each part is actually deciding for
+you.</p>
+<h1 id="worlds-and-their-economies">Worlds and Their Economies</h1>
+<blockquote>
+<p><em>A world is worth exactly what its factories say it is worth, and
+not one headline more.</em> – Ledger of the Fourth Reconstruction</p>
+</blockquote>
+<p>Every planet is a small economy with a population, a technology
+level, and a stack of industries that turn raw materials into the things
+the empire needs. Worlds are where the game is actually won; fleets only
+spend what the worlds produce.</p>
+<h2 id="the-anatomy-of-a-world">The anatomy of a world</h2>
+<p>A world’s close-up (<code>z</code> on its sector) shows its:</p>
+<ul>
+<li><strong>Class</strong> – what the world physically is: Paradise, Ice
+world, Gas Giant, Ancient ruins, and the rest of the twenty-two classes.
+The class is permanent except by terraforming (see below), and it sets
+the world’s trillum reserve, how much its terrain helps ground defense,
+and the percentage of each industry that runs effectively there. The
+class table in the appendix lists all of them; a Paradise world is worth
+more than a Barren one at the same population, and the map glyph tells
+you which is which at a glance.</li>
+<li><strong>Designation</strong> – the job you assign: agricultural
+world, metal mine, shipyard base, university, capital, and so on.
+Designations require a minimum technology, set the world’s principal
+industry, and change how its leftover industry distributes. You change
+them with <em>Worlds ▸ Designate</em>.</li>
+<li><strong>Population</strong>, counted in units of 100 million.
+Population grows toward the maximum its technology supports; the base
+figure for a world at 50% efficiency runs from 3 (a hundred million,
+pre-tech) to 3,000 (three hundred billion, gate technology).</li>
+<li><strong>Technology level</strong>, 0 to 10, from pre-tech to gate.
+It governs what the world’s industry can produce at all, and it can
+outrun the empire’s own level – which matters for research, not just
+production.</li>
+<li><strong>Efficiency</strong>, 0..100: how well the population
+actually works, worn down by famine, ambrosia withdrawal, occupation and
+shock, and rebuilt in calmer years.</li>
+<li><strong>Revolution index</strong>, 0..100: unrest. Unrest grows with
+distance from the capital, with the empire’s overall mood, with
+starvation and with garrisons on quiet worlds. Above 30 the world
+mutters, above 43 it marches, above 66 it rioted last week; above 75 it
+may rebel outright. A rebellion either gets crushed by the local troops
+and ninjas or succeeds, and the world goes independent. The capital
+never rebels. You can see the mood building in the news long before the
+map changes color.</li>
+<li><strong>Hold cargo</strong>: troops, ninjas, and stocks of the four
+raw materials sitting in the world’s warehouses, plus its fixed defenses
+spread across the orbital shells.</li>
+</ul>
+<h2 id="production-where-everything-comes-from">Production: where
+everything comes from</h2>
+<p>Each year, a world’s <strong>industrial potential</strong> – driven
+by population, technology, class and efficiency – is distributed among
+the nine industries:</p>
+<table>
+<thead>
+<tr>
+<th>Industry</th>
+<th>Makes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>food factories</td>
+<td>supplies</td>
+</tr>
+<tr>
+<td>chemical plants</td>
+<td>chemicals</td>
+</tr>
+<tr>
+<td>metal mines</td>
+<td>metal</td>
+</tr>
+<tr>
+<td>trillum mines</td>
+<td>trillum</td>
+</tr>
+<tr>
+<td>bio-tech labs</td>
+<td>ambrosia (and ninjas, with the right class)</td>
+</tr>
+<tr>
+<td>ship yards</td>
+<td>fighters and transports, mostly</td>
+</tr>
+<tr>
+<td>jumpship yards</td>
+<td>jumpships, hunter-killers, jumptransports</td>
+</tr>
+<tr>
+<td>starship yards</td>
+<td>starships and penetrators</td>
+</tr>
+<tr>
+<td>transport yards</td>
+<td>transports and fighters</td>
+</tr>
+</tbody>
+</table>
+<p>Yards consume raw materials (the cost tables are in the appendix) and
+spit out hulls every year without being told; the split between what a
+world keeps as raw material and what it converts is set by its
+designation and by the <strong>ISSP</strong> slider.</p>
+<p><strong>ISSP</strong> (<em>Worlds ▸ ISSP</em>) is four sliders – one
+for each raw material: chemicals, metal, supplies, trillum – each set 0
+to 10, with 5 meaning the world produces exactly what it needs of that
+material. Set a world’s supplies slider to 10 and it pours industry into
+food factories to feed its neighbours; set it to 1 and it starves
+politely and lets its chemical plants eat the difference, hoping someone
+ships. The budget is shared, so every slider raised takes industry from
+somewhere else.</p>
+<p>Raw output is a forecast (<em>Worlds ▸ Production</em>), not a
+promise: an exhausted trillum reserve, or a world that cannot feed
+itself, will produce less than the screen projects.</p>
+<h2 id="feeding-everyone">Feeding everyone</h2>
+<p>Supplies are the economy’s heartbeat. Every billion people consume 25
+megatons of supplies a year. A world that cannot produce them from its
+own food factories is <strong>not self-sufficient</strong>, and must be
+shipped food by fleet – run the convoy aground, and the news starts
+reporting starvation. Famine kills population, drops efficiency and
+pushes the revolution index up; in the old DOS manual’s phrase, a
+blockaded world is a loyal world right up until it isn’t.</p>
+<h2 id="ambrosia">Ambrosia</h2>
+<p>Bio-tech technology (level 7) unlocks ambrosia, and ambrosia is a
+trap with a payoff attached. Worlds with bio-tech labs produce it; at
+11.5 kilotons per billion people a year it holds off addiction, each
+year a world’s population has a 25% chance of becoming dependent. An
+addicted world kept off its drug suffers mass casualties – and the
+deaths drag efficiency and the revolution index down into the basement.
+Delivered on time, though, ambrosia makes the population work harder: an
+addicted-and-satisfied world runs its industry at 145%. Many late-game
+empires are, functionally, drug dealers with a navy. Independent worlds
+drift toward addiction anyway; liberating a world does not liberate its
+habits.</p>
+<h2 id="special-worlds">Special worlds</h2>
+<ul>
+<li><strong>Capital</strong> (<em>Worlds ▸ Designate</em> to move it, if
+you can stomach the staff’s objections): +12% annual research chance,
+immune to rebellion, and in some scenarios the loss of it loses the
+empire.</li>
+<li><strong>University worlds</strong> (designatable at jump tech) are
+the engine of research – see chapter 4.</li>
+<li><strong>Ancient ruins</strong> worlds from the old empire yield a
+small research bonus and, according to scenario authors, occasionally
+something worse.</li>
+<li><strong>Hostile life</strong> worlds have natives: a strong garrison
+deters them, and under some empires they can be enlisted as ninja
+legions instead of fighting them.</li>
+<li><strong>Terraforming</strong> worlds are mid-transformation – see
+below.</li>
+</ul>
+<p>You cannot designate every world every job: universities need jump
+technology, ambrosia worlds need bio-tech, ninja worlds need starship
+tech, and the gate-tier variants of every base type need gate tech. The
+appendix table gives the minimums.</p>
+<h2 id="terraforming">Terraforming</h2>
+<p><em>Worlds ▸ Terraform</em> (warp technology, and a world already
+paid for in metal and patience) rewrites a world’s class. The target
+class is drawn from a short list each class may become – a Desert can
+turn greener, an Ice world can be melted – and harder targets terraform
+more slowly: Paradise, the best land there is, completes on about one
+annual roll in ten, and every attempt carries its own standing chance of
+catastrophic failure, which leaves the world something worse than it
+started. While the job runs the world is a Terraforming world: half its
+former industry and a fraction of its efficiency. Finish it and you own
+the empire’s best kind of real estate: a new Paradise. Fail to protect
+it and the enemy inherits it.</p>
+<h2 id="designing-for-the-long-run">Designing for the long run</h2>
+<p>Three habits separate a Reconstruction that outlives its first
+century from one that dissolves into the news archive:</p>
+<ol type="1">
+<li><strong>Match designations to classes.</strong> A trillum mine on a
+Desert runs at 190% strength; the same mine on a Poisonous world runs at
+80%. The class table in the appendix says exactly where each industry
+earns its keep.</li>
+<li><strong>Watch the revolution index like fuel.</strong> Garrisons put
+down revolts, but quiet worlds resently garrisoned push unrest the other
+way; military index is a dial, not a setting.</li>
+<li><strong>Feed the labs, then the yards.</strong> Production you
+cannot scout with is production the enemy will take delivery of.</li>
+</ol>
+<h1 id="technology-and-research">Technology and Research</h1>
+<blockquote>
+<p><em>No one steals a civilization’s tools from an armory that has
+nothing left to lose.</em> – Guardian proverb, date of composition
+disputed</p>
+</blockquote>
+<h2 id="eleven-levels">Eleven levels</h2>
+<p>Technology runs from <strong>0, pre-tech</strong>, through primitive,
+pre-atomic, atomic, pre-warp, warp, jump, bio-tech, starship and
+pre-gate, to <strong>10, gate</strong> – the drive technology that
+scattered the old empire and the ceiling of what anyone here can reach
+again.</p>
+<p>Each level unlocks its kit: atomic tech opens trillum mining and
+ground-defense missiles, pre-warp gives you fighters and command bases,
+warp gives transports, jump gives the jumpships and the bases that carry
+them, bio-tech opens hunter-killers, penetrators, ambrosia and outposts,
+starship tech brings the capital ships, LAMs and ninjas, and gate tech –
+fifteen years a site – brings stargate links and disrupters that rewrite
+the geometry of the whole map. The appendix’s technology table lists
+exactly what each level first makes possible.</p>
+<p>Every <strong>world</strong> carries its own technology level as
+well, and the two advance together only through the empire’s research
+effort.</p>
+<h2 id="how-research-actually-happens">How research actually
+happens</h2>
+<p>Once per year, each active empire rolls for discovery. The chance is
+built from the empire’s <strong>labs</strong>, of which there are four
+kinds:</p>
+<table>
+<thead>
+<tr>
+<th>Lab</th>
+<th>Annual chance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Capital world</td>
+<td>12%</td>
+</tr>
+<tr>
+<td>University world (at the empire’s level)</td>
+<td>15%</td>
+</tr>
+<tr>
+<td>Any world that has out-researched the empire</td>
+<td>15%</td>
+</tr>
+<tr>
+<td>Ruins world</td>
+<td>5%</td>
+</tr>
+<tr>
+<td>University standing on ruins</td>
+<td>17%</td>
+</tr>
+</tbody>
+</table>
+<p>Starbases count too, with a shorter list and no ruins bonus. Only the
+twenty best labs count at all.</p>
+<p>The roll is <strong>breadth before depth</strong>. An empire that is
+missing any single technology of its current tier is spending its
+research on that hole – you cannot skip a level by getting lucky – and
+only an empire whose tier is complete can advance to the next one at
+all. The last technology of a tier is the lock on the door. When the
+empire does advance, its capital and every university and lab world come
+up one level with it, which is how a research empire snowballs instead
+of leaving its home worlds behind.</p>
+<p>The third row of the table is the interesting one: <strong>conquest
+is research</strong>. A world that already knows more than your empire
+does is a working lab whatever its designation, and seizing one makes
+every future roll better. Losing a frontier world that out-grew your
+tier stings twice.</p>
+<p>One honesty note, because the game keeps the original’s arithmetic:
+the annual research chance is accumulated in a small integer that can
+overflow. Up to a point more labs mean faster research; past that point,
+adding another university can make the counter wrap and the empire
+research <em>worse</em>. The twenty-lab cap exists in the game as a
+mercy the DOS build could not offer.</p>
+<h2 id="independent-worlds">Independent worlds</h2>
+<p>Worlds do not sit still either, but they follow the capital rather
+than the empire’s books: any world <em>below</em> its capital’s level
+has a 16% annual chance to climb one, and a world that has outrun the
+capital regresses slowly – technology out there is sustained by the
+centre, not held permanently. Independent worlds have no capital and
+advance on a bare 1-in-50 annual roll, which is still not nothing: a
+backwater you leave alone for two hundred years may be embarrassing to
+conquer by then. This is also why “wait and see” is not free: the galaxy
+gets richer while you hold still.</p>
+<h2 id="trading-technology">Trading technology</h2>
+<p><em>Empire ▸ Trade technology</em> hands one of your technologies to
+another empire – free, no request in return, and no check whether they
+already have it: two empires at the same level are each always offering
+the other their entire tier. Gift technology to a small neighbor to keep
+them ahead of a large one, or watch what the pirates do with a jump
+drive. It is also the only way to give someone something <em>after</em>
+you conquer their lab world – a peace offering the recipient can read as
+exactly what it is.</p>
+<h2 id="what-tech-gates">What tech gates</h2>
+<p>Technology is checked in four places, all of them annoying at the
+worst moment:</p>
+<ul>
+<li><strong>Designations</strong> – universities need jump tech to
+found, ninja worlds need starship, the gate-tier bases need gate
+tech.</li>
+<li><strong>Industry</strong> – you cannot run what you cannot name:
+bio-tech labs need level 7, shipyards at least level 4.</li>
+<li><strong>Population</strong> – some classes cannot support life at
+all below a given level; Gas Giants and Oceans wait for pre-warp.</li>
+<li><strong>Ships in space</strong> – a world’s scouts only credit it
+with ships its own technology could have built, so a level-4 empire
+reporting a level-8 starship is being honest about having <em>seen</em>
+something, not about what it was.</li>
+</ul>
+<h1 id="construction">Construction</h1>
+<blockquote>
+<p><em>A gate never built is a war never won cheaply.</em> – Ministry of
+War memorandum, year 4019</p>
+</blockquote>
+<p>Shipyards make ships on their own, every year, from raw materials –
+that is production, covered in chapter 3. <strong>Construction</strong>
+here means the eight big installations that take a site, years, and a
+steady delivery line of cargo:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Structure</th>
+<th>Years</th>
+<th>What it is for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SRM field</td>
+<td>2</td>
+<td>Mines the sector; damages fleets that jump through it</td>
+</tr>
+<tr>
+<td>Command base</td>
+<td>6</td>
+<td>A mobile starbase: scouting, scanning, fleet support, jump base</td>
+</tr>
+<tr>
+<td>Fortress</td>
+<td>12</td>
+<td>The immovable one: the strongest fixed defense in the game</td>
+</tr>
+<tr>
+<td>Industrial complex</td>
+<td>10</td>
+<td>Links the surrounding mine worlds and concentrates their output</td>
+</tr>
+<tr>
+<td>Outpost</td>
+<td>3</td>
+<td>A cheap sensor and a flag planted in someone else’s back yard</td>
+</tr>
+<tr>
+<td>Stargate</td>
+<td>15</td>
+<td>The jump corridor itself – the reason level-10 tech ends wars</td>
+</tr>
+<tr>
+<td>Warp link</td>
+<td>5</td>
+<td>A one-way door between exactly two friendly bases</td>
+</tr>
+<tr>
+<td>Jumpspace disrupter</td>
+<td>8</td>
+<td>Denies enemy jump movement around itself</td>
+</tr>
+</tbody>
+</table>
+<p>A site consumes its materials <strong>per year while it
+stands</strong> (the table is in the appendix), and an unfinished site
+is a target: enemies can destroy one as easily as a world, and <em>Build
+▸ Abort construction</em> tears yours down if the money stops making
+sense. The universe holds fifty sites at a time; when <em>New
+construction site</em> says there is no room, somebody else’s project is
+using it.</p>
+<h2 id="bases">Bases</h2>
+<p>Command bases and fortresses carry destinations like fleets and crawl
+one sector a year, burning trillum whether blocked or not; all other
+base types are fixed once built. Bases of any kind:</p>
+<ul>
+<li>scout what is around them and scan for what is not, which is the
+only way to learn about objects your fleets never visit;</li>
+<li>act as the jump base for fleets sitting on them;</li>
+<li>refuel fleets;</li>
+<li>cannot enter an occupied sector at all – and a base being shoved
+sideways by its own pathing can actually be pushed off the playable
+grid, because the original checked its detours nowhere. Watch bases that
+hug the edges.</li>
+</ul>
+<p>An <strong>industrial complex</strong> is a different animal: it is
+the grid connector between the eight neighbouring sectors. Each year it
+pulls raw material from friendly mine worlds that hold a working
+reserve, and pushes its own overflow back out to the same mines when its
+hold is full. Clustering chemical plants, metal mines and trillum mines
+around a complex is how late-game empires pay for gate construction
+without bankrupting a sector.</p>
+<h2 id="gates-links-and-disrupters">Gates, links and disrupters</h2>
+<p>A <strong>stargate</strong> sends jump-capable fleets – jump fleets
+and hunter-killer forces, not standard warp traffic – between any two
+gates tuned to the same <strong>frequency</strong>, a number 0 to 9999.
+Frequencies are the diplomacy of movement: <em>Empire ▸ Link
+frequencies</em> retunes a gate, so a captured enemy gate can be folded
+into your network – or a retune can strand every fleet that was counting
+on the old pairing.</p>
+<p>A <strong>warp link</strong> is a gate built as a pair: it connects
+your base to exactly one far end, permanently, and needs none of the
+frequency diplomacy a stargate does. Five years instead of fifteen; a
+corridor you can widen only by building more of them.</p>
+<p>A <strong>jumpspace disrupter</strong> makes the space around it
+hostile to jump drives: enemy jump fleets cannot make jump moves through
+its field, while <em>your own</em> warp-driven fleets riding inside a
+friendly disrupter’s field move at jump speed – ten sectors a year on
+hulls that normally crawl one. A disrupter ringed around a choke point
+is the strongest defensive structure in the game and the most expensive
+thing to fight through.</p>
+<h2 id="fortresses-gates-and-the-two-rules-that-surprise-people">Fortresses,
+gates and the two rules that surprise people</h2>
+<p>A <strong>fortress</strong> multiplies the value of everything a
+defended sector is worth – the combat table’s base adjustment makes a
+fortress sector worth two and a half times an open one – and at twelve
+years’ construction, it is a statement about where you intend to stand
+and not move. It also does something no manual written before 1990
+mentioned politely: <strong>a fleet that departs from under a fortress
+is catapulted four sectors along its way</strong> before it even starts.
+Fortresses are not defense. They are short-range logistics with a gun on
+top.</p>
+<p><strong>A fleet entering a stargate arrives the next year, whatever
+the distance.</strong> One sector away or across the map – gates move
+jump traffic at a flat one year per jump, and only the two ends need
+their frequencies in agreement. Ten-sector jumps from jump bases pale
+next to this, which is why gate construction (fifteen years) decides
+wars decades before anyone fires in the sector they connect.</p>
+<p><strong>SRM fields</strong> (space minefields) damage anything that
+<em>jumps</em> through the sector – hunter-killers, jumpships,
+jumptransports – and do nothing to warp traffic, which makes them
+chokepoint tools along gate lanes rather than area denial in general.
+They are also mortal: <em>Fleet ▸ SRM sweep</em> clears a field the slow
+way, one careful pass at a time, and an unescorted sweeper in enemy
+space is a letter the enemy will never forward.</p>
+<h1 id="fleets-and-movement">Fleets and Movement</h1>
+<blockquote>
+<p><em>Amateurs discuss tactics. Professionals discuss fuel.</em> –
+inscription, unofficial, on the wall of the Logistics Directorate</p>
+</blockquote>
+<h2 id="what-a-fleet-is">What a fleet is</h2>
+<p>A fleet is a named pile of ships and cargo sitting in one sector –
+yours or nobody’s – with a destination, a fuel load, and standing
+orders. <em>Fleet ▸ Deploy</em> creates one out of the ships and cargo
+at any object you select: a world, a base, or another fleet. Each empire
+can field thirty fleets; the map can hold two hundred and forty between
+all of them.</p>
+<p>Fleets are not uniform. A fleet’s <strong>type</strong> is worked out
+from what it <em>lacks</em> – one transport hides inside a battle fleet
+and drags the whole thing down – and the type decides the speed:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Fleet type</th>
+<th>Composition</th>
+<th>Sectors per year</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Standard fleet</td>
+<td>contains transports, fighters or starships</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Advanced-warp fleet</td>
+<td>penetrators and jumpships, nothing slower</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Penetrator force</td>
+<td>only penetrators (with escorts of hunter-killers)</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Jump fleet</td>
+<td>jumpships and jumptransports (and hunter-killers), no sublight
+hulls</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Hunter-killer force</td>
+<td>hunter-killers alone</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>Movement is measured with a <strong>Chebyshev metric</strong>: the
+cost of a move is the larger of the horizontal and vertical distance, so
+a diagonal sector is exactly as cheap as an orthogonal one and fleets
+travel in straight lines, diagonally included. Your coordinates are
+relative to your capital, +Y north; another empire’s coordinates are
+relative to theirs, and typing one into your destination prompt gets you
+what you deserve.</p>
+<h2 id="fuel-the-trillum-treadmill">Fuel: the trillum treadmill</h2>
+<p>Every ship’s hold is part fuel tank: each type has a capacity and a
+consumption per sector, and <strong>fuel is trillum</strong> – the only
+fuel there is. Fleet movement burns it; standing in space burns a tenth
+of the same per-year rate whether the fleet moves or not. A fleet that
+runs dry stops dead and reports its status as <em>out of trillum</em>,
+and the only way out of that is <em>Fleet ▸ Refuel</em> on a friendly
+world or base with reserves.</p>
+<p>The numbers have teeth. A hunter-killer sips fuel by sector and
+carries a deep tank – that is what raiders are made of. A starship
+drinks 1.4 times a transport’s rate per sector and moves at half the
+speed of anything crossing its own space, which is why capital fleets
+live off base chains. And raw trillum as cargo is expensive to ship: 100
+kilotons a transport.</p>
+<p>Refuel early, refuel where the reserves are: every world’s class sets
+how much trillum it started with (a Barren world’s 1,200 beats your
+Paradise’s 600), reserves do not grow back fast, and a fuel picture is a
+strategic map in its own right. The scouts’ reports of enemy reserves,
+remember, are estimates – the status windows show another empire’s
+holdings in a rough notation (see chapter 8), and your own in exact
+hundreds.</p>
+<h2 id="cargo-and-loading">Cargo and loading</h2>
+<p>Ships that carry: transports (5 legions, 3 megatons of chemicals, 2
+of supplies), jumptransports (a fifth of a transport), and cargo itself.
+<em>Fleet ▸ Transfer</em> moves ships or cargo between two fleets in the
+same sector. When you deploy an attack, the grouping screen auto-loads
+troops into empty transport slots in the groups – and beware the
+original’s temper: changing a slot’s ship type, or its count, spills
+that group’s whole cargo back into the common hold, soldiers included.
+Load your groups last, or load them and then leave them alone.</p>
+<h2 id="standing-orders">Standing orders</h2>
+<p><em>Fleet ▸ Orders</em> compiles a program for a fleet – the
+original’s most ambitious interface, and still the fastest way to run a
+police force:</p>
+<pre><code>DEST &lt;coordinates or name&gt;   set destination
+TRANS &lt;resource&gt; &lt;amount&gt;    transfer cargo at arrival
+SRMS                         sweep minefields
+WAIT &lt;years&gt;                 sit
+REPE                         repeat the order list
+ABORT                        return to base
+DEST &lt;place&gt; / TRANS / ...   chain as many lines as you like</code></pre>
+<p>Compiled orders move fleets and dump cargo automatically each year
+without touching anything; a supply fleet on a repeat loop
+<code>DEST convoy route / TRANS sup 2000 / WAIT 1 / REPE</code> is a
+convoy that never needs a signal officer again. <em>caNcel orders</em>
+wipes the program. Orders break silently on arrival if the target has
+vanished – read the news, it will tell you.</p>
+<h2 id="probes">Probes</h2>
+<p><em>Fleet ▸ Probe</em> pokes a destination you already know with a
+sensor pack: up to ten per empire, each launched probe lands its news
+the following turn and is ready again. Probes are cheap knowledge about
+specific places; starbase scans (chapter 2) are patient knowledge about
+areas; and neither is a substitute for a fleet whose orders say <em>DEST
+and find out</em>.</p>
+<h2 id="hazards-of-the-deep">Hazards of the deep</h2>
+<ul>
+<li><strong>Nebulae</strong> blind: any nebula hides what sits in it
+from remote sensors; a <strong>dark</strong> nebula additionally stops a
+scout’s line of sight, so worlds behind one stay unknown; a
+<strong>dense</strong> nebula is a wall – warp movement into it simply
+fails, and a jump that ends in one makes the news instead of the
+destination.</li>
+<li><strong>Black holes, pulsars, wormholes</strong> damage or vanish
+anything passing through; wormholes also move things, to somewhere.</li>
+<li><strong>Minefields</strong> (chapter 5) hit jump traffic only.</li>
+<li><strong>Enemy disrupters</strong> stop jump movement outright inside
+their field – friendly ones, as noted, speed <em>warp</em> traffic to
+jump pace instead.</li>
+</ul>
+<h1 id="combat-and-conflict">Combat and Conflict</h1>
+<blockquote>
+<p><em>The shells are the same five in every system in the galaxy. Only
+the arithmetic changes.</em> – Gunnery handbook of the Reconstruction,
+first edition</p>
+</blockquote>
+<p>Combat happens when your fleet and someone else’s object share a
+sector. Two commands reach it from the map, both under <em>Ministry of
+War</em>:</p>
+<ul>
+<li><strong>Attack</strong> opens the interactive battle: you command
+each group round by round.</li>
+<li><strong>auTo attack</strong> hands the whole fight to the same
+tactical routine the computer empires use and shows you the result. If
+you have ever wondered what the AI thinks of your formation, this is the
+button that says so.</li>
+</ul>
+<p>Defensively, there is no button: enemy computer empires attack you
+the moment they weigh the odds as favourable, and the fight simply
+appears in the news. Position is diplomacy.</p>
+<h2 id="who-can-be-fought">Who can be fought</h2>
+<p>Attacks target enemy fleets in the sector, then enemy objects. One
+rule surprises people the first time: <strong>a fleet in orbit screens
+the world beneath it.</strong> If hostile fleets are present, the world
+is not offered as a target at all – you fight the navy first, and only
+then the planet. The same is true in reverse when you are defending: one
+surviving corvette in low orbit keeps your capital legally untouchable,
+which is occasionally worth more than the corvette.</p>
+<h2 id="the-five-shells">The five shells</h2>
+<p>Everything in a fight stands at one of five altitudes, and combat
+resolves from the outside in, one round at a time:</p>
+<ol type="1">
+<li><strong>Deep space</strong> (<code>DpSpc</code>) – where fleets
+arrive.</li>
+<li><strong>High orbit</strong></li>
+<li><strong>Orbit</strong> – where starbases and defense satellites
+live.</li>
+<li><strong>Sub-orbit</strong> – the catch-all layer; the defense grid
+puts any remainder here.</li>
+<li><strong>Ground</strong> – where populations die.</li>
+</ol>
+<p>Groups start in deep space with no targets. Ships at the same shell
+as a target shoot at it; shells that are uncontested let the fight
+descend toward the surface. This means combat is mostly a race and an
+alignment problem: the attacker must <em>close</em>, and the defender
+survives by making every shell above the ground cost more than it is
+worth.</p>
+<h2 id="the-arithmetic">The arithmetic</h2>
+<p>Each round, every group fires at its target. The damage a weapon does
+is looked up in the combat table – attacker type against defender type –
+and modified by the attacker-vs-defender technology table, the
+defender’s terrain (ground fighting only), and any base in the sector
+(command bases 150%, fortresses 250%, outposts 125%). Points accumulate
+against each defender; <strong>100 points destroy one unit</strong>, 200
+destroy two, and so on. The full tables are in the appendix; the short
+version is that a fighter squadron does 15 points of damage to a
+hunter-killer where a starship does 250 to the same target – but the
+fighter costs a twentieth the metal and is worth five points to your
+bookkeeping against a starship’s two hundred. Cheap hulls swarm;
+expensive hulls win the rounds nobody can afford to repeat; transports
+are cargo that happens to be on fire.</p>
+<p>A world under attack answers with its <strong>ground-defense
+missiles</strong> – a salvo sized by the world’s technology (up to 2,759
+at gate tech), of which the attackers shoot a fixed number down on
+approach per ten ships depending on hull type. Fighters catch nothing;
+starships catch twenty apiece.</p>
+<p>The <strong>defense grid</strong> (<code>d</code> on any world you
+own) is where you decide what that fight looks like before it starts:
+percentages of each of the four fixed defenses – LAMs, defense
+satellites, GDMs, ion cannons – distributed across the five shells so
+that each type’s five numbers total 100. The grid normalizes whatever
+you type, and <strong>sub-orbit is where every rounding error and
+impossible request ends up</strong>, which is worth knowing the first
+time your even 100/100 split comes back 33/33/33 with a stray 1 parked
+in sub-orbit.</p>
+<h2 id="closing-the-interactive-battle">Closing: the interactive
+battle</h2>
+<p>The attack screen lists your groups – up to nine per attack – and the
+enemy roster. Groups do nothing unless you tell them to:</p>
+<ul>
+<li><strong><code>m</code></strong> manoeuvres a group: advance a shell,
+retreat a shell, or hold station.</li>
+<li><strong><code>t</code></strong> gives a group its target.</li>
+<li><strong><code>e</code></strong> fights the round.</li>
+<li><strong><code>d</code></strong> shows the damage detail from last
+round, and <strong><code>r</code></strong> extracts everyone.</li>
+</ul>
+<p>A player who only ever presses <code>e</code> will sit in a perfect
+battle in which nobody moves, nobody aims and nobody fires, forever.
+Closing and aiming are the entire point of the screen – the original’s
+author put it in the manual’s place where the help file could not: the
+computer aims for you only when you let it.</p>
+<p>When you load transports for an assault the grouping screen
+auto-loads troops for you, with the two caveats from chapter 6: the
+auto-loader prefers men over ninjas, and changing a group’s ships spills
+its cargo back to the hold.</p>
+<h2 id="after-the-shooting">After the shooting</h2>
+<p>Resolution cascades down: fleet wins the shells and the world is
+next; a beaten world’s survival turn comes its own arithmetic of
+population, morale, the power of its remaining weapons and the size of
+the occupying force – worlds that lose their navy are liable to sue for
+terms rather than die on the ground, and the technology band a world
+sits in changes how often terms are offered. A conquest puts the world
+in your empire: population and industry change hands intact, morale
+shock and revolution index arrive together, and the news runs a headline
+either way. Scenarios with written background text give conquered worlds
+their own epitaphs.</p>
+<p>Losses are tallied where you can read them – the news headlines carry
+the casualty figures, and the empire status and records windows
+(<code>F8</code>, <code>F9</code>) report what survived – and destroyed
+construction sites and stargates are announced as destroyed whether or
+not the wreckage agrees.</p>
+<h2 id="the-tools-you-use-to-say-no">The tools you use to say no</h2>
+<ul>
+<li><strong>LAMs</strong> (<em>Ministry of War ▸ Launch LAMs</em>):
+light attack missiles, stockpiled as a base’s fixed defense and fired
+without moving a fleet or risking a fight. Against an enemy fleet the
+salvo spreads by what each hull is worth, concentrating on the ships
+actually worth killing – a LAM barrage can clear a sector’s navy before
+the invasion starts; against a world it strips fixed defenses evenly.
+The missiles are spent whether they hit or not, the target cannot
+intercept, and the news will be very clear about who fired. It is the
+cheapest violence in the game and the least deniable.</li>
+<li><strong>Self-destruct</strong> (<code>x</code> / <em>Worlds ▸
+Self-destruct</em>): what you do to your own world when it is clearly
+about to change hands. Industries die, population dies, the enemy
+inherits a rock.</li>
+<li><strong>Minefields, disrupters, fortresses</strong>: chapter 5. A
+war won in the construction menu is a war not fought.</li>
+</ul>
+<h1 id="command-reference">Command Reference</h1>
+<blockquote>
+<p><em>The map is the argument. Everything else is paperwork.</em> –
+marginalia, Imperial staff college exercise files</p>
+</blockquote>
+<p>This chapter is the whole interface in one place: every key, every
+menu item, every window. Commands are entered by picking them off the
+menu and answering prompts – the shipped original never had a
+typed-command parser, and this recreation does not add one.</p>
+<h2 id="function-keys">Function keys</h2>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Opens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>F1</code></td>
+<td>Help window – the original’s topic index</td>
+</tr>
+<tr>
+<td><code>F2</code></td>
+<td>Menu bar (same as <code>m</code>)</td>
+</tr>
+<tr>
+<td><code>F3</code></td>
+<td>World status window</td>
+</tr>
+<tr>
+<td><code>F4</code></td>
+<td>Military status window</td>
+</tr>
+<tr>
+<td><code>F5</code></td>
+<td>Fleet status window</td>
+</tr>
+<tr>
+<td><code>F6</code></td>
+<td>Fleet contents window</td>
+</tr>
+<tr>
+<td><code>F7</code></td>
+<td>News window</td>
+</tr>
+<tr>
+<td><code>F8</code></td>
+<td>Empire status window</td>
+</tr>
+<tr>
+<td><code>F9</code></td>
+<td>Names and records window</td>
+</tr>
+<tr>
+<td><code>F10</code></td>
+<td>Map (closes whatever window is open)</td>
+</tr>
+</tbody>
+</table>
+<p><code>F3</code> and <code>F4</code> are one window: the world status
+table stacked over the military status table, both listing the same
+worlds in the same order, so the two halves line up row for row.
+<code>F5</code> and <code>F6</code> are the same trick with fleets:
+position over contents. <code>PageUp</code> and <code>PageDown</code>
+page through windows; <code>Esc</code> closes them.</p>
+<p>The status tables are stricter about fog than the map is: a foreign
+<strong>world</strong> is listed only if scouted, since the tables are
+made of numbers and knowing a world exists tells you none of them. A
+merely <em>known</em> enemy <strong>fleet</strong> does get a row,
+reading <code>(unknown)</code> and <code>(out of range)</code> – being
+warned that something is out there is the point of that window.</p>
+<h2 id="direct-keys-on-the-map">Direct keys on the map</h2>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>arrows / <code>h</code> <code>j</code> <code>k</code>
+<code>l</code></td>
+<td>Move the cursor</td>
+</tr>
+<tr>
+<td><code>f</code></td>
+<td>Fleet roster</td>
+</tr>
+<tr>
+<td><code>b</code></td>
+<td>Construction screen</td>
+</tr>
+<tr>
+<td><code>w</code></td>
+<td>Warp link frequencies</td>
+</tr>
+<tr>
+<td><code>d</code></td>
+<td>Defense grid for the cursor’s world</td>
+</tr>
+<tr>
+<td><code>z</code></td>
+<td>Close-up of the cursor’s object</td>
+</tr>
+<tr>
+<td><code>i</code></td>
+<td>Production report for it</td>
+</tr>
+<tr>
+<td><code>x</code></td>
+<td>Self-destruct it (if it is yours, and you are certain)</td>
+</tr>
+<tr>
+<td><code>g</code></td>
+<td>The prologue menu</td>
+</tr>
+<tr>
+<td><code>m</code> or <code>F2</code></td>
+<td>The command menu bar</td>
+</tr>
+<tr>
+<td><code>n</code></td>
+<td>Next turn – end the year</td>
+</tr>
+<tr>
+<td><code>q</code></td>
+<td>Quit (asking first if unsaved)</td>
+</tr>
+</tbody>
+</table>
+<p>The close-up and production reports always act on whatever the cursor
+is over, which is how the original reached them too.</p>
+<h2 id="the-menu-bar">The menu bar</h2>
+<p>Seven pull-downs. The letter in parentheses is the accelerator,
+counted exactly as the original wrote it – which is why
+<code>caNcel orders</code> answers to N and <code>auTo attack</code> to
+T.</p>
+<p><strong>Info (I)</strong></p>
+<ul>
+<li>(A)bout Re:creon</li>
+<li>(D)OS shell</li>
+</ul>
+<p><strong>Game (G)</strong></p>
+<ul>
+<li>(P)ause game</li>
+<li>(S)tatus hardcopy</li>
+<li>(N)ext turn</li>
+<li>(Q)uit</li>
+</ul>
+<p><strong>Empire (E)</strong></p>
+<ul>
+<li>(S)end message</li>
+<li>(R)ead messages</li>
+<li>(T)rade technology</li>
+<li>(L)ink frequencies</li>
+</ul>
+<p><strong>Worlds (W)</strong></p>
+<ul>
+<li>(C)lose up</li>
+<li>(D)esignate</li>
+<li>(P)roduction</li>
+<li>(I)SSP</li>
+<li>(N)ame</li>
+<li>(R)emove name</li>
+<li>(L)iberate</li>
+<li>(S)elf-destruct</li>
+<li>(T)erraform</li>
+</ul>
+<p><strong>Fleet (F)</strong></p>
+<ul>
+<li>(D)eploy</li>
+<li>(C)hange destination</li>
+<li>(T)ransfer</li>
+<li>(A)bort/join</li>
+<li>(R)efuel</li>
+<li>(S)RM sweep</li>
+<li>(O)rders</li>
+<li>ca(N)cel orders</li>
+<li>(P)robe</li>
+</ul>
+<p><strong>Build (B)</strong></p>
+<ul>
+<li>(S)ite status</li>
+<li>(N)ew construction site</li>
+<li>(A)bort construction</li>
+</ul>
+<p><strong>Ministry of War (M)</strong></p>
+<ul>
+<li>(A)ttack</li>
+<li>au(T)o attack</li>
+<li>(L)aunch LAMs</li>
+<li>(D)efenses</li>
+</ul>
+<p><em>Status hardcopy</em> is the game’s old printout – <em>Game ▸
+Status hardcopy</em> builds the full report of your worlds, fleets and
+holdings, and lets you write it to a file. Its numbers are encoded the
+way a dot-matrix printer had room for: your own holdings in hundreds (so
+<code>42</code> means about 4200, and <code>++</code> is past 99), while
+another empire’s read as estimates – <code>no</code>, <code>y</code>
+plus thousands, or <code>y+</code>, with raw materials as
+<code>--</code> because you cannot see them at all.</p>
+<h2 id="interactive-combat-keys">Interactive combat keys</h2>
+<p>The grouping screen, first. Build up to nine groups out of the ships
+and cargo in the attacking fleet:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>up</code> / <code>down</code></td>
+<td>Select group</td>
+</tr>
+<tr>
+<td><code>left</code> / <code>right</code></td>
+<td>Change its ship type</td>
+</tr>
+<tr>
+<td><code>space</code></td>
+<td>Auto-fill cargo</td>
+</tr>
+<tr>
+<td><code>enter</code></td>
+<td>Load an amount</td>
+</tr>
+<tr>
+<td><code>m</code> / <code>n</code></td>
+<td>Load men / ninjas</td>
+</tr>
+<tr>
+<td><code>Esc</code></td>
+<td>Confirm the grouping and fight</td>
+</tr>
+</tbody>
+</table>
+<p>Then, round by round:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>e</code></td>
+<td>Engage – fight the round</td>
+</tr>
+<tr>
+<td><code>m</code></td>
+<td>Manoeuvre a group: advance, retreat or hold</td>
+</tr>
+<tr>
+<td><code>t</code></td>
+<td>Assign a group’s target</td>
+</tr>
+<tr>
+<td><code>d</code></td>
+<td>Damage report from last round</td>
+</tr>
+<tr>
+<td><code>r</code></td>
+<td>Retreat the attack</td>
+</tr>
+</tbody>
+</table>
+<p>Groups begin in deep space aiming at nothing. A player who only
+presses <code>e</code> fights a battle in which nobody closes and nobody
+fires, forever: <code>m</code> and <code>t</code> are the decisions the
+screen exists for.</p>
+<h2 id="construction-and-defense-screens">Construction and defense
+screens</h2>
+<p><code>b</code> lists the world’s sites: <code>c</code> starts a new
+construction (pick the kind, pay the materials, point at the object),
+<code>a</code> aborts one. <code>w</code> opens the warp-link frequency
+screen, where each gate and link of yours is retuned – both ends have to
+agree, and retuning can strand your own fleets mid-network.</p>
+<p><code>d</code> opens the defense grid: four fixed types, five shells,
+each type’s five percentages forced to total 100. The normalizer’s
+fallback layer is <strong>sub-orbit</strong>: ground percentages for
+things that cannot land, any shortfall, and any rounding remainder all
+park there. Percentages typed outside 0..100 store as zero, not as the
+nearest bound.</p>
+<h2 id="fleet-roster-keys">Fleet roster keys</h2>
+<p>The roster (<code>f</code>) lists your scouted fleets. Selecting one
+and pressing enter opens its detail screen, where the Fleet menu items
+act on it directly; the transfer, abort and refuel screens all pick
+their counterpart fleets from the same sector.</p>
+<h1 id="scenarios">Scenarios</h1>
+<blockquote>
+<p><em>Every scenario is an argument about history, written by someone
+who expects to be contradicted.</em> – attributed to the authors of the
+original twelve, in jest</p>
+</blockquote>
+<p>A galaxy is not generated; it is <em>authored</em>. Every game of
+Re:creon starts from a scenario file – a plain-text list of worlds,
+owners, fleets, nebulae, minefields, empires and prose, loaded in one
+forward pass that asks you for the player count and your empire’s name
+<em>while</em> it reads. There is no procedural “random map” button,
+because the original never had one.</p>
+<h2 id="the-fourteen-you-ship-with">The fourteen you ship with</h2>
+<p>Thirteen of them are the scenarios that came with Anacreon:
+Reconstruction 4021, imported byte-identical except for line 2 (the
+title), so they play exactly as they did in 2004. The fourteenth,
+<em>frontier.scn</em>, is new content written for this recreation.</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Title</th>
+<th>Original name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>frontier.scn</code></td>
+<td>Frontier</td>
+<td>– (authored for Re:creon)</td>
+</tr>
+<tr>
+<td><code>firstlight.scn</code></td>
+<td>First Light: 4021</td>
+<td>Reconstruction: 4021</td>
+</tr>
+<tr>
+<td><code>twocrowns.scn</code></td>
+<td>Two Crowns</td>
+<td>East vs. West</td>
+</tr>
+<tr>
+<td><code>triad.scn</code></td>
+<td>Triad</td>
+<td>Trinity</td>
+</tr>
+<tr>
+<td><code>fourheirs.scn</code></td>
+<td>The Four Heirs</td>
+<td>The Four Princes</td>
+</tr>
+<tr>
+<td><code>outerreach.scn</code></td>
+<td>The Outer Reach</td>
+<td>The Periphery</td>
+</tr>
+<tr>
+<td><code>corsairs.scn</code></td>
+<td>Corsairs of Meridian</td>
+<td>The Pirates of Jakarta</td>
+</tr>
+<tr>
+<td><code>boundary.scn</code></td>
+<td>The Boundary Stones</td>
+<td>Algerian Fences</td>
+</tr>
+<tr>
+<td><code>reckoning.scn</code></td>
+<td>The Reckoning</td>
+<td>The Aftermath</td>
+</tr>
+<tr>
+<td><code>longrun.scn</code></td>
+<td>The Long Run</td>
+<td>The Gauntlet</td>
+</tr>
+<tr>
+<td><code>longsleep.scn</code></td>
+<td>The Long Sleep</td>
+<td>A Rude Awakening</td>
+</tr>
+<tr>
+<td><code>thousandsuns.scn</code></td>
+<td>The Thousand Suns</td>
+<td>Imperium Galactica</td>
+</tr>
+<tr>
+<td><code>veil.scn</code></td>
+<td>The Veil</td>
+<td>The Nebula</td>
+</tr>
+<tr>
+<td><code>vhalsecc.scn</code></td>
+<td>Vhalsecc</td>
+<td>Arronax</td>
+</tr>
+</tbody>
+</table>
+<p><strong>First game?</strong> <em>First Light</em> is the introduction
+the original boxed with the manual: a small, legible galaxy, and the
+scenario the manual’s advice was written against. <em>Corsairs of
+Meridian</em> is where to go once you want the pirates to teach you
+about convoy routes; <em>The Veil</em> is the nebula-warfare exam,
+authored around a galaxy of dust you cannot scout through.</p>
+<h2 id="what-the-introductions-are-and-where-the-prose-comes-from">What
+the introductions are, and where the prose comes from</h2>
+<p>Every scenario opens with one or more pages of background text – read
+them; in several cases they contain hints that are otherwise only
+discoverable by losing something. That prose is the original authors’,
+untouched.</p>
+<p>The same files also carry <strong>per-object background</strong>:
+seven of the shipped galaxies index prose blocks to specific worlds,
+starbases and stargates, so closing up on a named place (<code>z</code>)
+or conquering it can print the author’s words for <em>that object</em>
+instead of a generic report. When you take a place that has a passage
+written about it, the conquest screen says so.</p>
+<h2 id="why-two-scenarios-sometimes-refuse-to-load">Why two scenarios
+sometimes refuse to load</h2>
+<p>Each scenario places a mix of hand-authored and randomly-rolled
+worlds, and the random rolls ask for open sectors inside their zone – up
+to a hundred attempts, and then they give up rather than stack two
+worlds in one sector. The densest galaxies (<em>The Long Run</em>,
+<em>The Long Sleep</em>, packed at 200 worlds) will therefore refuse
+some rolls: roughly one in fifteen in the denser cases. This is the
+authors’ own density and the original’s own failure mode – the DOS build
+quit on the same rolls. <strong>Start a new game; it will
+place.</strong></p>
+<h2 id="how-a-new-game-is-assembled">How a new game is assembled</h2>
+<ol type="1">
+<li>Choose the scenario. The header (its declared format, its title) is
+checked before anything else happens; files from the original declare
+version 10.</li>
+<li>The introduction pages scroll by.</li>
+<li>Choose how many empires are run by human players – one, two, or more
+– and which slots those humans take.</li>
+<li>Name each human empire, or take a random one from the original’s
+table of 59. Computer empires are seated as their scenario specifies and
+pick up personalities at load: pirate, kingdom, guardian or berserker,
+each with its own temperament for escalating from raiding to
+annihilation.</li>
+</ol>
+<p>Randomness in world placement, combat and events all runs through a
+ported copy of the original’s own generator, seeded by the clock (the
+original did the same – the galaxies players saw in 2004 never existed
+twice), so a scenario can genuinely unfold differently on every run.</p>
+<h2 id="writing-your-own">Writing your own</h2>
+<p>The shipped files are plain text and readable: directives for zones,
+<code>CreateWorld</code> blocks, empire seats, nebulae, the
+<code>BEGINTEXT</code>/<code>ENDTEXT</code> prose blocks. Copy the
+smallest one that looks like the game you want and start editing – they
+are lightly commented, and the scenario parser’s test suite is a
+catalogue of every accepted directive. A scenario that disagrees with
+the format loses, every time – the original files are the
+specification.</p>
+<h1 id="glossary">Glossary</h1>
+<blockquote>
+<p><em>The empire names a thing twice: once for the record, once for the
+crew that has to carry it.</em> – Concordance of the Reconstruction,
+preface</p>
+</blockquote>
+<dl>
+<dt>Sector</dt>
+<dd>
+One cell of the square map grid – a star system and whatever sits in it:
+worlds, bases, gates, fleets, phenomena. The unit of all distances.
+</dd>
+<dt>Chebyshev distance</dt>
+<dd>
+The map’s measure: the larger of the horizontal and vertical gaps
+between two sectors, so diagonal movement costs exactly the same as
+straight movement.
+</dd>
+<dt>Capital</dt>
+<dd>
+An empire’s seat world. All your typed coordinates are measured from it,
+and it counts as a laboratory in every research roll.
+</dd>
+<dt>Designation</dt>
+<dd>
+The assigned job of a world – agricultural, mine, shipyard base,
+university, outpost, and so on. Sets its principal industry and how its
+leftover industry is distributed.
+</dd>
+<dt>Class</dt>
+<dd>
+What a world physically is: Paradise, Ice world, Gas Giant, Ancient
+ruins. Sets trillum reserves, ground-defense bonus, and per-industry
+efficiency. Changed only by terraforming.
+</dd>
+<dt>Scouted</dt>
+<dd>
+The strongest grade of knowledge: you have seen the object and can see
+what it holds. Merely <strong>known</strong> objects are on the map but
+opaque; the detail panels and status tables demand scouting.
+</dd>
+<dt>Base scan</dt>
+<dd>
+The slow per-object coin flip a starbase runs each year, and the only
+way to discover something you had no idea existed.
+</dd>
+<dt>Probe</dt>
+<dd>
+A single-use sensor packet (<em>Fleet ▸ Probe</em>) sent to a known
+destination; reports what is there and returns by next year.
+</dd>
+<dt>ISSP</dt>
+<dd>
+Import/export self-sufficiency settings – four sliders per world
+(chemicals, metal, supplies, trillum), 0 to 10, where 5 means the world
+produces exactly what it consumes.
+</dd>
+<dt>Supply link</dt>
+<dd>
+The habit of food factories, mines and complexes of trading raw material
+across the eight neighbouring sectors. Starvation is usually a link
+problem before it is a fleet problem.
+</dd>
+<dt>Trillium</dt>
+<dd>
+The only fuel, and the rarest raw material. Ships, bases and jump drives
+burn it; worlds hold finite reserves set by their class. A fleet
+reporting <em>out of trillum</em> is a monument.
+</dd>
+<dt>Fleet type</dt>
+<dd>
+Standard, advanced-warp, penetrator, jump or hunter-killer force –
+decided by what the fleet lacks, not what it has, and setting the
+fleet’s sectors-per-year movement rate.
+</dd>
+<dt>Jump</dt>
+<dd>
+Movement through the gate network or a jump base’s projection. Gate
+jumps cover any distance in one year. Jump traffic trips minefields;
+warp traffic does not.
+</dd>
+<dt>Link (warp link)</dt>
+<dd>
+A paired corridor structure, five years to build: a gate whose network
+is exactly one other end.
+</dd>
+<dt>Disrupter</dt>
+<dd>
+A structure that denies enemy jump movement in its neighbourhood while
+letting friendly warp fleets ride at ten sectors a year.
+</dd>
+<dt>Group</dt>
+<dd>
+Up to nine formations per attack: a set number of one ship type with its
+loaded troops. Groups manoeuvre and aim independently; this is the unit
+you command on the combat screen.
+</dd>
+<dt>Shell</dt>
+<dd>
+One of five altitudes – deep space, high orbit, orbit, sub-orbit,
+ground. Combat resolves outermost first; anything not placed
+deliberately ends up parked in sub-orbit.
+</dd>
+<dt>SRM field</dt>
+<dd>
+Space-minefield; a site-built hazard that damages fleets making jump
+moves through its sector, and can be swept.
+</dd>
+<dt>Command base</dt>
+<dd>
+The mobile starbase. Scans, scouts, refuels, supports jump traffic, and
+shuffles one sector a year under orders.
+</dd>
+<dt>Fortress</dt>
+<dd>
+The base that multiplies sector defense (combat adjustment 250%) and
+catapults departing fleets four sectors forward.
+</dd>
+<dt>Industrial complex</dt>
+<dd>
+A base that concentrates the surrounding sectors’ raw material and
+passes its own overflow back to the mines.
+</dd>
+<dt>GDM</dt>
+<dd>
+Ground-defense missile. A world’s fixed salvo, sized by technology,
+fired at anything in range of the surface.
+</dd>
+<dt>LAM</dt>
+<dd>
+Light attack missile. Precision first-strike stock carried by bases,
+fired at enemy fleets or a world’s defenses; not interceptable, not
+recoverable.
+</dd>
+<dt>Ninja</dt>
+<dd>
+A legion that costs metal to produce, counts five-to-one against
+revolution and occupation duties, and wins fights they should lose.
+</dd>
+<dt>Ambrosia</dt>
+<dd>
+The product of bio-tech labs at 11.5 kilotons per billion people.
+Withholds: death and rage. Delivers: a 45% industry bonus from an
+addicted, satisfied population.
+</dd>
+<dt>Revolution index</dt>
+<dd>
+Per-world unrest, 0..100. Above 75, rebellion is possible; garrisons cap
+it, and quiet worlds under occupation resent the garrison.
+</dd>
+<dt>Rebellion</dt>
+<dd>
+The uprising that follows: either crushed by local troops, or
+successful, and the world becomes independent.
+</dd>
+<dt>Auto-attack</dt>
+<dd>
+The computer’s attack routine – the tactical AI that closes, aims and
+fires your fleets for you when you choose <em>auTo attack</em>, and that
+attacks you when it thinks the numbers are good.
+</dd>
+<dt>Personality (NPE empire)</dt>
+<dd>
+The computer empires’ temperaments – pirate, kingdom, guardian,
+berserker – set by the scenario and reflected in what they build, where
+they raid, and how fast they escalate.
+</dd>
+<dt>Ruins world</dt>
+<dd>
+A relic of the old empire: a small research bonus, an easy conquest, and
+scenarios that disagree about what else.
+</dd>
+<dt>Wanderer</dt>
+<dd>
+An unidentified moving contact in a sensor report. The original reserved
+the name; you may go a hundred games without meeting one that exists.
+</dd>
+</dl>
+<h1 id="reference-tables">Reference Tables</h1>
+<!-- Generated by docs/manual/build.py from the ported game tables.
+     Do not edit by hand: run `uv run python docs/manual/build.py --tables`
+     from the repository root and commit the result. -->
+<p>Every table in this appendix is taken directly from the game’s own
+data – the same constants the simulation uses, transcribed from
+<em>DATACNST.PAS</em> and <em>ATTACK.PAS</em>. They are reproduced here
+so that a number you read in the manual and a number the game computes
+are never two different numbers.</p>
+<p>Units follow the original’s conventions:</p>
+<ul>
+<li><strong>Population</strong> is counted in units of 100 million.</li>
+<li><strong>Fuel figures</strong> for ships are scaled: consumption is
+recorded in thousandths of a unit per sector per ship, capacity in
+hundredths of a unit per ship.</li>
+<li><strong>Raw-material costs</strong> are quantities (megatons, except
+ambrosia and trillum in kilotons) needed to build <strong>100
+units</strong> of the thing.</li>
+<li><strong>Percentages of population in the military</strong> are
+stored in hundredths of one percent.</li>
+<li>A dash means the game has no entry for that cell; a zero is a real
+zero.</li>
+</ul>
+<h2 id="technology-levels">Technology Levels</h2>
+<p>There are eleven technology levels. <strong>Base population</strong>
+is the average population a world of that technology supports at 50%
+efficiency, in units of 100 million. <strong>TIP adj</strong> and
+<strong>prod adj</strong> are the percent multipliers the level applies
+to a world’s industrial potential and production; <strong>min supply
+ind</strong> is the percent of industry a world needs in food factories
+to be self-sufficient; <strong>military pct</strong> is the percent of
+population in the military at military index 50 (hundredths of a
+percent). <strong>GDM salvo</strong> is how many ground-defense missiles
+a world can put up at once. The <strong>Unlocks</strong> column lists
+the things first buildable at that level.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr>
+<th>Lvl</th>
+<th>Level</th>
+<th>Base pop</th>
+<th>TIP adj</th>
+<th>Prod adj</th>
+<th>Min sup ind</th>
+<th>Military pct</th>
+<th>GDM salvo</th>
+<th>Unlocks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>pre-tech</td>
+<td>3</td>
+<td>25</td>
+<td>12</td>
+<td>95</td>
+<td>1</td>
+<td>0</td>
+<td>supply</td>
+</tr>
+<tr>
+<td>1</td>
+<td>primitive</td>
+<td>10</td>
+<td>40</td>
+<td>24</td>
+<td>90</td>
+<td>80</td>
+<td>0</td>
+<td>troop, metal</td>
+</tr>
+<tr>
+<td>2</td>
+<td>pre-atomic</td>
+<td>100</td>
+<td>49</td>
+<td>36</td>
+<td>80</td>
+<td>100</td>
+<td>0</td>
+<td>chemical</td>
+</tr>
+<tr>
+<td>3</td>
+<td>atomic</td>
+<td>250</td>
+<td>57</td>
+<td>47</td>
+<td>70</td>
+<td>90</td>
+<td>20</td>
+<td>GDM, trillum</td>
+</tr>
+<tr>
+<td>4</td>
+<td>pre-warp</td>
+<td>500</td>
+<td>66</td>
+<td>58</td>
+<td>50</td>
+<td>80</td>
+<td>217</td>
+<td>fighter</td>
+</tr>
+<tr>
+<td>5</td>
+<td>warp</td>
+<td>700</td>
+<td>80</td>
+<td>67</td>
+<td>40</td>
+<td>75</td>
+<td>662</td>
+<td>transport</td>
+</tr>
+<tr>
+<td>6</td>
+<td>jump</td>
+<td>1100</td>
+<td>85</td>
+<td>76</td>
+<td>34</td>
+<td>60</td>
+<td>1013</td>
+<td>ion cannon, jumpship, jumptransport</td>
+</tr>
+<tr>
+<td>7</td>
+<td>bio-tech</td>
+<td>1700</td>
+<td>90</td>
+<td>84</td>
+<td>30</td>
+<td>50</td>
+<td>1261</td>
+<td>defense satellite, hunter-killer, penetrator, ambrosia, outpost</td>
+</tr>
+<tr>
+<td>8</td>
+<td>starship</td>
+<td>2000</td>
+<td>94</td>
+<td>90</td>
+<td>28</td>
+<td>30</td>
+<td>2163</td>
+<td>LAM, starship, ninja, SRM, command base, industrial complex</td>
+</tr>
+<tr>
+<td>9</td>
+<td>pre-gate</td>
+<td>2500</td>
+<td>97</td>
+<td>95</td>
+<td>26</td>
+<td>15</td>
+<td>2644</td>
+<td>fortress, link, disrupter</td>
+</tr>
+<tr>
+<td>10</td>
+<td>gate</td>
+<td>3000</td>
+<td>100</td>
+<td>100</td>
+<td>23</td>
+<td>10</td>
+<td>2759</td>
+<td>gate, terraforming</td>
+</tr>
+</tbody>
+</table>
+<h2 id="industries-and-output">Industries and Output</h2>
+<p>Nine kinds of industry, the technology needed to run them, and the
+metal cost of building 100 points of each.</p>
+<table>
+<thead>
+<tr>
+<th>Industry</th>
+<th>Min tech</th>
+<th>Metal per 100</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bio-tech labs</td>
+<td>bio-tech</td>
+<td>100</td>
+</tr>
+<tr>
+<td>chemical plants</td>
+<td>pre-atomic</td>
+<td>500</td>
+</tr>
+<tr>
+<td>metal mines</td>
+<td>primitive</td>
+<td>100</td>
+</tr>
+<tr>
+<td>ship yards</td>
+<td>pre-warp</td>
+<td>1900</td>
+</tr>
+<tr>
+<td>jumpship yards</td>
+<td>jump</td>
+<td>1200</td>
+</tr>
+<tr>
+<td>starship yards</td>
+<td>starship</td>
+<td>1500</td>
+</tr>
+<tr>
+<td>transport yards</td>
+<td>warp</td>
+<td>1000</td>
+</tr>
+<tr>
+<td>food factories</td>
+<td>pre-tech</td>
+<td>0</td>
+</tr>
+<tr>
+<td>trillum mines</td>
+<td>atomic</td>
+<td>300</td>
+</tr>
+</tbody>
+</table>
+<p>What each industry produces, in relative points per 100 points of
+that industry. Bio-tech labs produce ambrosia; the food factories
+produce supplies; the raw-material industries their eponymous materials;
+the yards build hulls. Heads: men and nnj are legions, amb and tri
+kilotons, che, met and sup megatons; hull abbreviations are fgt, hkr,
+jmp, jtn, pen, ssp, trn.</p>
+<table style="width:90%;">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+</colgroup>
+<thead>
+<tr>
+<th>Industry</th>
+<th>fgt</th>
+<th>hkr</th>
+<th>jmp</th>
+<th>jtn</th>
+<th>pen</th>
+<th>ssp</th>
+<th>trn</th>
+<th>men</th>
+<th>nnj</th>
+<th>amb</th>
+<th>che</th>
+<th>met</th>
+<th>sup</th>
+<th>tri</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bio-tech labs</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>10</td>
+<td>175</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>chemical plants</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>175</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>metal mines</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>350</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>ship yards</td>
+<td>27</td>
+<td>5</td>
+<td>9</td>
+<td>5</td>
+<td>4</td>
+<td>2</td>
+<td>10</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>jumpship yards</td>
+<td>—</td>
+<td>25</td>
+<td>50</td>
+<td>30</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>starship yards</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>40</td>
+<td>15</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>transport yards</td>
+<td>75</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>45</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>food factories</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>320</td>
+<td>—</td>
+</tr>
+<tr>
+<td>trillum mines</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>75</td>
+</tr>
+</tbody>
+</table>
+<h2 id="ships">Ships</h2>
+<p>Combat power is 0..100 on an absolute scale (a starship anchors the
+top end at 100). <strong>Weapon eff</strong> is the average
+effectiveness of the type’s weapons; <strong>value</strong> and
+<strong>protection</strong> are the AI’s bookkeeping figures – how many
+points a ship of the type is worth and how much protection it offers or
+needs. <strong>Trns</strong> is cargo capacity relative to a transport.
+Fuel figures are scaled as noted above.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th>Ship</th>
+<th>Tech</th>
+<th>Power</th>
+<th>Weap eff</th>
+<th>Value</th>
+<th>Prot off</th>
+<th>Prot need</th>
+<th>Trns</th>
+<th>Fuel/sector</th>
+<th>Fuel cap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fighter</td>
+<td>pre-warp</td>
+<td>1</td>
+<td>30</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>0</td>
+<td>10</td>
+<td>3</td>
+</tr>
+<tr>
+<td>hunter-killer</td>
+<td>bio-tech</td>
+<td>20</td>
+<td>100</td>
+<td>50</td>
+<td>10</td>
+<td>30</td>
+<td>0</td>
+<td>1086</td>
+<td>851</td>
+</tr>
+<tr>
+<td>jumpship</td>
+<td>jump</td>
+<td>12</td>
+<td>100</td>
+<td>50</td>
+<td>10</td>
+<td>20</td>
+<td>0</td>
+<td>659</td>
+<td>329</td>
+</tr>
+<tr>
+<td>jumptransport</td>
+<td>jump</td>
+<td>1</td>
+<td>10</td>
+<td>30</td>
+<td>1</td>
+<td>50</td>
+<td>0.2</td>
+<td>894</td>
+<td>1341</td>
+</tr>
+<tr>
+<td>penetrator</td>
+<td>bio-tech</td>
+<td>25</td>
+<td>150</td>
+<td>100</td>
+<td>50</td>
+<td>200</td>
+<td>0</td>
+<td>943</td>
+<td>1886</td>
+</tr>
+<tr>
+<td>starship</td>
+<td>starship</td>
+<td>100</td>
+<td>100</td>
+<td>200</td>
+<td>100</td>
+<td>500</td>
+<td>0</td>
+<td>1427</td>
+<td>2854</td>
+</tr>
+<tr>
+<td>transport</td>
+<td>warp</td>
+<td>0</td>
+<td>10</td>
+<td>30</td>
+<td>0</td>
+<td>150</td>
+<td>1</td>
+<td>994</td>
+<td>1988</td>
+</tr>
+</tbody>
+</table>
+<h2 id="cargo-and-defenses">Cargo and Defenses</h2>
+<p>Cargo carried in the hold of a transport. <strong>Space per
+transport</strong> is how many units of that cargo one standard
+transport carries; a jumptransport carries a fifth of it.
+<strong>Power</strong> is on the surrender scale.</p>
+<table>
+<thead>
+<tr>
+<th>Cargo</th>
+<th>Power</th>
+<th>Space per transport</th>
+<th>Fuel/sector</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>troop</td>
+<td>20</td>
+<td>5</td>
+<td>10</td>
+</tr>
+<tr>
+<td>ninja</td>
+<td>100</td>
+<td>5</td>
+<td>10</td>
+</tr>
+<tr>
+<td>ambrosia</td>
+<td>—</td>
+<td>100</td>
+<td>15</td>
+</tr>
+<tr>
+<td>chemical</td>
+<td>—</td>
+<td>3</td>
+<td>10</td>
+</tr>
+<tr>
+<td>metal</td>
+<td>—</td>
+<td>3</td>
+<td>10</td>
+</tr>
+<tr>
+<td>supply</td>
+<td>—</td>
+<td>2</td>
+<td>15</td>
+</tr>
+<tr>
+<td>trillum</td>
+<td>—</td>
+<td>100</td>
+<td>20</td>
+</tr>
+</tbody>
+</table>
+<p>The four things a world can build as fixed defense.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr>
+<th>Defense</th>
+<th>Tech</th>
+<th>Power</th>
+<th>Weap eff</th>
+<th>Def adj</th>
+<th>Build rate</th>
+<th>che / met / tri</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LAM</td>
+<td>starship</td>
+<td>100</td>
+<td>100</td>
+<td>145</td>
+<td>220</td>
+<td>25 / 20 / 5</td>
+</tr>
+<tr>
+<td>defense satellite</td>
+<td>bio-tech</td>
+<td>100</td>
+<td>150</td>
+<td>76</td>
+<td>50</td>
+<td>30 / 140 / 20</td>
+</tr>
+<tr>
+<td>GDM</td>
+<td>atomic</td>
+<td>10</td>
+<td>100</td>
+<td>215</td>
+<td>250</td>
+<td>10 / 20 / 2</td>
+</tr>
+<tr>
+<td>ion cannon</td>
+<td>jump</td>
+<td>50</td>
+<td>30</td>
+<td>83</td>
+<td>95</td>
+<td>25 / 150 / 10</td>
+</tr>
+</tbody>
+</table>
+<h2 id="construction-1">Construction</h2>
+<p>Years to complete, and the cargo (megatons; ambrosia and trillum
+kilotons) a site consumes <strong>per year</strong> while under
+construction.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr>
+<th>Structure</th>
+<th>Years</th>
+<th>troop</th>
+<th>ninja</th>
+<th>ambrosia</th>
+<th>chemical</th>
+<th>metal</th>
+<th>supply</th>
+<th>trillum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SRM</td>
+<td>2</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>110</td>
+<td>500</td>
+<td>—</td>
+<td>80</td>
+</tr>
+<tr>
+<td>command base</td>
+<td>6</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>460</td>
+<td>2300</td>
+<td>—</td>
+<td>180</td>
+</tr>
+<tr>
+<td>fortress</td>
+<td>12</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>840</td>
+<td>2870</td>
+<td>—</td>
+<td>250</td>
+</tr>
+<tr>
+<td>industrial complex</td>
+<td>10</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>590</td>
+<td>2600</td>
+<td>—</td>
+<td>150</td>
+</tr>
+<tr>
+<td>outpost</td>
+<td>3</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>350</td>
+<td>1120</td>
+<td>—</td>
+<td>150</td>
+</tr>
+<tr>
+<td>gate</td>
+<td>15</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>2530</td>
+<td>3920</td>
+<td>—</td>
+<td>1450</td>
+</tr>
+<tr>
+<td>link</td>
+<td>5</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>1560</td>
+<td>2550</td>
+<td>—</td>
+<td>290</td>
+</tr>
+<tr>
+<td>disrupter</td>
+<td>8</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>1110</td>
+<td>1180</td>
+<td>—</td>
+<td>1120</td>
+</tr>
+</tbody>
+</table>
+<h2 id="raw-material-costs">Raw-Material Costs</h2>
+<p>Raw materials consumed to build 100 units of each thing. (Structures
+are built by year and are in the construction table instead; their
+per-year rate scales the same way.)</p>
+<table style="width:67%;">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+</colgroup>
+<thead>
+<tr>
+<th>Thing</th>
+<th>che</th>
+<th>met</th>
+<th>sup</th>
+<th>tri</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ambrosia</td>
+<td>110</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>fighter</td>
+<td>5</td>
+<td>30</td>
+<td>0</td>
+<td>2</td>
+</tr>
+<tr>
+<td>hunter-killer</td>
+<td>100</td>
+<td>110</td>
+<td>0</td>
+<td>18</td>
+</tr>
+<tr>
+<td>jumpship</td>
+<td>65</td>
+<td>70</td>
+<td>0</td>
+<td>12</td>
+</tr>
+<tr>
+<td>jumptransport</td>
+<td>100</td>
+<td>110</td>
+<td>0</td>
+<td>16</td>
+</tr>
+<tr>
+<td>penetrator</td>
+<td>95</td>
+<td>275</td>
+<td>0</td>
+<td>20</td>
+</tr>
+<tr>
+<td>starship</td>
+<td>175</td>
+<td>520</td>
+<td>0</td>
+<td>30</td>
+</tr>
+<tr>
+<td>transport</td>
+<td>90</td>
+<td>600</td>
+<td>0</td>
+<td>10</td>
+</tr>
+<tr>
+<td>troop</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>ninja</td>
+<td>50</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>LAM</td>
+<td>25</td>
+<td>20</td>
+<td>0</td>
+<td>5</td>
+</tr>
+<tr>
+<td>defense satellite</td>
+<td>30</td>
+<td>140</td>
+<td>0</td>
+<td>20</td>
+</tr>
+<tr>
+<td>GDM</td>
+<td>10</td>
+<td>20</td>
+<td>0</td>
+<td>2</td>
+</tr>
+<tr>
+<td>ion cannon</td>
+<td>25</td>
+<td>150</td>
+<td>0</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<h2 id="combat">Combat</h2>
+<h3 id="the-combat-table">The combat table</h3>
+<p>Destructive power of attacker against defender. At the standard
+adjustments, 100 points of accumulated damage destroys one unit, 200
+destroys two, and so on.</p>
+<table style="width:90%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attacker  defender</th>
+<th>None</th>
+<th>Lam</th>
+<th>Def</th>
+<th>Gdm</th>
+<th>Ion</th>
+<th>Fgt</th>
+<th>Hkr</th>
+<th>Jmp</th>
+<th>Jtn</th>
+<th>Pen</th>
+<th>Ssp</th>
+<th>Trn</th>
+<th>Men</th>
+<th>Nnj</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>—</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>LAM</td>
+<td>0</td>
+<td>200</td>
+<td>100</td>
+<td>200</td>
+<td>150</td>
+<td>250</td>
+<td>60</td>
+<td>75</td>
+<td>100</td>
+<td>50</td>
+<td>15</td>
+<td>200</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>defense satellite</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>25</td>
+<td>90</td>
+<td>100</td>
+<td>100</td>
+<td>50</td>
+<td>6</td>
+<td>250</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>GDM</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>250</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>50</td>
+<td>25</td>
+<td>50</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>ion cannon</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>50</td>
+<td>65</td>
+<td>75</td>
+<td>75</td>
+<td>15</td>
+<td>2</td>
+<td>100</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>fighter</td>
+<td>0</td>
+<td>5</td>
+<td>5</td>
+<td>1</td>
+<td>25</td>
+<td>25</td>
+<td>15</td>
+<td>8</td>
+<td>20</td>
+<td>12</td>
+<td>1</td>
+<td>25</td>
+<td>5</td>
+<td>4</td>
+</tr>
+<tr>
+<td>hunter-killer</td>
+<td>0</td>
+<td>12</td>
+<td>40</td>
+<td>38</td>
+<td>20</td>
+<td>50</td>
+<td>50</td>
+<td>75</td>
+<td>50</td>
+<td>50</td>
+<td>4</td>
+<td>75</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>jumpship</td>
+<td>0</td>
+<td>8</td>
+<td>15</td>
+<td>25</td>
+<td>10</td>
+<td>150</td>
+<td>25</td>
+<td>38</td>
+<td>50</td>
+<td>25</td>
+<td>1</td>
+<td>150</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>jumptransport</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>25</td>
+<td>1</td>
+<td>1</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>penetrator</td>
+<td>0</td>
+<td>15</td>
+<td>35</td>
+<td>50</td>
+<td>35</td>
+<td>50</td>
+<td>65</td>
+<td>105</td>
+<td>125</td>
+<td>50</td>
+<td>5</td>
+<td>250</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>starship</td>
+<td>0</td>
+<td>45</td>
+<td>90</td>
+<td>200</td>
+<td>50</td>
+<td>1000</td>
+<td>250</td>
+<td>300</td>
+<td>500</td>
+<td>100</td>
+<td>15</td>
+<td>500</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>transport</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>12</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>troop</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>7</td>
+<td>2</td>
+</tr>
+<tr>
+<td>ninja</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>20</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<h3 id="military-power-surrender-test">Military power (surrender
+test)</h3>
+<p>Powers used when weighing whether a beaten world surrenders.</p>
+<table>
+<thead>
+<tr>
+<th>Weapon</th>
+<th>Power</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LAM</td>
+<td>80</td>
+</tr>
+<tr>
+<td>defense satellite</td>
+<td>75</td>
+</tr>
+<tr>
+<td>GDM</td>
+<td>20</td>
+</tr>
+<tr>
+<td>ion cannon</td>
+<td>65</td>
+</tr>
+<tr>
+<td>fighter</td>
+<td>2</td>
+</tr>
+<tr>
+<td>hunter-killer</td>
+<td>15</td>
+</tr>
+<tr>
+<td>jumpship</td>
+<td>10</td>
+</tr>
+<tr>
+<td>jumptransport</td>
+<td>1</td>
+</tr>
+<tr>
+<td>penetrator</td>
+<td>20</td>
+</tr>
+<tr>
+<td>starship</td>
+<td>100</td>
+</tr>
+<tr>
+<td>transport</td>
+<td>1</td>
+</tr>
+<tr>
+<td>troop</td>
+<td>20</td>
+</tr>
+<tr>
+<td>ninja</td>
+<td>100</td>
+</tr>
+</tbody>
+</table>
+<h3 id="technology-adjustment">Technology adjustment</h3>
+<p>Percent applied to the attacker’s power for attacker technology
+(rows) against defender technology (columns). 100 is no adjustment.</p>
+<table>
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attacker  defender</th>
+<th>pre-tech</th>
+<th>primitive</th>
+<th>pre-atomic</th>
+<th>atomic</th>
+<th>pre-warp</th>
+<th>warp</th>
+<th>jump</th>
+<th>bio-tech</th>
+<th>starship</th>
+<th>pre-gate</th>
+<th>gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pre-tech</td>
+<td>100</td>
+<td>90</td>
+<td>50</td>
+<td>25</td>
+<td>10</td>
+<td>5</td>
+<td>3</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>primitive</td>
+<td>120</td>
+<td>100</td>
+<td>80</td>
+<td>40</td>
+<td>25</td>
+<td>10</td>
+<td>5</td>
+<td>3</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>pre-atomic</td>
+<td>150</td>
+<td>110</td>
+<td>100</td>
+<td>60</td>
+<td>40</td>
+<td>25</td>
+<td>10</td>
+<td>5</td>
+<td>3</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>atomic</td>
+<td>160</td>
+<td>140</td>
+<td>130</td>
+<td>100</td>
+<td>60</td>
+<td>40</td>
+<td>30</td>
+<td>20</td>
+<td>10</td>
+<td>5</td>
+<td>3</td>
+</tr>
+<tr>
+<td>pre-warp</td>
+<td>200</td>
+<td>170</td>
+<td>145</td>
+<td>120</td>
+<td>100</td>
+<td>90</td>
+<td>85</td>
+<td>75</td>
+<td>70</td>
+<td>55</td>
+<td>45</td>
+</tr>
+<tr>
+<td>warp</td>
+<td>250</td>
+<td>200</td>
+<td>175</td>
+<td>140</td>
+<td>110</td>
+<td>100</td>
+<td>95</td>
+<td>90</td>
+<td>85</td>
+<td>70</td>
+<td>55</td>
+</tr>
+<tr>
+<td>jump</td>
+<td>280</td>
+<td>210</td>
+<td>190</td>
+<td>175</td>
+<td>115</td>
+<td>110</td>
+<td>100</td>
+<td>97</td>
+<td>93</td>
+<td>80</td>
+<td>70</td>
+</tr>
+<tr>
+<td>bio-tech</td>
+<td>320</td>
+<td>250</td>
+<td>210</td>
+<td>195</td>
+<td>120</td>
+<td>115</td>
+<td>105</td>
+<td>100</td>
+<td>95</td>
+<td>90</td>
+<td>80</td>
+</tr>
+<tr>
+<td>starship</td>
+<td>360</td>
+<td>320</td>
+<td>280</td>
+<td>220</td>
+<td>125</td>
+<td>120</td>
+<td>115</td>
+<td>110</td>
+<td>100</td>
+<td>97</td>
+<td>90</td>
+</tr>
+<tr>
+<td>pre-gate</td>
+<td>500</td>
+<td>400</td>
+<td>300</td>
+<td>250</td>
+<td>130</td>
+<td>125</td>
+<td>120</td>
+<td>115</td>
+<td>110</td>
+<td>100</td>
+<td>95</td>
+</tr>
+<tr>
+<td>gate</td>
+<td>530</td>
+<td>415</td>
+<td>310</td>
+<td>260</td>
+<td>135</td>
+<td>130</td>
+<td>125</td>
+<td>120</td>
+<td>115</td>
+<td>110</td>
+<td>100</td>
+</tr>
+</tbody>
+</table>
+<h3 id="gdm-interception">GDM interception</h3>
+<p>Ground-defense missiles shot down on approach per 10 attacking ships
+of the type.</p>
+<table>
+<thead>
+<tr>
+<th>Ship</th>
+<th>GDMs killed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fighter</td>
+<td>0</td>
+</tr>
+<tr>
+<td>hunter-killer</td>
+<td>3</td>
+</tr>
+<tr>
+<td>jumpship</td>
+<td>2</td>
+</tr>
+<tr>
+<td>jumptransport</td>
+<td>1</td>
+</tr>
+<tr>
+<td>penetrator</td>
+<td>15</td>
+</tr>
+<tr>
+<td>starship</td>
+<td>20</td>
+</tr>
+<tr>
+<td>transport</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<h2 id="world-classes">World Classes</h2>
+<p>The world’s class sets its trillum reserve, how strongly its terrain
+aids ground defense, and the percent of each industry that is effective
+on it. Industry column heads: Bio (labs), Che (micals), Min (es), SYG /
+SYJ / SYS / SYT (the four ship yards), Sup (plies), Tri (llium).</p>
+<table style="width:91%;">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 6%" />
+<col style="width: 9%" />
+<col style="width: 8%" />
+<col style="width: 7%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+</colgroup>
+<thead>
+<tr>
+<th>Class</th>
+<th>Glyph</th>
+<th>Min tech</th>
+<th>Tri res.</th>
+<th>Gd def.</th>
+<th>Bio</th>
+<th>Che</th>
+<th>Min</th>
+<th>SYG</th>
+<th>SYJ</th>
+<th>SYS</th>
+<th>SYT</th>
+<th>Sup</th>
+<th>Tri</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ambrosia</td>
+<td>A</td>
+<td>pre-tech</td>
+<td>200</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>75</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>75</td>
+</tr>
+<tr>
+<td>Arid</td>
+<td>a</td>
+<td>primitive</td>
+<td>350</td>
+<td>100</td>
+<td>100</td>
+<td>80</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>85</td>
+<td>100</td>
+</tr>
+<tr>
+<td>Artificial</td>
+<td>0</td>
+<td>jump</td>
+<td>50</td>
+<td>100</td>
+<td>100</td>
+<td>40</td>
+<td>40</td>
+<td>250</td>
+<td>200</td>
+<td>300</td>
+<td>300</td>
+<td>40</td>
+<td>40</td>
+</tr>
+<tr>
+<td>Barren</td>
+<td>B</td>
+<td>pre-warp</td>
+<td>1200</td>
+<td>50</td>
+<td>100</td>
+<td>60</td>
+<td>175</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>40</td>
+<td>175</td>
+</tr>
+<tr>
+<td>Class j</td>
+<td>j</td>
+<td>pre-tech</td>
+<td>700</td>
+<td>100</td>
+<td>100</td>
+<td>120</td>
+<td>120</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>90</td>
+</tr>
+<tr>
+<td>Class k</td>
+<td>k</td>
+<td>pre-tech</td>
+<td>800</td>
+<td>100</td>
+<td>100</td>
+<td>90</td>
+<td>120</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+</tr>
+<tr>
+<td>Class l</td>
+<td>l</td>
+<td>pre-tech</td>
+<td>900</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>90</td>
+<td>120</td>
+</tr>
+<tr>
+<td>Class m</td>
+<td>m</td>
+<td>pre-tech</td>
+<td>800</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>120</td>
+<td>90</td>
+</tr>
+<tr>
+<td>Desert</td>
+<td>D</td>
+<td>primitive</td>
+<td>1500</td>
+<td>140</td>
+<td>100</td>
+<td>60</td>
+<td>80</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>60</td>
+<td>190</td>
+</tr>
+<tr>
+<td>Earth-like</td>
+<td>E</td>
+<td>pre-tech</td>
+<td>800</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+</tr>
+<tr>
+<td>Forest world</td>
+<td>F</td>
+<td>pre-tech</td>
+<td>500</td>
+<td>140</td>
+<td>100</td>
+<td>120</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>145</td>
+<td>100</td>
+</tr>
+<tr>
+<td>Gas Giant</td>
+<td>G</td>
+<td>pre-warp</td>
+<td>450</td>
+<td>50</td>
+<td>100</td>
+<td>150</td>
+<td>50</td>
+<td>150</td>
+<td>125</td>
+<td>175</td>
+<td>150</td>
+<td>40</td>
+<td>60</td>
+</tr>
+<tr>
+<td>Hostile life</td>
+<td>h</td>
+<td>pre-atomic</td>
+<td>500</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+</tr>
+<tr>
+<td>Ice world</td>
+<td>I</td>
+<td>pre-atomic</td>
+<td>900</td>
+<td>160</td>
+<td>100</td>
+<td>90</td>
+<td>80</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>60</td>
+<td>80</td>
+</tr>
+<tr>
+<td>Jungle world</td>
+<td>J</td>
+<td>pre-tech</td>
+<td>600</td>
+<td>150</td>
+<td>100</td>
+<td>130</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>125</td>
+<td>100</td>
+</tr>
+<tr>
+<td>Ocean world</td>
+<td>O</td>
+<td>pre-warp</td>
+<td>300</td>
+<td>80</td>
+<td>100</td>
+<td>135</td>
+<td>40</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>130</td>
+<td>40</td>
+</tr>
+<tr>
+<td>Paradise</td>
+<td>1</td>
+<td>pre-tech</td>
+<td>600</td>
+<td>100</td>
+<td>120</td>
+<td>150</td>
+<td>125</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>200</td>
+<td>150</td>
+</tr>
+<tr>
+<td>Poisonous</td>
+<td>P</td>
+<td>atomic</td>
+<td>350</td>
+<td>60</td>
+<td>100</td>
+<td>200</td>
+<td>80</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>40</td>
+<td>80</td>
+</tr>
+<tr>
+<td>Ancient ruins</td>
+<td>2</td>
+<td>pre-tech</td>
+<td>200</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+</tr>
+<tr>
+<td>Underground</td>
+<td>U</td>
+<td>primitive</td>
+<td>900</td>
+<td>130</td>
+<td>100</td>
+<td>100</td>
+<td>150</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>70</td>
+<td>125</td>
+</tr>
+<tr>
+<td>Terraforming</td>
+<td>X</td>
+<td>warp</td>
+<td>800</td>
+<td>100</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>10</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Volcanic</td>
+<td>V</td>
+<td>pre-atomic</td>
+<td>1100</td>
+<td>120</td>
+<td>100</td>
+<td>125</td>
+<td>175</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>100</td>
+<td>75</td>
+<td>150</td>
+</tr>
+</tbody>
+</table>
+<h2 id="world-designations">World Designations</h2>
+<p>The technology needed before a world may be designated, its principal
+industry, and the optimum military index for that designation
+(hundredths of a percent of population in uniform).</p>
+<table>
+<thead>
+<tr>
+<th>Designation</th>
+<th>Glyph</th>
+<th>Min tech</th>
+<th>Principal industry</th>
+<th>Opt military</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>agricultural world</td>
+<td>a</td>
+<td>pre-tech</td>
+<td>food factories</td>
+<td>5</td>
+</tr>
+<tr>
+<td>ambrosia world</td>
+<td>A</td>
+<td>bio-tech</td>
+<td>bio-tech labs</td>
+<td>100</td>
+</tr>
+<tr>
+<td>base planet</td>
+<td>b</td>
+<td>pre-warp</td>
+<td>ship yards</td>
+<td>200</td>
+</tr>
+<tr>
+<td>base planet</td>
+<td>B</td>
+<td>gate</td>
+<td>ship yards</td>
+<td>200</td>
+</tr>
+<tr>
+<td>capital</td>
+<td>C</td>
+<td>jump</td>
+<td>ship yards</td>
+<td>200</td>
+</tr>
+<tr>
+<td>chemical planet</td>
+<td>c</td>
+<td>pre-atomic</td>
+<td>chemical plants</td>
+<td>10</td>
+</tr>
+<tr>
+<td>independent world</td>
+<td>i</td>
+<td>pre-tech</td>
+<td>ship yards</td>
+<td>80</td>
+</tr>
+<tr>
+<td>jumpship base</td>
+<td>j</td>
+<td>jump</td>
+<td>jumpship yards</td>
+<td>100</td>
+</tr>
+<tr>
+<td>jumpship base</td>
+<td>J</td>
+<td>gate</td>
+<td>jumpship yards</td>
+<td>100</td>
+</tr>
+<tr>
+<td>metal mine</td>
+<td>m</td>
+<td>primitive</td>
+<td>metal mines</td>
+<td>20</td>
+</tr>
+<tr>
+<td>ninja world</td>
+<td>N</td>
+<td>starship</td>
+<td>bio-tech labs</td>
+<td>150</td>
+</tr>
+<tr>
+<td>outpost</td>
+<td>o</td>
+<td>gate</td>
+<td>ship yards</td>
+<td>0</td>
+</tr>
+<tr>
+<td>raw material mine</td>
+<td>r</td>
+<td>primitive</td>
+<td>metal mines</td>
+<td>20</td>
+</tr>
+<tr>
+<td>raw material mine</td>
+<td>R</td>
+<td>gate</td>
+<td>metal mines</td>
+<td>20</td>
+</tr>
+<tr>
+<td>starship base</td>
+<td>s</td>
+<td>bio-tech</td>
+<td>starship yards</td>
+<td>150</td>
+</tr>
+<tr>
+<td>starship base</td>
+<td>S</td>
+<td>gate</td>
+<td>starship yards</td>
+<td>150</td>
+</tr>
+<tr>
+<td>transport base</td>
+<td>t</td>
+<td>pre-warp</td>
+<td>transport yards</td>
+<td>80</td>
+</tr>
+<tr>
+<td>transport base</td>
+<td>T</td>
+<td>gate</td>
+<td>transport yards</td>
+<td>80</td>
+</tr>
+<tr>
+<td>university world</td>
+<td>U</td>
+<td>jump</td>
+<td>metal mines</td>
+<td>1</td>
+</tr>
+<tr>
+<td>terraforming</td>
+<td>X</td>
+<td>warp</td>
+<td>metal mines</td>
+<td>10</td>
+</tr>
+<tr>
+<td>trillum mine</td>
+<td>z</td>
+<td>atomic</td>
+<td>trillum mines</td>
+<td>30</td>
+</tr>
+</tbody>
+</table>
+<h2 id="fleets-and-movement-1">Fleets and Movement</h2>
+<p>Fleet movement rate in sectors per year, by fleet type. A fleet’s
+type is the slowest ship it contains.</p>
+<table>
+<thead>
+<tr>
+<th>Fleet type</th>
+<th>Sectors / year</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Standard fleet</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Jump fleet</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Hunter-killer force</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Penetrator force</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Advanced-warp fleet</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>Other movement and cargo constants:</p>
+<ul>
+<li>Jump and jump-transport bases project a fleet of up to <strong>5
+transports</strong> worth of cargo (or the ship-count equivalent).</li>
+<li>Fuel per ton of cargo: <strong>265</strong> (thousandths).</li>
+<li>A standing fleet in space burns its type’s fuel consumption divided
+by <strong>10</strong> per turn.</li>
+<li>Warp distance is Chebyshev: a diagonal sector costs the same as an
+orthogonal one.</li>
+</ul>
+<h2 id="game-limits">Game Limits</h2>
+<table>
+<thead>
+<tr>
+<th>Thing</th>
+<th>Maximum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Worlds</td>
+<td>200</td>
+</tr>
+<tr>
+<td>Starbases</td>
+<td>100</td>
+</tr>
+<tr>
+<td>Fleets, total</td>
+<td>240</td>
+</tr>
+<tr>
+<td>Fleets per empire</td>
+<td>30</td>
+</tr>
+<tr>
+<td>Stargates</td>
+<td>50</td>
+</tr>
+<tr>
+<td>Construction sites</td>
+<td>50</td>
+</tr>
+<tr>
+<td>Probe packets per empire</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Names per empire</td>
+<td>100</td>
+</tr>
+<tr>
+<td>Groups per attack</td>
+<td>9</td>
+</tr>
+<tr>
+<td>Max resources</td>
+<td>9999</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

@@ -88,6 +88,26 @@ The map screen's keys:
 
 The function keys open the original's status windows: `F1` help, `F3`/`F4` world and military status, `F5`/`F6` fleets, `F7` news, `F8` empires, `F9` names, `F10` map.
 
+## The manual
+
+The original shipped a printed manual and no in-game help worth reading; this recreation carries its own. The source is Markdown, one file per chapter under [`docs/manual/chapters/`](docs/manual/chapters/), and the reference appendix at the back is *generated* straight from the game's own tables so a number in the manual and a number in the simulation can never disagree.
+
+Prebuilt copies:
+
+- **[`docs/manual/recreon-manual.pdf`](docs/manual/recreon-manual.pdf)** — the print edition: typst-set, dark starfield cover with the Re:creon emblem, chapter icons, and the full appendix.
+- **[`docs/manual/recreon-manual.html`](docs/manual/recreon-manual.html)** — the same text as a standalone, styled HTML file (the logo inlined).
+- **[`docs/manual/logo.svg`](docs/manual/logo.svg)** — the emblem, as a standalone asset.
+
+To rebuild after editing a chapter or a game table (needs `pandoc` and `typst` on PATH; no new Python deps):
+
+```bash
+uv run python docs/manual/build.py           # regenerate appendix, then build PDF + HTML
+uv run python docs/manual/build.py --tables  # regenerate the appendix only
+uv run python docs/manual/build.py --check   # verify the committed appendix is current
+```
+
+`tests/test_manual.py` pins the drift between the committed appendix, the menu bar, and chapter 8's command listing.
+
 ## Development
 
 ```bash
