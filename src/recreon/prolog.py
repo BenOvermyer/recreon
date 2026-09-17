@@ -405,20 +405,9 @@ def add_player_empire(
     one. Every empire that already knows the world gets a ``NewPlEmp``
     headline, so the galaxy notices.
 
-    **Original bug (#55).** The technology *set* is gathered wrongly:
-
-    ```pascal
-    IF Tech>MaxTech THEN
-       BEGIN MaxTech:=Tech; MaxTechnology:=Technology; END
-    ELSE
-       MaxTechnology:=MaxTechnology+Technology;
-    ```
-
-    A new high-water mark **replaces** the accumulated set instead of merging
-    into it, so everything gathered from empires examined earlier is thrown
-    away. The result depends on the order the empires happen to sit in: the
-    newcomer gets the best empire's technologies plus those of any empire
-    *after* it in slot order, and nothing from before. Reproduced.
+    Technology sets from all active empires are merged while the highest
+    technology level is selected, so the result does not depend on empire slot
+    order.
     """
     state.require_game()
 
@@ -451,10 +440,7 @@ def add_player_empire(
         tech, technology = get_empire_technology(game, emp)
         if tech > max_tech:
             max_tech = tech
-            # Replaces rather than merges -- see #55 above.
-            max_technology = set(technology)
-        else:
-            max_technology |= technology
+        max_technology |= technology
 
     create_empire(
         game,
