@@ -388,14 +388,8 @@ def test_a_ninth_empire_is_refused(tmp_path, state):
         add_player_empire(g, state, EmpireIdentity(name="Ninth"))
 
 
-def test_the_technology_union_is_order_dependent(tmp_path, state):
-    """Original bug #55, reproduced.
-
-    A new high-water mark *replaces* the accumulated technology set instead of
-    merging into it, so anything gathered from empires examined earlier is
-    discarded. The newcomer ends up with the best empire's technologies plus
-    those of empires after it in slot order, and nothing from before.
-    """
+def test_a_newcomer_inherits_the_union_of_empire_technology(tmp_path, state):
+    """Technology inheritance is independent of empire slot order."""
     g = mature(tmp_path)
 
     early, late = Empire.Empire1, Empire.Empire7
@@ -413,16 +407,15 @@ def test_the_technology_union_is_order_dependent(tmp_path, state):
     # A distinctive technology on a *low*-tech empire early in slot order.
     g.Universe.EmpireData[early].TechnologyLevel = TechLevel.PrimitLvl
     g.Universe.EmpireData[early].Technology = {TechnologyTypes.gte}
-    # ...and the highest level late in slot order, which resets the union.
+    # ...and the highest level late in slot order.
     g.Universe.EmpireData[late].TechnologyLevel = TechLevel.GteTchLvl
     g.Universe.EmpireData[late].Technology = {TechnologyTypes.ssp}
 
     emp = add_player_empire(g, state, EmpireIdentity(name="Newcomer"))
     gathered = g.Universe.EmpireData[emp].Technology
 
-    # The early empire's contribution was thrown away when Empire7 raised the
-    # maximum. Fixing #55 would put `gte` back.
-    assert TechnologyTypes.gte not in gathered
+    assert TechnologyTypes.gte in gathered
+    assert TechnologyTypes.ssp in gathered
 
 
 # --- Deleting an empire ------------------------------------------------------
