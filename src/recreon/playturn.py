@@ -757,18 +757,15 @@ def _check_object(
     sets = game.GlobalSets
 
     if E.NotKnown in error_cond:
-        # The original's first disjunct is
-        #     (Obj.ObjTyp = Flt) AND (NOT Obj.Index IN SetOfActiveFleets)
-        # which in Turbo Pascal parses as `(NOT Obj.Index) IN ...` -- NOT binds
-        # tighter than IN -- and is therefore always False. Reproduced by
-        # omission; see issue #75. The author parenthesised correctly
-        # everywhere else in this same routine.
         if obj.ObjTyp not in (
             ObjectTypes.Pln,
             ObjectTypes.Flt,
             ObjectTypes.Base,
         ) or (
             not known(game, player, obj) and not scouted(game, player, obj)
+        ) or (
+            obj.ObjTyp == ObjectTypes.Flt
+            and obj.Index not in sets.SetOfActiveFleets
         ):
             return E.NotKnown
 

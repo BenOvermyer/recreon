@@ -401,19 +401,8 @@ def test_a_starbase_counts_as_a_world(game):
 # --- The two original bugs ---------------------------------------------------
 
 
-def test_the_not_known_check_lets_a_stood_down_fleet_through(game, capital):
-    """Original bug #75. The guard reads
-
-        (Obj.ObjTyp = Flt) AND (NOT Obj.Index IN SetOfActiveFleets)
-
-    which Turbo Pascal parses as `(NOT Obj.Index) IN ...` -- NOT binds tighter
-    than IN -- so it is always false. Close-up is the only command that asks
-    for `NotKnown`, and it therefore accepts a fleet that is no longer in
-    space, so long as the stale record is still marked known.
-
-    Do not "fix" this by adding the disjunct: that is a behaviour change, not
-    a transcription repair.
-    """
+def test_the_not_known_check_rejects_a_stood_down_fleet(game, capital):
+    """A close-up cannot open on a fleet that is no longer in space."""
     from recreon.playturn import _check_object
 
     flt = get_next_fleet(game, PLAYER)
@@ -424,7 +413,7 @@ def test_the_not_known_check_lets_a_stood_down_fleet_through(game, capital):
     game.GlobalSets.SetOfActiveFleets.discard(flt.Index)
 
     assert flt.Index not in game.GlobalSets.SetOfActiveFleets
-    assert _check_object(game, PLAYER, flt, frozenset({E.NotKnown})) == E.NoError
+    assert _check_object(game, PLAYER, flt, frozenset({E.NotKnown})) == E.NotKnown
 
 
 def test_refuel_asks_for_a_check_that_does_not_exist():
