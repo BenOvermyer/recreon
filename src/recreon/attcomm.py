@@ -937,9 +937,8 @@ def raze_command(
     """Destroy a construction site or stargate. Port of ``TakeOverConOrGate``.
 
     No battle: a half-built hull and a warp gate have nothing to shoot with.
-    Note that the interactive command really does destroy the thing, where
-    ``AutoAttackCommand`` only *says* it did -- original bug #71, reproduced in
-    :func:`auto_attack_command`.
+    Both the interactive and auto-attack commands use this path so that the
+    target is removed and its owner receives the corresponding consequences.
     """
     name = object_name(game, player, target, long_format=True)
     hk_surprise = forces_unknown(game, flt_id, target)
@@ -1028,14 +1027,6 @@ def auto_attack_command(
 ) -> AttackOutcome:
     """Resolve an attack without the player directing it. ``AutoAttackCommand``.
 
-    **Original bug (#71).** A construction site or stargate is reported
-    destroyed and *not destroyed*. The branch is the ``WriteString`` alone --
-    no ``DestroyConstructionOrGate``, so the thing is still standing, still on
-    the map, and its owner gets neither the news nor the morale hit. The
-    interactive command (:func:`raze_command`) and the AI both call it; only
-    this one does not. Reproduced, because a missing call is faithfully
-    reproducible.
-
     The intent is always ``ConquerAIT``: a player attacking by hand is trying
     to take the thing, not to deny its cargo.
 
@@ -1053,6 +1044,9 @@ def auto_attack_command(
     """
     if target.ObjTyp not in FIGHTS_BACK:
         name = object_name(game, player, target, long_format=True)
+        destroy_construction_or_gate(
+            game, player, forces_unknown(game, flt_id, target), target
+        )
         return AttackOutcome(
             result=AttackResultTypes.NoART,
             lines=[f"{name} has been destroyed."],

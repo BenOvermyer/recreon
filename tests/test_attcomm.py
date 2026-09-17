@@ -192,6 +192,7 @@ def test_a_gate_is_razed_rather_than_fought(game):
     assert outcome.result is AttackResultTypes.NoART
     assert outcome.casualties == {}
     assert "has been destroyed" in outcome.lines[0]
+    assert gate.Index not in game.GlobalSets.SetOfActiveGates
 
 
 def test_an_overwhelming_attack_takes_the_target(game):
