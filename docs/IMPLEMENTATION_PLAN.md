@@ -1194,7 +1194,7 @@ for a player's sex where the original takes it from the naming prompt.
 
 SCENA.PAS is **not** this. Despite the name it is the conditional background-text
 system — `DisplayBackground` shows flavour text for a world against a set of
-conditions. Unported, and not part of §8.5.
+conditions. It was ported separately as `scena.py`, not as part of §8.5.
 
 **Not planned**: the artifact and transaction scripting engine (CODE.PAS,
 ARTIFACT.PAS, CDETYPES.PAS). Its directives are commented out of the scenario
@@ -1291,12 +1291,11 @@ def test_save_load_round_trip():
 - Compare tech advancement rates
 - Play-test scenarios to ensure game balance matches
 
-Note the ceiling on this: the original `.SCN` files are permanently
-unavailable (§3.5.0), so validation runs against authored scenarios. Balance
-is checked against the Pascal *formulas* — which are transcribed exactly and
-can be verified term by term — not by replaying the galaxies the original
-shipped. Generation itself is deliberately not bit-comparable (§3.5.4), so
-"same seed, same galaxy as DOS" is not a test that can exist.
+The original `.SCN` files were recovered (§3.5.0), and tests now exercise
+their contents as well as the adapted bundled versions. Balance is checked
+against the Pascal *formulas*, which can be verified term by term. Generation
+is not bit-comparable to a DOS run (§3.5.4), so "same seed, same galaxy as
+DOS" is not a validation test.
 
 **Milestone 9**: All tests pass, game validated against original.
 

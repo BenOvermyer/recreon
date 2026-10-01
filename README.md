@@ -55,7 +55,7 @@ Fourteen scenarios ship with the game, in `src/recreon/data/scenarios/`, and the
 
 **First Light: 4021** is the one to start with, and **The Kalgan Frontier** is the default `--no-ui` uses.
 
-Thirteen of these are the scenarios the original shipped, imported under new titles; the galaxies are byte-identical to the originals, and only the titles were changed. `src/recreon/data/scenarios/README.md` maps each one back to the file it came from, and documents the two that needed repairing to load at all. `The Kalgan Frontier` is new content rather than a port.
+Thirteen of these adapt scenarios shipped with the original game. Their titles and introductions were revised; **Corsairs of Meridian** and **Vhalsecc** also rename places and empires in the scenario data. **The Long Sleep** and **The Four Heirs** have small structural repairs that let them load. [The scenario provenance file](src/recreon/data/scenarios/README.md) maps each one to its source and records the changes. **The Kalgan Frontier** is new content.
 
 The unmodified originals are still in `original/scenarios/` under their own names, and can be played directly — two of them will not load, faithfully:
 
@@ -117,3 +117,11 @@ uvx ruff check src/ tests/       # lint
 ```
 
 `AGENTS.md` covers the porting conventions and the known original bugs that are reproduced deliberately; `docs/` carries the architecture and the implementation plan.
+
+## License and provenance
+
+[MIT terms](LICENSE.md) apply to original Re:creon work by Ben Overmyer.
+The original Pascal source and adapted scenarios contain material from
+Anacreon: Reconstruction 4021 and are outside that grant. See
+[docs/LICENSING.md](docs/LICENSING.md) for the scope, source provenance and
+the unresolved permission question for distributing the original material.

@@ -2,7 +2,7 @@
 
 > *Every scenario is an argument about history, written by someone
 > who expects to be contradicted.*
-> -- attributed to the authors of the original twelve, in jest
+> -- attributed to the authors of the original scenarios, in jest
 
 A galaxy is not generated; it is *authored*. Every game of Re:creon
 starts from a scenario file -- a plain-text list of worlds, owners,
@@ -13,14 +13,11 @@ because the original never had one.
 
 ## The fourteen you ship with
 
-Thirteen of them are the scenarios that came with Anacreon:
-Reconstruction 4021, imported byte-identical except for line 2 (the
-title), so they play exactly as they did in 2004. The fourteenth,
-*frontier.scn*, is new content written for this recreation.
+Thirteen adapt scenarios from Anacreon: Reconstruction 4021. Each has a new title and a revised introduction. *Corsairs of Meridian* and *Vhalsecc* also rename places and empires. *The Long Sleep* and *The Four Heirs* have small repairs so they can load. The repository's `src/recreon/data/scenarios/README.md` records the changes. The fourteenth, *frontier.scn*, is new content written for this recreation.
 
 | File | Title | Original name |
 | --- | --- | --- |
-| `frontier.scn` | Frontier | -- (authored for Re:creon) |
+| `frontier.scn` | The Kalgan Frontier | -- (authored for Re:creon) |
 | `firstlight.scn` | First Light: 4021 | Reconstruction: 4021 |
 | `twocrowns.scn` | Two Crowns | East vs. West |
 | `triad.scn` | Triad | Trinity |
@@ -46,17 +43,25 @@ galaxy of dust you cannot scout through.
 
 Every scenario opens with one or more pages of background text --
 read them; in several cases they contain hints that are otherwise
-only discoverable by losing something. That prose is the original
-authors', untouched.
+only discoverable by losing something. The bundled introductions
+were revised from the recovered originals.
 
 The same files also carry **per-object background**: seven of the
 shipped galaxies index prose blocks to specific worlds, starbases
 and stargates, so closing up on a named place (`z`) or conquering
 it can print the author's words for *that object* instead of a
-generic report. When you take a place that has a passage written
-about it, the conquest screen says so.
+generic report. Some references in the *Corsairs of Meridian* and
+*Vhalsecc* background passages were changed with their place names.
+When you take a place that has a passage written about it, the
+conquest screen says so.
 
-## Why two scenarios sometimes refuse to load
+## Scenario load failures
+
+The original *AWAKEN* and *PRINCES* files have defects that prevent
+them from loading. Their bundled counterparts, *The Long Sleep* and
+*The Four Heirs*, include the two repairs described in the scenario
+provenance file. A separate placement failure can still occur on an
+unlucky random roll:
 
 Each scenario places a mix of hand-authored and randomly-rolled
 worlds, and the random rolls ask for open sectors inside their
@@ -64,8 +69,8 @@ zone -- up to a hundred attempts, and then they give up rather than
 stack two worlds in one sector. The densest galaxies (*The Long
 Run*, *The Long Sleep*, packed at 200 worlds) will therefore refuse
 some rolls: roughly one in fifteen in the denser cases. This is the
-authors' own density and the original's own failure mode -- the DOS
-build quit on the same rolls. **Start a new game; it will place.**
+bundled scenario density and the original's placement limit -- the DOS build
+could fail on the same rolls. **Start a new game; it will place.**
 
 ## How a new game is assembled
 

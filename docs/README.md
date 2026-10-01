@@ -1,11 +1,14 @@
 # Re:creon Documentation
 
-Welcome to the Re:creon project documentation. This directory contains the complete design and implementation documentation for the Python recreation of Anacreon: Reconstruction 4021.
+Documentation for the Python recreation of Anacreon: Reconstruction 4021.
+For installation and play, start with the [project README](../README.md) and
+the [player's manual](manual/chapters/02-getting-started.md).
 
 ## Documentation Index
 
 ### [INITIAL_DESIGN.md](INITIAL_DESIGN.md)
-Project overview and high-level design decisions. Start here for a quick understanding of what Re:creon is and how it's structured.
+The project's original design proposal. It records early decisions and estimates,
+so use the README and architecture guide for current behavior.
 
 **Contents:**
 - Project overview
@@ -25,7 +28,8 @@ Detailed module breakdown and file mappings from Pascal source to Python impleme
 - Key functions and their purposes
 
 ### [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
-Phased implementation roadmap with clear milestones and deliverables.
+Historical implementation roadmap with completion notes. Phases 1–9 are complete;
+the early sketches and estimates remain for context.
 
 **Contents:**
 - 10 implementation phases (1-9, plus 3.5 for galaxy generation)
@@ -47,11 +51,10 @@ Pascal to Python translation patterns and common gotchas.
 
 ## Quick Start
 
-1. **Understand the project**: Read [INITIAL_DESIGN.md](INITIAL_DESIGN.md)
-2. **Review architecture**: Skim [ARCHITECTURE.md](ARCHITECTURE.md)
-3. **Check implementation plan**: Review [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
-4. **Start coding**: Follow Phase 1 in the implementation plan
-5. **Reference translation notes**: Keep [TRANSLATION_NOTES.md](TRANSLATION_NOTES.md) handy
+1. **Play the game**: Follow the [README](../README.md) and [player's manual](manual/chapters/02-getting-started.md).
+2. **Understand the port**: Read [ARCHITECTURE.md](ARCHITECTURE.md) and [TRANSLATION_NOTES.md](TRANSLATION_NOTES.md).
+3. **Understand its history**: Consult [INITIAL_DESIGN.md](INITIAL_DESIGN.md) and [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
+4. **Check reuse terms**: Read [LICENSING.md](LICENSING.md) before distributing the project or its original-game material.
 
 ## Original Pascal Source
 
@@ -67,20 +70,18 @@ The original Pascal source code is available in the `original/` directory. Key f
 
 ## Development Status
 
-**Current Phase**: Phases 1-3.5 complete. On top of the Phase 1-2 foundation,
-the world economy is ported (`update.py`, `design.py`, `resource.py`,
-`news.py`, `intrface.py`) along with scenario loading (`newgame.py`,
-`utils/dfa.py`). A scenario file yields a populated galaxy whose worlds
-produce resources, grow and starve, advance and regress in tech, and rebel.
+**Phases 1–9 are complete.** The port runs from the prologue through the
+turn loop, including the economy, fleets, combat, AI, menus and save/load.
+The remaining work is play-testing, improvement of known original bugs and
+release preparation; see [AGENTS.md](../AGENTS.md) for the port's fidelity
+conventions and deliberate bug reproductions.
 
-**Next Steps**: Begin Phase 4 - Fleet management.
-
-Galaxy generation is done: `newgame.py` interprets `.scn` scenario files, and
-`src/recreon/data/scenarios/frontier.scn` is an authored starter scenario.
-The original `*.SCN` files are permanently unavailable, so authored scenarios
-are new content and reproduce no galaxy the original shipped. Generation uses
-Python's RNG: seeds are reproducible within this port but do not match the
-DOS build. See Phase 3.5.
+Fourteen scenarios are bundled: thirteen adapted from the recovered files in
+`original/scenarios/` and one new scenario, `frontier.scn`. The adapted
+files have revised titles and introductions; two also have structural repairs. The
+[scenario provenance](../src/recreon/data/scenarios/README.md) records each
+source and change. Galaxy randomness uses the ported Pascal generator, not
+Python's default RNG.
 
 ## Contributing
 
@@ -93,4 +94,5 @@ When implementing features:
 
 ## License
 
-See the main README.md for license information.
+See [LICENSING.md](LICENSING.md) for the MIT grant covering original Re:creon
+work and the separate status of the original-game material.

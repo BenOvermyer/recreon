@@ -2,20 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="pandoc 3.10.2" />
+  <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <meta name="author" content="The Re:creon project" />
-  <meta name="dcterms.date" content="2026-09-11" />
+  <meta name="dcterms.date" content="2026-10-01" />
   <title>Re:creon Player&#39;s Manual</title>
   <style>
-
+code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: 1.5em;}
-div.column{flex: auto;}
-@media screen {
-div.columns{gap: min(4vw, 1.5em);}
-div.column{overflow-x: auto;}
-}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 
 ul.task-list[class]{list-style: none;}
@@ -289,7 +285,7 @@ nav#TOC { break-after: page; }
 <h1 class="title">Re:creon Player&#39;s Manual</h1>
 <p class="subtitle">Anacreon: Reconstruction 4021</p>
 <p class="author">The Re:creon project</p>
-<p class="date">2026-09-11</p>
+<p class="date">2026-10-01</p>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
@@ -391,8 +387,7 @@ keys</a></li>
 <li><a href="#the-fourteen-you-ship-with" id="toc-the-fourteen-you-ship-with">The fourteen you ship with</a></li>
 <li><a href="#what-the-introductions-are-and-where-the-prose-comes-from" id="toc-what-the-introductions-are-and-where-the-prose-comes-from">What
 the introductions are, and where the prose comes from</a></li>
-<li><a href="#why-two-scenarios-sometimes-refuse-to-load" id="toc-why-two-scenarios-sometimes-refuse-to-load">Why two scenarios
-sometimes refuse to load</a></li>
+<li><a href="#scenario-load-failures" id="toc-scenario-load-failures">Scenario load failures</a></li>
 <li><a href="#how-a-new-game-is-assembled" id="toc-how-a-new-game-is-assembled">How a new game is
 assembled</a></li>
 <li><a href="#writing-your-own" id="toc-writing-your-own">Writing your
@@ -1627,7 +1622,7 @@ their counterpart fleets from the same sector.</p>
 <blockquote>
 <p><em>Every scenario is an argument about history, written by someone
 who expects to be contradicted.</em> – attributed to the authors of the
-original twelve, in jest</p>
+original scenarios, in jest</p>
 </blockquote>
 <p>A galaxy is not generated; it is <em>authored</em>. Every game of
 Re:creon starts from a scenario file – a plain-text list of worlds,
@@ -1636,10 +1631,13 @@ forward pass that asks you for the player count and your empire’s name
 <em>while</em> it reads. There is no procedural “random map” button,
 because the original never had one.</p>
 <h2 id="the-fourteen-you-ship-with">The fourteen you ship with</h2>
-<p>Thirteen of them are the scenarios that came with Anacreon:
-Reconstruction 4021, imported byte-identical except for line 2 (the
-title), so they play exactly as they did in 2004. The fourteenth,
-<em>frontier.scn</em>, is new content written for this recreation.</p>
+<p>Thirteen adapt scenarios from Anacreon: Reconstruction 4021. Each has
+a new title and a revised introduction. <em>Corsairs of Meridian</em>
+and <em>Vhalsecc</em> also rename places and empires. <em>The Long
+Sleep</em> and <em>The Four Heirs</em> have small repairs so they can
+load. The repository’s <code>src/recreon/data/scenarios/README.md</code>
+records the changes. The fourteenth, <em>frontier.scn</em>, is new
+content written for this recreation.</p>
 <table>
 <thead>
 <tr>
@@ -1651,7 +1649,7 @@ title), so they play exactly as they did in 2004. The fourteenth,
 <tbody>
 <tr>
 <td><code>frontier.scn</code></td>
-<td>Frontier</td>
+<td>The Kalgan Frontier</td>
 <td>– (authored for Re:creon)</td>
 </tr>
 <tr>
@@ -1731,24 +1729,30 @@ authored around a galaxy of dust you cannot scout through.</p>
 the introductions are, and where the prose comes from</h2>
 <p>Every scenario opens with one or more pages of background text – read
 them; in several cases they contain hints that are otherwise only
-discoverable by losing something. That prose is the original authors’,
-untouched.</p>
+discoverable by losing something. The bundled introductions were revised
+from the recovered originals.</p>
 <p>The same files also carry <strong>per-object background</strong>:
 seven of the shipped galaxies index prose blocks to specific worlds,
 starbases and stargates, so closing up on a named place (<code>z</code>)
 or conquering it can print the author’s words for <em>that object</em>
-instead of a generic report. When you take a place that has a passage
-written about it, the conquest screen says so.</p>
-<h2 id="why-two-scenarios-sometimes-refuse-to-load">Why two scenarios
-sometimes refuse to load</h2>
+instead of a generic report. Some references in the <em>Corsairs of
+Meridian</em> and <em>Vhalsecc</em> background passages were changed
+with their place names. When you take a place that has a passage written
+about it, the conquest screen says so.</p>
+<h2 id="scenario-load-failures">Scenario load failures</h2>
+<p>The original <em>AWAKEN</em> and <em>PRINCES</em> files have defects
+that prevent them from loading. Their bundled counterparts, <em>The Long
+Sleep</em> and <em>The Four Heirs</em>, include the two repairs
+described in the scenario provenance file. A separate placement failure
+can still occur on an unlucky random roll:</p>
 <p>Each scenario places a mix of hand-authored and randomly-rolled
 worlds, and the random rolls ask for open sectors inside their zone – up
 to a hundred attempts, and then they give up rather than stack two
 worlds in one sector. The densest galaxies (<em>The Long Run</em>,
 <em>The Long Sleep</em>, packed at 200 worlds) will therefore refuse
 some rolls: roughly one in fifteen in the denser cases. This is the
-authors’ own density and the original’s own failure mode – the DOS build
-quit on the same rolls. <strong>Start a new game; it will
+bundled scenario density and the original’s placement limit – the DOS
+build could fail on the same rolls. <strong>Start a new game; it will
 place.</strong></p>
 <h2 id="how-a-new-game-is-assembled">How a new game is assembled</h2>
 <ol type="1">

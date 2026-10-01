@@ -3,11 +3,12 @@
 The scenarios the game ships with, and what each one came from.
 
 `frontier.scn` is new content authored against the file format — it reproduces
-no galaxy the original shipped. The other thirteen are the scenarios that came
-with Anacreon: Reconstruction 4021, imported from `original/scenarios/` under
-new titles and filenames. **Only line 2, the title, differs** — every zone,
-world, empire, nebula and block of prose is byte-identical to the original, so
-these play exactly as they did in 2004.
+no galaxy the original shipped. The other thirteen adapt the scenarios from
+`original/scenarios/` under new titles and filenames. A direct line comparison
+shows that all thirteen also revise their introductions. `corsairs.scn` and
+`vhalsecc.scn` carry internal name changes, including some background text;
+`longsleep.scn` and `fourheirs.scn` carry structural repairs. They are not
+byte-identical copies or guaranteed to produce identical playthroughs.
 
 | Bundled | Title | From | Original title |
 | --- | --- | --- | --- |
@@ -25,14 +26,21 @@ these play exactly as they did in 2004.
 | `veil.scn` | The Veil | `Nebula.SCN` | The Nebula |
 | `vhalsecc.scn` | Vhalsecc | `ARRONAX.SCN` | Arronax |
 
-The prose inside these files is untouched, so the introductions and background
-text still use the authors' own place names. Only the titles were changed.
+## Text and name changes
+
+The introductions in every imported file were revised. Most per-object
+background passages remain from the original files, but `corsairs.scn` and
+`vhalsecc.scn` also replace references to Jakarta and Arronax with Meridian
+and Vhalsecc. Their scenario definitions use the renamed places and empires
+consistently. The character art in `corsairs.scn` also changed during the
+import. Compare the bundled files with `original/scenarios/` when tracing a
+passage or scenario rule back to its source.
 
 ## The two that were repaired
 
-Two of the thirteen could not load, in the DOS build as much as here, and the
-imported copies carry the smallest change that makes them playable. These are
-the only edits anywhere in the set beyond line 2:
+Two of the thirteen could not load, in the DOS build as much as here. These
+are the two changes to scenario structure that make their bundled versions
+playable:
 
 - **`longsleep.scn`** (AWAKEN) asked for 212 worlds — 36 explicit plus 176
   random — against `MaxNoOfPlanets = 200`. The original has no bounds check

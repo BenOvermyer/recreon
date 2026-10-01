@@ -4,10 +4,10 @@ ANACREON 16 SCENARIO
 ; ---------------------------------------------------------------------------
 ; NEW CONTENT -- NOT A PORT.
 ;
-; The scenario files that shipped with Anacreon: Reconstruction 4021 are not
-; available. This one is newly authored against the file format recovered
-; from the NEWGAME.PAS parser, and does not reproduce any galaxy the original
-; shipped. See docs/IMPLEMENTATION_PLAN.md section 3.5.
+; The original scenario files were recovered and live in original/scenarios/.
+; This one was authored against the format in NEWGAME.PAS before that recovery;
+; it does not reproduce any galaxy the original shipped. See
+; docs/IMPLEMENTATION_PLAN.md section 3.5.
 ;
 ; Header fields, in order:
 ;   seed  minPlayers  maxPlayers  galaxySize  maxPlanets  difficulty
