@@ -1380,12 +1380,12 @@ def _get_chance_for_new_tech(
     university**, which is how conquering somebody more advanced accelerates
     your own research.
 
-    **Original bug #87**: the total accumulates into an `Index` (0..100),
-    which Turbo Pascal stores in a byte. Twenty labs at 17 each reach 340, so
-    the sum can pass 100 -- making research certain -- and then wrap at 256,
-    making a large research empire *worse* at research than a small one. The
-    wrap is modelled because a Python int would give a different bug rather
-    than no bug.
+    The total is not bounded by 100. Twenty labs at 17 each reach 340, and the
+    caller's ``Rnd(1,100) <= Chance`` comparison treats any total at or above
+    100 as a certainty. Original bug #87 accumulated the sum into an ``Index``
+    (0..100) stored in a byte, so the total wrapped at 256 and a large research
+    empire grew *worse* at research; the accumulator is now an unbounded
+    integer and the certainty stands, which is what the sum describes.
     """
     labs: list[_Lab] = []
 
@@ -1425,7 +1425,7 @@ def _get_chance_for_new_tech(
         elif typ == WorldTypes.RsrTyp and tch == emp_tech:
             labs.append(_Lab(obj, trunc(TECH_INC_UNV * eff / 100)))
 
-    total_chance = sum(lab.Chance for lab in labs) % 256  # #87
+    total_chance = sum(lab.Chance for lab in labs)
 
     # Draw the lab in proportion to its contribution. `Rnd(1, 0)` returns 1
     # when there are no labs at all, and the walk below then finds none, so

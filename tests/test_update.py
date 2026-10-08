@@ -802,8 +802,7 @@ def test_an_empire_at_the_top_stops_researching():
 
 
 def test_more_labs_mean_a_better_chance():
-    """The chances sum, which is the whole mechanic -- and what makes #87's
-    overflow reachable."""
+    """The chances sum, which is the whole mechanic -- and what #87 broke."""
     from recreon.update import _get_chance_for_new_tech
 
     set_rand_seed(4021)
@@ -818,10 +817,12 @@ def test_more_labs_mean_a_better_chance():
     assert chance_many > chance_one
 
 
-def test_the_research_chance_wraps_past_a_byte():
-    """Original bug #87. `TotalChance` is an `Index` (0..100) in a byte, and
-    twenty labs at 17 each reach 340 -- so a big enough research empire wraps
-    and gets *worse* at research. Do not "fix" by widening the accumulator."""
+def test_a_large_research_empire_keeps_its_full_chance():
+    """Original bug #87. `TotalChance` used to be an `Index` (0..100) in a
+    byte, so twenty labs at 17 each wrapped at 256 and a big enough research
+    empire got *worse* at research. The accumulator is now unbounded, so the
+    sum over every lab is reported and the caller's `Rnd(1,100)` roll makes
+    anything at or above 100 a certainty."""
     from recreon.update import MAX_NO_OF_LABS, _get_chance_for_new_tech
 
     set_rand_seed(4021)
@@ -844,9 +845,9 @@ def test_the_research_chance_wraps_past_a_byte():
 
     chance, _ = _get_chance_for_new_tech(game, Empire.Empire1, TechLevel.WrpTchLvl)
 
-    # 12 (capital) + 19 x 17 = 335, which wraps to 79 rather than saturating.
-    assert chance < 100, "an unbounded sum would be far above 100"
-    assert chance == 335 % 256
+    # 12 (capital) + 19 x 17 = 335, not wrapped down to 79.
+    assert chance == 335
+    assert chance > 100
 
 
 def test_update_universe_researches_and_clears_read_messages():
